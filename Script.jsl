@@ -1,0 +1,160 @@
+/*scene = Scene Box( 400, 400 );
+New Window( "Example 1", scene );
+scene << Perspective( 45, 3, 7 );
+scene << Translate( 0.0, 0.0, -4.5 );
+scene << Rotate(70, 0, 0, 1);
+scene << color( 1, 0, 0 );
+scene << Text( center, baseline, 0.4, "hello world." );
+scene << update;
+
+
+
+scene = Scene Box( 600, 600 );
+New Window( "Example 11", scene );
+For( i + 1, i < 360, i++,
+	scene << clear;
+	scene << Perspective( 45, 1, 10 );
+	scene << translate( 0.0, 0.0, -5 );
+	scene << rotate( i, 1, 0, 0 );
+	scene << rotate( i * 3, 0, 1, 0 );
+	scene << rotate( i * 3 / 2, 0, 0, 1 );
+	scene << color( 0, 1, 0 );
+	scene << Cylinder( 0.5, 0.5, 0.5, 40, 10 );
+	scene << Color( 0, 0, 0 );
+	scene << sphere( 0.01, 10, 5 );
+	scene << update;
+	Wait( 0.01 );
+);*/
+
+
+
+/*
+shape = Scene Display List();
+shape << Color(0.6, 0.3, 0.75);
+shape << Begin(polygon);
+shape << vertex( 0, 0, 1);
+shape << vertex( 0, 3, 0);
+shape << vertex( 3, 3, 0);
+shape << vertex( 5, 2, 1);
+shape << vertex( 4, 0, 0);
+shape << vertex( 2, -1, 0);
+shape << end();
+
+scene = scene box(400, 400);
+New Window("primative", scene);
+scene << Perspective(90, 3, 7);
+scene << Translate(0.0, 0.0, -5);
+scene << Point Size(20);
+//scene << Call List(shape);
+scene << ArcBall(shape, 2);
+scene << Show ArcBall(Always);
+scene << Update;*/
+
+
+
+/*scene = Scene Box(400, 400);
+New Window ("Stipples", scene);
+scene << Ortho(-2, 2, -2, 2, -1, 1);
+scene << color(0, 0, 0);
+scene << enable(Line_Stipple);
+scene << Line Width(2);
+scene << Line Stipple(1, 255);
+
+scene << Begin(LINES);
+scene << Vertex(-2, -1, 0);
+scene << vertex(2, -1, 0);
+scene << end();
+
+scene << LineWidth(4);
+scene << Line Stipple(3, 32767);
+
+scene << begin(lines);
+scene << vertex(-2, 0, 0);
+scene << vertex(2, 0, 0);
+scene << end();
+
+scene << LineWidth(6);
+scene << Line Stipple(3, 51);
+
+scene << begin(lines);
+scene << vertex(-2, 1, 0);
+scene << vertex(2, 1, 0);
+scnee << end();
+scene << update;*/
+
+
+
+
+/*shape = Scene Display List();
+shape << begin(Triangles);
+shape << vertex(0, 0, 0);
+shape << vertex(-1, 2, 0);
+shape << vertex(1, 2, 0);
+shape << end();
+
+scene = scene box(400, 400);
+new Window("Fill Modes", scene);
+scene << ortho(-2, 2, -2, 2, -10, 10);
+scene << Color (1, 0, 0);
+scene << Call List(shape);
+scene << update;
+
+scene << Rotate(90, 0, 0, 1);
+scene << translate(-0.5, 0, 0);
+scene << Color(0, 0.5, 0.5);
+scene << polygon Mode(Front_and_back, line);
+scene << LineWidth(6);
+scene << ArcBall(shape,1);
+scene << Update;
+
+scene << rotate(90, 0, 0, 1);
+scene << translate(-0.5, -1, 0);
+scene << color(0, 0, 0);
+scene << pointsize(9);
+scene << polygon Mode(Front_and_back, point);
+scene << arcball(shape, 1);
+scene << update;*/
+
+
+
+/*toy = Scene Display List( 1 );
+toy << PushMatrix;
+toy << translate( 0, 0, .1 );
+toy << color( 1, 0, 0 );
+toy << cylinder( 1, 0.2, .2, 25, 5 );
+toy << pop Matrix;
+
+toy << push Matrix;
+toy << translate( 0, 0, -0.1 );
+toy << rotate( 180, 1, 0, 0 );
+toy << color( 0, 1, 0 );
+toy << cylinder( 1, 0.2, 0.2, 25, 5 );
+toy << pop matrix;
+
+toy << color( 0, 0, 1 );
+toy << sphere( 0.5, 30, 30 );
+
+toy << color( 1, 1, 0 );
+toy << partial disk( 1, 1.2, 25, 2, 0, 270 );
+
+toy << push matrix;
+toy << translate( 0, 0, -0.1 );
+toy << color( 1, 0, 1 );
+toy << cylinder( 1, 1, 0.2, 25, 3 );
+toy << pop matrix;
+
+toy << push matrix;
+toy << rotate( 90, 1, 0, 0 );
+toy << translate( 0, 0.5, 0 );
+toy << color( 0, 1, 1 );
+toy << Text( "center", "baseline", 0.2, "toy top" );
+toy << pop matrix;
+
+scene = Scene Box( 600, 600 );
+New Window( "example 3", scene );
+scene << perspective( 45, 3, 7 );
+scene << translate( 0.0, 0.0, -4.5 );
+scene << rotate( -85, 1, 0, 0 );
+scene << rotate( 65, 0, 0, 1 );
+scene << arcball( toy, 2 );
+scene << update;*/

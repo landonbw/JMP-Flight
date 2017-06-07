@@ -1,0 +1,146 @@
+nose = SceneDisplayList(1);
+nose<<Begin(POLYGON);
+nose<<Vertex(0,-1, 10);
+nose<<Vertex(2, 0,  4);
+nose<<Vertex(-2, 0,  4);
+nose<<End();
+
+tail = SceneDisplayList(1);
+tail<<Begin(POLYGON);
+tail<<Vertex( 1, 0, -3);
+tail<<Vertex ( 3, 0, -4);
+tail<<Vertex ( 3, 0, -5);  
+tail<<Vertex (-3, 0, -5);
+tail<<Vertex (-3, 0, -4);
+tail<<Vertex (-1, 0, -3);
+tail<<End();
+
+body1 = SceneDisplayList(1);
+body1<<Begin(POLYGON);
+body1<<Vertex ( 2, 0,  4);
+body1<<Vertex ( 2, 0, -.5);
+body1<<Vertex ( 2, 0, -1);
+body1<<Vertex ( 1, 0, -1);
+body1<<Vertex (-1, 0, -1);
+body1<<Vertex (-2, 0, -1);
+body1<<Vertex (-2, 0, -.5);
+body1<<Vertex (-2, 0,  4);
+body1<<End();
+
+body2 = SceneDisplayList(1);
+body2<<Begin(POLYGON);
+body2<<Vertex ( 1, 0, -1);
+body2<<Vertex ( 1, 0, -3);
+body2<<Vertex (-1, 0, -3);
+body2<<Vertex (-1, 0, -1);
+body2<<End();
+
+leftwingtip= SceneDisplayList(1);
+leftwingtip<<Begin(POLYGON);
+leftwingtip<<Vertex  ( 8, 0,  1);
+leftwingtip<<Vertex ( 8, 0, -1);
+leftwingtip<<Vertex  ( 5, 0, -1);
+leftwingtip<<Vertex  ( 5, 0, -.5);
+leftwingtip<<End();
+
+rightwingtip= SceneDisplayList(1);
+rightwingtip<<Begin(POLYGON);
+rightwingtip<<Vertex  (-5, 0, -.5);
+rightwingtip<<Vertex (-5, 0, -1);
+rightwingtip<<Vertex  (-8, 0, -1);
+rightwingtip<<Vertex  (-8, 0,  1);
+rightwingtip<<End();
+
+leftwing = Scene Display List( 1 );
+leftwing << Begin( POLYGON );
+leftwing << Vertex( 2, 0, 4 );
+leftwing << Vertex( 8, 0, 1 );
+leftwing << Vertex( 5, 0, -.5 );
+leftwing << Vertex( 2, 0, -.5 );
+leftwing << End();
+
+rightwing = Scene Display List( 1 );
+rightwing << Begin( POLYGON );
+rightwing << Vertex(-2, 0,  4);
+rightwing << Vertex (-2, 0, -.5);
+rightwing << Vertex (-5, 0, -.5);
+rightwing << Vertex (-8, 0,  1);
+rightwing << End();
+
+leftflap = Scene Display List( 1 );
+//leftflap << translate(2, 0, -.5);
+//leftflap << Rotate(30,1,0,0);
+leftflap << Begin( POLYGON );
+leftflap << Vertex ( 3, 0,  0);
+leftflap << Vertex  ( 0, 0,  0);
+leftflap << Vertex  ( 0, 0, -1);
+leftflap << Vertex  ( 3, 0, -1);
+leftflap << End();
+
+rightflap = Scene Display List( 1 );
+//rightflap << translate(-2, 0, -.5);
+//rightflap << Rotate(30,1,0,0);
+rightflap << Begin( POLYGON );
+rightflap << Vertex  (-3, 0,  0);
+rightflap << Vertex  ( 0, 0,  0);
+rightflap << Vertex   ( 0, 0, -1);
+rightflap << Vertex  (-3, 0, -1);
+rightflap << End();
+
+tailwing = Scene Display List( 1 );
+tailwing << translate( 0, 0, -4.5 );
+tailwing << Begin( POLYGON );
+tailwing << vertex( 0, 0, 0 );
+tailwing << vertex( 0, 1, 1.5 );
+tailwing << vertex( 0, 0, 3 );
+tailwing << End();
+tailwing << Begin( POLYGON );
+tailwing << vertex( 0, 0, 0 );
+tailwing << vertex( 0, 2.5, 0 );
+tailwing << vertex( 0, 3, .5 );
+tailwing << vertex( 0, 1, 1.5 );
+tailwing << End();
+tailwing << Begin( POLYGON );
+tailwing << vertex( 0, 2.5, 0 );
+tailwing << vertex( 0, 2.5, -.5 );
+tailwing << vertex( 0, 3, -.5 );
+tailwing << vertex( 0, 3, .5 );
+tailwing << End();
+
+rudder = Scene Display List( 1 );
+//rudder << translate (0, 0, -4.5);
+//rudder << Rotate( 30, 0, 1, 0 );
+rudder << Begin( POLYGON );
+rudder << vertex( 0, 0, 0 );
+rudder << vertex( 0, 2.5, 0 );
+rudder << vertex( 0, 2.5, -1 );
+rudder << vertex( 0, 0, -1 );
+rudder << End();
+
+
+cockpit = Scene Display List( 1 );
+cockpit << Begin( POLYGON );
+  cockpit << vertex ( 0, -1, 10);
+  cockpit << vertex (-2,  0,  4);
+  cockpit << vertex ( 0,  1.5,5);
+cockpit << End();
+cockpit << Begin( POLYGON );
+  cockpit << vertex ( 0, -1, 10);
+  cockpit << vertex ( 0,  1.5, 5);
+  cockpit << vertex ( 2,  0,   4);
+cockpit << End();
+cockpit << Begin( POLYGON );
+  cockpit << vertex ( 0,  1.5, 5);
+  cockpit << vertex ( 2,  0,   4);
+  cockpit << vertex ( 1,  0,  -1);
+cockpit << End();
+cockpit << Begin( POLYGON );
+  cockpit << vertex (-2,  0,   4);
+  cockpit << vertex ( 0,  1.5, 5);
+  cockpit << vertex (-1,  0,  -1);
+cockpit << End();
+cockpit << Begin( POLYGON );
+  cockpit << vertex ( 0,  1.5, 5);
+  cockpit << vertex (-1,  0,  -1);
+  cockpit << vertex ( 1,  0,  -1);
+cockpit << End();
