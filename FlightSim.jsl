@@ -410,6 +410,7 @@ cz_q = function({alpha},
 
 cz_del_e = function({alpha},
 	ret_czdel = -CdDeltae * sin(alpha) - ClDeltae * cos(alpha);
+	return(ret_czdel);
 );
 
 
