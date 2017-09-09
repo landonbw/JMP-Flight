@@ -81,7 +81,7 @@ getForces_func = function({state},
                 //   calculate the derivative of the equations of motion
 ///////////////////////////////////////////////////////////////////////////////////////////
 derivatives = function({state, inputs},
-	show("calculating derivatives");
+	//show("calculating derivatives");
 	pn = state[1];
 	pe = state[2];
 	pd = state[3];

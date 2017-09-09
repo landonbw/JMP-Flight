@@ -18,7 +18,20 @@ p = 0;
 q = 0;
 r = 0;
 
-state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r});
+Pn0 = 0.0;
+Pe0 = 0.0;
+Pd0 = -20.0;
+u0 = 3.49997970e+01;
+v0 = -2.76273829e-05;
+w0 = 1.19203683e-01;
+phi0 = -1.52263833e-06;
+theta0 =  3.40582609e-03;
+psi0 = 0.0;
+p0 = 0;
+q0 = 0;
+r0 = 0;
+
+//state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r});
 
 fx = 0.0;
 fy = 0.0;
@@ -100,7 +113,7 @@ CnDeltar = -0.032;
 ///////////////////////////////////////////////////////////////////////////////////////////
                 //	Calculation Values
 ///////////////////////////////////////////////////////////////////////////////////////////
-ts_simulation = 0.010;
+ts_simulation = 0.10;
 num_steps = 10;
 //   gamma parameters pulled from page 36 (dynamics)
 gamma = jx * jz - (jxz^2);
@@ -126,3 +139,75 @@ CrP         = gamma4 * ClP      + gamma8 * CnP;
 CrR         = gamma4 * Clr      + gamma8 * Cnr;
 CrDeltaA    = gamma4 * ClDeltaa + gamma8 * CnDeltaa;
 CrDeltaR    = gamma4 * ClDeltar + gamma8 * CnDeltar;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //	Control Values
+///////////////////////////////////////////////////////////////////////////////////////////
+
+// ts_control = 0.1
+ts_control = ts_simulation * 2.0;
+sigma = 0.05; // low pass filter gain for derivative
+
+// Initial path following values
+Va0 = sqrt(u0^2 + v0^2 + w0^2); //m/s
+altitude0 = -Pd0;
+heading0 = psi0;
+beta0 = 0.0;
+path_angle0 = 0.0;
+
+//////////// Lateral transfer function vales
+// Roll control values
+e_phi_max = 40 * 3.14159/180;
+delta_a_max = 50 * 3.14159/180;
+a_phi1 = -0.5 * rho * Va0^2 * S * b * CpP * b / (2 * Va0);
+a_phi2 = 0.5 * rho * Va0^2 * S * b * CpDeltaA;
+zeta_phi = 0.707;
+omega_n_phi = sqrt(abs(a_phi2) * (delta_a_max / e_phi_max));
+kp_roll = delta_a_max / (e_phi_max) * 0.37;
+kd_roll = (2. * zeta_phi * omega_n_phi - a_phi1) / a_phi2 * 4.0;
+
+// Course control values
+phi_max = 30 * 3.14159/180;
+course_bandwidth_separation = 36.0;
+omega_n_chi = omega_n_phi / course_bandwidth_separation;
+zeta_chi = 3.0;
+//kp_chi = 2.0 * zeta_chi * omega_n_chi * Va0 / g * 5.55;
+kp_chi = kp_roll;
+show(kp_chi);
+kd_chi = 0.0;
+ki_chi = omega_n_chi^2 * Va0 / g * 0.01;
+
+// Sideslip control values
+delta_r_max = 30 * 3.14159/180;
+e_beta_max = 60 * 3.14159/180;
+zeta_beta = 3.0;
+a_beta1 = -rho * Va0 * S * CyBeta / (2.0 * mass);
+a_beta2 = rho * Va0 * S * CyDeltar / (2.0 * mass);
+kp_beta = delta_r_max / e_beta_max / 5;
+ki_beta = (1 / a_beta2) * ((a_beta1 + a_beta2 * kp_beta) / (2.0 * zeta_beta))^2 * 5;
+
+////////// Longitudinal transfer function values
+h_error_max = 10.0;
+// energy balance control values
+theta_max = 15* 3.14159/180;
+kp_bal = 0.00011;
+ki_bal = 0.00003;
+
+// Pitch control values
+delta_e_max = 30 * 3.14159/180;
+e_theta_max = 30 * 3.14159/180;
+
+a_theta1 = -rho * Va0^2 * c^2 * S * Cmq / (4.0 * jy * Va0);
+a_theta2 = -rho * Va0^2 * c * S * CmAlpha / (2.0 * jy);
+a_theta3 = rho * Va0^2 * c * S * CmDeltae / (2.0 * jy);
+
+// kp_theta = delta_e_max / e_theta_max * 0.80
+kp_theta = delta_e_max / e_theta_max * 0.6;
+omega_n_theta = sqrt(a_theta2 + (delta_e_max / e_theta_max) * abs(a_theta3));
+zeta_theta = 5.0;
+kd_theta = (2 * zeta_theta * omega_n_theta - a_theta1) / a_theta3 / 19.0;
+
+// Throttle control values
+delta_t_max = 1.0;
+kp_throttle = 0.0004;
+ki_throttle = 0.001;

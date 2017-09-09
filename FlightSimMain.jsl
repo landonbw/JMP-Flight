@@ -1,5 +1,11 @@
-﻿Include( "Parameters.jsl" );
+﻿clear globals();
+clear log();
+
+Include( "Parameters.jsl" );
 Include( "TableManager.jsl" );
+Include( "Simulator.jsl" );
+Include( "Controller.jsl" );
+Include( "LateralController.jsl" );
 //make table to record the state through time
 data_table = createTable_func();
 
@@ -11,19 +17,23 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 1001, ii++, 
+For( ii = 1, ii < 1500, ii++, 
 	//path manager for path
 	
 	//path follower for desired flight state
 	
 	//autopilot for control inputs
-	
+	//flight_state - va, alpha, beta, pathangle, heading
+	va = sqrt(state[4]^2 + state[5]^2 + state[6]^2);
+	alpha = ArcTan(state[6]/state[4]);
+	beta = ArcSine(state[5]/va);
+	flight_state = matrix({va, alpha, beta, 0, state[9]});
+	deltaA = lateralControl(state, 0.0, flight_state);
 	//simulator for plane response
-	Include( "Simulator.jsl" );
-	forces = getForces_func(state);
-	//Show( forces );
-	state = updateState_func(state, forces);
-	//Show( state );
+	forces = getForces_func( state );
+
+	state = updateState_func( state, forces );
+
 	time += ts_simulation;
 	Show( time );
 	updateTable_func( data_table, state );
@@ -31,5 +41,5 @@ For( ii = 1, ii < 1001, ii++,
 		:v_col=v, :w_col=w, :phi_col=phi, :theta_col=theta, :psi_col=psi, :p_col=p,
 		:q_col=q, :r_col=r});*/
 	//draw the plane in the gui
-	Wait( 0.001 );
+	Wait( 0.00001 );
 );
