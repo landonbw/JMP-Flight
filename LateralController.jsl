@@ -2,6 +2,7 @@ course_integrator = 0.0;
 course_e_d1 = 0.0;
 chi_dot = 0.0;
 chi_d1 = 0.0;
+ts_control = 0.001;
 
 
 
@@ -13,7 +14,7 @@ saturate_val = function({value, max_value},
 		saturated_value = (value / Abs(value)) * max_value,
 		//else
 		saturated_value = value);
-	return(saturated_value);
+saturated_value;
 );
 
 
@@ -21,13 +22,13 @@ saturate_val = function({value, max_value},
                 //	Lateral Control
 ///////////////////////////////////////////////////////////////////////////////////////////
 lateral_control = function({state, commanded_course, flight_state, phi_ff=0.0},
-	vg_fs = flight_state.item(0);
-	beta_fs = flight_state.item(2);
-	heading_fs = flight_state.item(4);
+	vg_fs = flight_state[1];
+	beta_fs = flight_state[3];
+	heading_fs = flight_state[5];
 	
 	phi_c = course_control_loop(heading_fs, commanded_course, phi_ff);
 	delta_a = roll_control_loop(state, phi_c);
-	//delta_r = 
+	ret = delta_a
 );
 
 
@@ -45,6 +46,7 @@ roll_control_loop = function({state, phi_c},
 	delta_a_unsaturated = delta_a_prime - kd_roll * p;
 	delta_a = saturate_val(delta_a_unsaturated, delta_a_max);
 	return(delta_a);
+	delta_a;
 );
 
 
@@ -53,8 +55,9 @@ roll_control_loop = function({state, phi_c},
 ///////////////////////////////////////////////////////////////////////////////////////////
 course_control_loop = function({chi, chi_c, phi_ff=0},
 	phi_c_max = 1;
-	a = (2.0 * sigma - ts_control) / (2.0 * sigma + ts_control)
-	a2 = 2.0 / (2.0 * sigma + ts_control)
+	sigma = 0.003;
+	a = (2.0 * sigma - ts_control) / (2.0 * sigma + ts_control);
+	a2 = 2.0 / (2.0 * sigma + ts_control);
 	chi_error = chi_c - chi;
 	kp_phi = 1;
 	kd_chi = 1;
@@ -70,9 +73,10 @@ course_control_loop = function({chi, chi_c, phi_ff=0},
 	chi_d1 = chi;
 	phi_c = saturate(phi_c_unsat);
 	show(course_integrator);
-	course_integrator = course_integrator + (ts_control / ki_chi) * (phi_c - phi_c_unsat)
-	return(phi_c)
+	course_integrator = course_integrator + (ts_control / ki_chi) * (phi_c - phi_c_unsat);
+	return(phi_c);
 	show(ts_simulation);
+	phi_c;
 );
 
 
@@ -80,7 +84,7 @@ course_control_loop = function({chi, chi_c, phi_ff=0},
                 //	Sideslip Control Loop
 ///////////////////////////////////////////////////////////////////////////////////////////
 sideslip_integrator = 0.0;
-sideslip_error_d1;
+sideslip_error_d1 = 0.0;
 sideslip_kp = 1;
 sideslip_ki = 1;
 delta_r_max = 0.5;
@@ -99,6 +103,7 @@ sideslip_control_loop = function({beta},
 	
 	sideslip_integrator = sideslip_integrator + (ts_control / sideslip_ki) * (delta_r - delta_r_unsat);
 	return(delta_r);
+	delta_r;
 );
 
 
@@ -110,20 +115,11 @@ unit_circle_compliment = function({angle},
 	ucc_sign = angle / Abs(angle);
 	compliment_angle = ucc_sign * (Abs(angle) - 2.0 * 3.14159265359);
 	return(compliment_angle);
+	compliment_angle;
 );
 
 ///////////////////////////////////////////////////////////////////////////////////////////
                 //	testing things
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-show(saturate_val(1,3));
-show(saturate_val(41,3));
-show(saturate_val(-11,3));
-show(saturate_val(-2.99,3));
-show(unit_circle_compliment(0.1));
-course_control_loop(1,2,3);
-course_control_loop(1,2,3);
-course_control_loop(1,2,3);
-course_control_loop(1,2,3);
-course_control_loop(1,2,3);
-course_control_loop(1,2,3);
+5

@@ -1,0 +1,113 @@
+//include("Parameters.jsl");
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   Calculate forces on the airframe
+///////////////////////////////////////////////////////////////////////////////////////////
+
+getForces_func = function({state},
+	pn = state[1];
+	pe = state[2];
+	pd = state[3];
+	u = state[4];
+	v = state[5];
+	w = state[6];
+	phi = state[7];
+	theta = state[8];
+	psi = state[9];
+	p = state[10];
+	q = state[11];
+	r = state[12];
+	va = sqrt(u^2 + v^2 + w^2);
+	alpha = ArcTan(w/u);
+	beta = ArcSine(v/va);
+	//show(va);
+	//show(alpha);
+	//show(beta);
+	fx = -mass*g*sin(theta) + 0.5 * rho * va^2 * S * (cx_alpha(alpha) + cx_q(alpha) * (c * q / (2 * va)) + cx_del_e(alpha) * deltaE) + 0.5 * rho * Sprop * Cprop * ((kMotor*deltaT)^2 - va^2);
+	fy = mass * g * cos(theta) * sin(phi) + 0.5 * rho * va^2 * S * (Cy0 + CyBeta * beta + CyP * (b*p/(2*va)) + CYr * (b*r/(2*va)) + Cydeltaa * deltaA + CyDeltar * DeltaR);
+	fz = mass * g * cos(theta) * cos(phi) + 0.5 * rho * va^2 * S * (cz_alpha(alpha) + cz_q(alpha) * c * q /(2 * va) + cz_del_e(alpha) * deltaE);
+	ml = 0.5 * rho * va^2 * S * b * (CL0 * ClBeta * beta + ClP * b * p / (2 * va) + Clr * b * r / (2 * va) + ClDeltaa * deltaA + ClDeltar * deltaR);
+	mm = 0.5 * rho * va^2 * S * c * (Cm0 + CmAlpha * alpha + Cmq * c * q / (2 * va) + CmDeltae * deltaE);
+	mn = 0.5 * rho * va^2 * S * b * (Cn0 + CnBeta * beta + CnP * b * p / (2 * va) + Cnr * b * r / (2 * va) + CnDeltaa * deltaA + CnDeltaR * deltaR);
+	forces = matrix({fx, fy, fz, ml, mm, mn});
+);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   calculate the derivative of the equations of motion
+///////////////////////////////////////////////////////////////////////////////////////////
+derivatives = function({state, inputs},
+	pn = state[1];
+	pe = state[2];
+	pd = state[3];
+	u = state[4];
+	v = state[5];
+	w = state[6];
+	phi = state[7];
+	theta = state[8];
+	psi = state[9];
+	p = state[10];
+	q = state[11];
+	r = state[12];
+	
+	fx = inputs[1];
+	fy = inputs[2];
+	fz = inputs[3];
+	l = inputs[4];
+	m = inputs[5];
+	n = inputs[6];
+	
+	cphi = cos(phi);
+	sphi = sin(phi);
+	ctheta = cos(theta);
+	stheta = sin(theta);
+	ttheta = tan(theta);
+	cpsi = cos(psi);
+	spsi = sin(psi);
+	
+	pn_dot = ctheta * cpsi * u + (sphi * stheta * cpsi - cphi * spsi) * v + (cphi * stheta * cpsi + sphi * spsi) * w;
+	pe_dot = ctheta * spsi * u + (sphi * stheta * spsi + cphi * cpsi) * v + (cphi * stheta * sphi - sphi * cpsi) * w;
+	pd_dot = -stheta * u + sphi * ctheta * v + cphi * ctheta * w;
+	
+	u_dot = r * v - q * w + fx / mass;
+	v_dot = p * w - r * w + fy / mass;
+	w_dot = q * u - P * v + fz / mass;
+	
+	phi_dot = p + sphi * ttheta * q + cphi * ttheta * r;
+	theta_dot = cphi * q - sphi * r;
+	psi_dot = sphi * q / ctheta + cphi * r / ctheta;
+	
+	p_dot = gamma1 * p * q - gamma2 * q * r + gamma3 * l + gamma4 * n;
+	q_dot = gamma5 * p * r - gamma6 * (p^2 - r*2) + m / jy;
+	r_dot = gamma7 * p * q - gamma1 * q * r + gamma4 * l + gamma8 * n;
+	
+	
+	edgkrsh = matrix({pn_dot, pe_dot, pd_dot, u_dot, v_dot, w_dot, phi_dot, theta_dot, psi_dot, p_dot, q_dot, r_dot});	
+);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   Calculate the new state of the airframe (rungga kutta)
+///////////////////////////////////////////////////////////////////////////////////////////
+updateState_func = function({state, inputs},
+	k1 = derivatives(current_state, current_inputs);
+	show(current_state * ts_simulation / num_steps / 2 :* k1, current_inputs);
+	k2 = derivatives(current_state * ts_simulation / num_steps / 2 :* k1, current_inputs);
+	k3 = derivatives(current_state * ts_simulation / num_steps / 2 :* k2, current_inputs);
+	k4 = derivatives(current_state * ts_simulation / num_steps :* k3, current_inputs);
+	new_state = current_state + (ts_simulation / num_steps / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
+	
+	//show(new_state);
+	
+	/*pn = new_state[1];
+	pe = new_state[2];
+	pd = new_state[3];
+	u = new_state[4];
+	v = new_state[5];
+	w = new_state[6];
+	phi = new_state[7];
+	theta = new_state[8];
+	psi = new_state[9];
+	p = new_state[10];
+	q = new_state[11];
+	r = new_state[12];*/
+);

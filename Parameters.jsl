@@ -1,4 +1,38 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
+					//	State Params
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+aircraftState = [0, 0, -200, 34.99979, 0, 0.1192, 0, 0, 0, 0, 0, 0];
+
+Pn = 0.0;
+Pe = 0.0;
+Pd = -20.0;
+u = 3.49997970e+01;
+v = -2.76273829e-05;
+w = 1.19203683e-01;
+phi = -1.52263833e-06;
+theta =  3.40582609e-03;
+psi = 0.0;
+p = 0;
+q = 0;
+r = 0;
+
+state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r})
+
+fx = 0.0;
+fy = 0.0;
+fz = 0.0;
+ml = 0.0;
+mm = 0.0;
+mn = 0.0;
+
+deltaA = 0.10;
+deltaE = -0.049348;
+deltaR = 0.0;
+deltaT = 0.46382;
+
+///////////////////////////////////////////////////////////////////////////////////////////
 					//	Plane Parameters
 ///////////////////////////////////////////////////////////////////////////////////////////
 mass = 13.5; //kg
@@ -66,12 +100,12 @@ CnDeltar = -0.032;
 ///////////////////////////////////////////////////////////////////////////////////////////
                 //	Calculation Values
 ///////////////////////////////////////////////////////////////////////////////////////////
-ts_simulation = 0.020;
+ts_simulation = 0.10;
 num_steps = 10;
 //   gamma parameters pulled from page 36 (dynamics)
-gamma = jx * jz - jxz^2;
+gamma = jx * jz - (jxz^2);
 gamma1 = (jxz * (jx - jy + jz)) / gamma;
-gamma2 = (jz * (jz - jy) + jxz^2) / gamma;
+gamma2 = (jz * (jz - jy) + (jxz^2)) / gamma;
 gamma3 = jz / gamma;
 gamma4 = jxz / gamma;
 gamma5 = (jz - jx) / jy;
@@ -92,76 +126,3 @@ CrP         = gamma4 * ClP      + gamma8 * CnP;
 CrR         = gamma4 * Clr      + gamma8 * Cnr;
 CrDeltaA    = gamma4 * ClDeltaa + gamma8 * CnDeltaa;
 CrDeltaR    = gamma4 * ClDeltar + gamma8 * CnDeltar;
-
-
-
-myfun = Function({a},
-	return (a*2);
-);
-
-cl_Alpha = function({alpha},
-	ret_cl = CL0 + ClAlpha * alpha;
-	return(ret_cl);
-);
-
-cd_Alpha = function({alpha},
-	ret_cd = Cd0 + CdAlpha * alpha;
-	return(ret_cd);
-);
-
-cx_Alpha = function({alpha},
-	ret_cx = -cdAlpha(alpha) * cos(alpha) + clAlpha(alpha) * sin(alpha);
-	return(ret_cx);
-);
-
-cx_q = function({alpha},
-	ret_cxq = -Cdq * cos(alpha) + Clq * sin(alpha);
-	return(ret_cxq);
-);
-
-cx_del_e = function({alpha},
-	ret_cxdel = -CdDeltae * cos(alpha) + ClDeltae * sin(alpha);
-	return(ret_cxdel);
-);
-
-cz_alpha = function({alpha},
-	ret_cz = -cd_Alpha(alpha) * sin(alpha) - cl_Alpha(alpha) * cos(alpha);
-	return(ret_cz);
-);
-
-cz_q = function({alpha},
-	ret_czq = -Cdq * sin(alpha) - Clq * cos(alpha);
-	return(ret_czq);
-);
-
-cz_del_e = function({alpha},
-	ret_czdel = -CdDeltae * sin(alpha) - ClDelate * cos(alpha);
-);
-
-
-/*show(cl_Alpha(0.1));
-show(cd_Alpha(0.1));
-show(cx_Alpha(0.1));
-show(cx_q(0.1));
-show(cx_del_e(0.1));
-show(cx_alpha(0.1));
-show(cz_q(0.1));
-show(cz_del_e(0.1));*/
-
-a = [1 2, 3 4, 5 6];
-show(a[1,1]);
-show(a[2,2]);
-show(a[3,1]);
-show(a[2]);
-show(a[5]);
-show(a*5);
-show(a:*5);
-b = 1;
-c = 2;
-d = 3;
-e = 4;
-f = matrix({b, c, d, e});
-g = matrix({e, d, b, c});
-show(f);
-show(g);
-show(f+g);

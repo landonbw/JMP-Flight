@@ -31,7 +31,7 @@ ml = 0.0;
 mm = 0.0;
 mn = 0.0;
 
-deltaA = 0.0;
+deltaA = 0.10;
 deltaE = -0.049348;
 deltaR = 0.0;
 deltaT = 0.46382;
@@ -421,9 +421,9 @@ getForces_expr = expr(
 	va = sqrt(u^2 + v^2 + w^2);
 	alpha = ArcTan(w/u);
 	beta = ArcSine(v/va);
-	show(va);
-	show(alpha);
-	show(beta);
+	//show(va);
+	//show(alpha);
+	//show(beta);
 	fx = -mass*g*sin(theta) + 0.5 * rho * va^2 * S * (cx_alpha(alpha) + cx_q(alpha) * (c * q / (2 * va)) + cx_del_e(alpha) * deltaE) + 0.5 * rho * Sprop * Cprop * ((kMotor*deltaT)^2 - va^2);
 	fy = mass * g * cos(theta) * sin(phi) + 0.5 * rho * va^2 * S * (Cy0 + CyBeta * beta + CyP * (b*p/(2*va)) + CYr * (b*r/(2*va)) + Cydeltaa * deltaA + CyDeltar * DeltaR);
 	fz = mass * g * cos(theta) * cos(phi) + 0.5 * rho * va^2 * S * (cz_alpha(alpha) + cz_q(alpha) * c * q /(2 * va) + cz_del_e(alpha) * deltaE);
@@ -479,9 +479,7 @@ derivatives = function({state, inputs},
 	r_dot = gamma7 * p * q - gamma1 * q * r + gamma4 * l + gamma8 * n;
 	
 	
-	edgkrsh = matrix({pn_dot, pe_dot, pd_dot, u_dot, v_dot, w_dot, phi_dot, theta_dot, psi_dot, p_dot, q_dot, r_dot});
-	return(edgkrsh);
-	
+	edgkrsh = matrix({pn_dot, pe_dot, pd_dot, u_dot, v_dot, w_dot, phi_dot, theta_dot, psi_dot, p_dot, q_dot, r_dot});	
 );
 
 updateState_expr = expr(
@@ -494,7 +492,7 @@ updateState_expr = expr(
 	k4 = derivatives(current_state * ts_simulation / num_steps :* k3, current_inputs);
 	new_state = current_state + (ts_simulation / num_steps / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
 	
-	show(new_state);
+	//show(new_state);
 	
 	pn = new_state[1];
 	pe = new_state[2];
@@ -514,12 +512,28 @@ updateState_expr = expr(
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   Calculate the control surface inputs
+///////////////////////////////////////////////////////////////////////////////////////////
+Include("LateralController.jsl");
+//current_control_state = matrix({pn, pe, pd, u, v, w, phi, theta, psi, p, q, r});
+//current_flight_state = matrix({vg, 0, beta, 0, psi});
 
-
+get_control_inputs_expr = expr(
+	get_lateral_control_expr;
+	current_control_state = matrix({pn, pe, pd, u, v, w, phi, theta, psi, p, q, r});
+	show(current_control_state);
+	vg = sqrt(u^2 + v^2 + w^2);
+	beta = ArcSine(v/va);
+	current_flight_state = matrix({vg, 0, beta, 0, psi});
+);
 
 get_lateral_control_expr = expr(
+	deltaA = lateral_control(current_control_state, 0, current_flight_state);
+	show(deltaA);
 	
 );
+
 
 
 
@@ -626,7 +640,7 @@ draw_world;
 
 
 ii=0;
-show("hit for loop");
+//show("hit for loop");
 for(ii=1, ii<200000, ii++,
 	lookat_y_val = 100-ii;
 	moveto_y_val = 0 ;
@@ -635,6 +649,7 @@ for(ii=1, ii<200000, ii++,
 	moveto_z_val = 0;
 	//centerpoint_y_val = centerpoint_y_val-ii;
 	//centerpoint_y_val = -500;
+	get_control_inputs_expr;
 	getForces_expr;
 	updateState_expr; 
 	draw_world;
