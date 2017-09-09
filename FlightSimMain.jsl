@@ -1,13 +1,17 @@
-include("Parameters.jsl")
+﻿Include( "Parameters.jsl" );
+Include( "TableManager.jsl" );
+//make table to record the state through time
+data_table = createTable_func();
+
 //make the gui
 
 //calculate the flight path
 
 // loop for each step of the program
 ii = 0;
-for(ii=1, ii<200000, ii++,
-	//update the plane image
-	
+time = 0;
+state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
+For( ii = 1, ii < 1001, ii++, 
 	//path manager for path
 	
 	//path follower for desired flight state
@@ -15,8 +19,17 @@ for(ii=1, ii<200000, ii++,
 	//autopilot for control inputs
 	
 	//simulator for plane response
-	include("Simulator.jsl");
+	Include( "Simulator.jsl" );
 	forces = getForces_func(state);
+	//Show( forces );
 	state = updateState_func(state, forces);
-	wait(0.001);
-	);
+	//Show( state );
+	time += ts_simulation;
+	Show( time );
+	updateTable_func( data_table, state );
+	/*data << Add Rows({:time_col=time, :Pn_col=Pn, :Pe_col=Pe, :Pd_col=Pd, :u_col=u,
+		:v_col=v, :w_col=w, :phi_col=phi, :theta_col=theta, :psi_col=psi, :p_col=p,
+		:q_col=q, :r_col=r});*/
+	//draw the plane in the gui
+	Wait( 0.001 );
+);

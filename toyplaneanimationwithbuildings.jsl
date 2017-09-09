@@ -1,4 +1,4 @@
-clear globals();
+﻿clear globals();
 clear log();
 
 LightAmbient1 = 0; LightAmbient2 = 0; LightAmbient3 = 0; LightAmbient4 = 1;
@@ -327,11 +327,6 @@ myscript = expr(
    scene  << Material(Front,Specular,MaterialSpecular1,MaterialSpecular2,MaterialSpecular3,MaterialSpecular4);
    scene  << Material(Front,Emission,MaterialEmission1,MaterialEmission2,MaterialEmission3,MaterialEmission4);
    scene  << Material(Front,Shininess,MaterialShininess);*/
-	
-	
-	
-	
-	
 	
 	scene << pushmatrix;
 	scene << Translate(0, 1, 7);

@@ -1,4 +1,49 @@
-//include("Parameters.jsl");
+﻿//include("Parameters.jsl");
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   calculate the changeing parameters to determine the forces
+///////////////////////////////////////////////////////////////////////////////////////////
+cl_alpha = function({alpha},
+	ret_cl = CL0 + ClAlpha * alpha;
+	return(ret_cl);
+);
+
+cd_alpha = function({alpha},
+	ret_cd = Cd0 + CdAlpha * alpha;
+	return(ret_cd);
+);
+
+cx_alpha = function({alpha},
+	ret_cx = -cdAlpha(alpha) * cos(alpha) + clAlpha(alpha) * sin(alpha);
+	return(ret_cx);
+);
+
+cx_q = function({alpha},
+	ret_cxq = -Cdq * cos(alpha) + Clq * sin(alpha);
+	return(ret_cxq);
+);
+
+cx_del_e = function({alpha},
+	ret_cxdel = -CdDeltae * cos(alpha) + ClDeltae * sin(alpha);
+	return(ret_cxdel);
+);
+
+cz_alpha = function({alpha},
+	ret_cz = -cd_Alpha(alpha) * sin(alpha) - cl_Alpha(alpha) * cos(alpha);
+	return(ret_cz);
+);
+
+cz_q = function({alpha},
+	ret_czq = -Cdq * sin(alpha) - Clq * cos(alpha);
+	return(ret_czq);
+);
+
+cz_del_e = function({alpha},
+	ret_czdel = -CdDeltae * sin(alpha) - ClDeltae * cos(alpha);
+	return(ret_czdel);
+);
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
                 //   Calculate forces on the airframe
@@ -36,6 +81,7 @@ getForces_func = function({state},
                 //   calculate the derivative of the equations of motion
 ///////////////////////////////////////////////////////////////////////////////////////////
 derivatives = function({state, inputs},
+	show("calculating derivatives");
 	pn = state[1];
 	pe = state[2];
 	pd = state[3];
@@ -67,6 +113,9 @@ derivatives = function({state, inputs},
 	pn_dot = ctheta * cpsi * u + (sphi * stheta * cpsi - cphi * spsi) * v + (cphi * stheta * cpsi + sphi * spsi) * w;
 	pe_dot = ctheta * spsi * u + (sphi * stheta * spsi + cphi * cpsi) * v + (cphi * stheta * sphi - sphi * cpsi) * w;
 	pd_dot = -stheta * u + sphi * ctheta * v + cphi * ctheta * w;
+	//show(pn_dot);
+	//show(pe_dot);
+	//show(pd_dot);
 	
 	u_dot = r * v - q * w + fx / mass;
 	v_dot = p * w - r * w + fy / mass;
@@ -88,15 +137,18 @@ derivatives = function({state, inputs},
 ///////////////////////////////////////////////////////////////////////////////////////////
                 //   Calculate the new state of the airframe (rungga kutta)
 ///////////////////////////////////////////////////////////////////////////////////////////
-updateState_func = function({state, inputs},
+updateState_func = function({current_state, current_inputs},
+	//show("entered update state function");
+	//show(current_state);
 	k1 = derivatives(current_state, current_inputs);
-	show(current_state * ts_simulation / num_steps / 2 :* k1, current_inputs);
+	//show(current_state * ts_simulation / num_steps / 2 :* k1, current_inputs);
 	k2 = derivatives(current_state * ts_simulation / num_steps / 2 :* k1, current_inputs);
 	k3 = derivatives(current_state * ts_simulation / num_steps / 2 :* k2, current_inputs);
 	k4 = derivatives(current_state * ts_simulation / num_steps :* k3, current_inputs);
 	new_state = current_state + (ts_simulation / num_steps / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
 	
 	//show(new_state);
+	new_state;
 	
 	/*pn = new_state[1];
 	pe = new_state[2];
