@@ -72,4 +72,6 @@ energy_control_loop = function({E_lon},
 	throttle_c_unsat = kp_throttle * E_lon + ki_throttle + energy_integrator;
 	if(throttle_c_unsat<0, throttle_c_unsat=0);
 	throttle_c = saturate_val(throttle_c_unsat, delta_t_max);
+	energy_integrator += (ts_control / ki_throttle) * (throttle_c - throttle_c_unsat);
+	throttle_c;
 )

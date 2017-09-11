@@ -18,7 +18,7 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 5000, ii++, 
+For( ii = 1, ii < 10000, ii++, 
 	//path manager for path
 	
 	//path follower for desired flight state
@@ -29,8 +29,10 @@ For( ii = 1, ii < 5000, ii++,
 	alpha = ArcTan(state[6]/state[4]);
 	beta = ArcSine(state[5]/va);
 	flight_state = matrix({va, alpha, beta, 0, state[9]});
-	deltaA = lateralControl(state, 0.0, flight_state);
-	lon_ret = longitudinalControl(state, flight_state, 20, 35);
+	if(time>5000, h_req=400, h_req=20);
+	if(time>2500, course_req=0.4, course_req=0.0);
+	deltaA = lateralControl(state, course_req, flight_state);
+	lon_ret = longitudinalControl(state, flight_state, h_req, 35);
 	deltaE = lon_ret[1];
 	deltaT = lon_ret[2];
 	//simulator for plane response
