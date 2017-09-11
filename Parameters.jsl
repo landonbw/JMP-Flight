@@ -171,11 +171,11 @@ phi_max = 30 * 3.14159/180;
 course_bandwidth_separation = 36.0;
 omega_n_chi = omega_n_phi / course_bandwidth_separation;
 zeta_chi = 3.0;
-//kp_chi = 2.0 * zeta_chi * omega_n_chi * Va0 / g * 5.55;
-kp_chi = kp_roll;
-show(kp_chi);
+kp_chi = 0.50 * zeta_chi * omega_n_chi * Va0 / g;
+//kp_chi = kp_roll;
+//show(kp_chi);
 kd_chi = 0.0;
-ki_chi = omega_n_chi^2 * Va0 / g * 0.01;
+ki_chi = omega_n_chi^2 * Va0 / g * 0.02;
 
 // Sideslip control values
 delta_r_max = 30 * 3.14159/180;
