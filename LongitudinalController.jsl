@@ -42,7 +42,8 @@ balance_loop = function({B_lon},
 	
 	theta_c_unsat = kp_bal * B_lon + ki_bal * balance_integrator;
 	theta_c = saturate_val(theta_c_unsat, theta_max);
-	//balance_integrator += (ts_control / ki_bal) * (theta_c - theta_c_unsat);
+	balance_integrator += (ts_control / ki_bal) * (theta_c - theta_c_unsat);
+	theta_c;
 );
 
 
