@@ -1,0 +1,75 @@
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//	Longitudinal control function
+////////////////////////////////////////////////////////////////////////////////////////
+longitudinalControl = function({state, flight_state, h_command, va_command},
+	lon_pd = state[3];
+	lon_va = flight_state[1];
+	h = -lon_pd;
+	h_error = saturate_val(h_command - h, h_error_max);
+	U_error = mass *g * h_error;
+	K_error = 0.5 * mass * (va_command^2 - lon_va^2);
+	E_lon = U_error + K_error;
+	B_lon = U_error - K_error;
+	
+	// get pitch command
+	theta_command = balance_loop(B_lon);
+	
+	// get elevator command
+	deltaE = elevator_control_loop(state, theta_command);
+	
+	// get throttle command
+	deltaT = energy_control_loop(E_lon);
+	ret = matrix({deltaE, deltaT});
+);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//	Balance control loop
+///////////////////////////////////////////////////////////////////////////////////////////
+balance_integrator = 0.0;
+B_d1 = 0.0;
+balance_loop = function({B_lon},
+	balance_integrator += (ts_control / 2.0) * (B_lon + B_d1);
+	B_d1 = B_lon;
+	
+	theta_c_unsat = kp_bal * B_lon + ki_bal * balance_integrator;
+	theta_c = saturate_val(theta_c_unsat, theta_max);
+	//balance_integrator += (ts_control / ki_bal) * (theta_c - theta_c_unsat);
+);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//	Pitch control loop
+///////////////////////////////////////////////////////////////////////////////////////////
+elevator_control_loop = function({state, theta_c},
+	theta = state[8];
+	q = state[11];
+	
+	error_theta = theta - theta_c;
+	delta_e_prime = error_theta * kp_theta;
+	delta_e_unsat = delta_e_prime - kd_theta * q;
+	delta_e = saturate_val(delta_e_unsat, delta_e_max);
+);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//	Energy control loop
+///////////////////////////////////////////////////////////////////////////////////////////
+energy_integrator = 0.0;
+energy_d1 = 0.0;
+energy_control_loop = function({E_lon},
+	energy_integrator += (ts_control / 2.0) * (E_lon + energy_d1);
+	energy_d1 = E_lon;
+	
+	throttle_c_unsat = kp_throttle * E_lon + ki_throttle + energy_integrator;
+	if(throttle_c_unsat<0, throttle_c_unsat=0);
+	throttle_c = saturate_val(throttle_c_unsat, delta_t_max);
+)

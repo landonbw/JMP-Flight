@@ -158,7 +158,7 @@ path_angle0 = 0.0;
 //////////// Lateral transfer function vales
 // Roll control values
 e_phi_max = 40 * 3.14159/180;
-delta_a_max = 50 * 3.14159/180;
+delta_a_max = 30 * 3.14159/180;
 a_phi1 = -0.5 * rho * Va0^2 * S * b * CpP * b / (2 * Va0);
 a_phi2 = 0.5 * rho * Va0^2 * S * b * CpDeltaA;
 zeta_phi = 0.707;
@@ -185,6 +185,8 @@ a_beta1 = -rho * Va0 * S * CyBeta / (2.0 * mass);
 a_beta2 = rho * Va0 * S * CyDeltar / (2.0 * mass);
 kp_beta = delta_r_max / e_beta_max / 5;
 ki_beta = (1 / a_beta2) * ((a_beta1 + a_beta2 * kp_beta) / (2.0 * zeta_beta))^2 * 5;
+
+
 
 ////////// Longitudinal transfer function values
 h_error_max = 10.0;

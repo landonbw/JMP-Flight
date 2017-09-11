@@ -6,6 +6,7 @@ Include( "TableManager.jsl" );
 Include( "Simulator.jsl" );
 Include( "Controller.jsl" );
 Include( "LateralController.jsl" );
+Include( "LongitudinalController.jsl");
 //make table to record the state through time
 data_table = createTable_func();
 
@@ -17,7 +18,7 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 10000, ii++, 
+For( ii = 1, ii < 5000, ii++, 
 	//path manager for path
 	
 	//path follower for desired flight state
@@ -28,7 +29,10 @@ For( ii = 1, ii < 10000, ii++,
 	alpha = ArcTan(state[6]/state[4]);
 	beta = ArcSine(state[5]/va);
 	flight_state = matrix({va, alpha, beta, 0, state[9]});
-	deltaA = lateralControl(state, 1.5, flight_state);
+	deltaA = lateralControl(state, 0.0, flight_state);
+	lon_ret = longitudinalControl(state, flight_state, 20, 35);
+	deltaE = lon_ret[1];
+	deltaT = lon_ret[2];
 	//simulator for plane response
 	forces = getForces_func( state );
 
@@ -43,10 +47,71 @@ For( ii = 1, ii < 10000, ii++,
 	//draw the plane in the gui
 	Wait( 0.00001 );
 );
+
+///////////////////////// Show the data table
 data_table << ShowWindow(1);
+
+//////////////////////// Plot some of the results
 Fit Group(
-	Bivariate( Y( :phi_col), X( :time_col)),
-	Bivariate( Y( :theta_col), X( :Time_col)),
-	Bivariate( Y( :psi_col), X( :time_col)),
-	<<{Arrange in Cols(1)}
+	Bivariate(
+		Y( :Pn_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :Pe_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :Pd_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+		),
+	Bivariate(
+		Y( :u_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :v_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :w_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+		),
+	Bivariate(
+		Y( :phi_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :theta_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :psi_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+		),
+/*	Bivariate(
+		Y( :p_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :q_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :r_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),*/
+	<<{Arrange in Rows( 3 )}
 );
