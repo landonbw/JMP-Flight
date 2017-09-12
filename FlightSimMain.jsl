@@ -18,7 +18,7 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 10000, ii++, 
+For( ii = 1, ii < 3000, ii++, 
 	//path manager for path
 	
 	//path follower for desired flight state
@@ -36,9 +36,11 @@ For( ii = 1, ii < 10000, ii++,
 	deltaE = lon_ret[1];
 	deltaT = lon_ret[2];
 	//simulator for plane response
-	forces = getForces_func( state );
+	for( jj = 0, jj < num_steps, jj++,
+		forces = getForces_func( state );
 
-	state = updateState_func( state, forces );
+		state = updateState_func( state, forces );
+	);
 
 	time += ts_simulation;
 	//Show( time );
