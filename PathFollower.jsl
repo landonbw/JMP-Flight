@@ -1,0 +1,36 @@
+follow_path_func = function({y_manager, pos, chi, phi},
+	follow_line_flag = y_manager[0];
+	if(follow_line_flag,
+		follow_path_return = follow_straight_line_func(y_manager, pos, chi, phi),
+		follow_path_return = follow_orbit_func(y_manager, pos, chi, phi)
+	);
+	follow_path_return;
+);
+
+
+follow_straight_line_func = function({y_manager, pos, chi, phi},
+	r = y_manager[3];
+	q = y_manager[4];
+	chi_q = atan(q[2]/q[1], 1);
+	epy = -sin(chi_q) + (pos[1] - r[1]) + cos(chi_q) + (pos[2] - r[2]);
+	
+	chi_follow_c = chi_q - chi_inf * (2/np.pi) * atan(k_path * epy);
+	h_follow_c = -r[3];
+	phi_follow_ff = 0;
+);
+
+
+follow_orbit_func = function({y_manager, pos, chi, phi},
+	c_follow = y_manager[5];
+	cn_follow = c_follow[1];
+	ce_follow = c_follow[2];
+	h_follow_c = -c_follow[3];
+	rho_follow = y_manager[6];
+	direction = y_manager[7];
+	pn_follow = pos[1];
+	pe_follow = pos[2];
+	
+	d_follow = sqrt((pn_follow - cn_follow)^2 + (pe_follow - ce_follow)^2);
+	phi_follow = atan((pe_follow - ce_follow)/(pn_follow - cn_follow), 1);
+	
+);
