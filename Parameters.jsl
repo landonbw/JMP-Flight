@@ -171,7 +171,7 @@ phi_max = 30 * 3.14159/180;
 course_bandwidth_separation = 36.0;
 omega_n_chi = omega_n_phi / course_bandwidth_separation;
 zeta_chi = 3.0;
-kp_chi = 0.50 * zeta_chi * omega_n_chi * Va0 / g;
+kp_chi = 0.8 * zeta_chi * omega_n_chi * Va0 / g;
 //kp_chi = kp_roll;
 //show(kp_chi);
 kd_chi = 0.0;
@@ -203,7 +203,7 @@ a_theta1 = -rho * Va0^2 * c^2 * S * Cmq / (4.0 * jy * Va0);
 a_theta2 = -rho * Va0^2 * c * S * CmAlpha / (2.0 * jy);
 a_theta3 = rho * Va0^2 * c * S * CmDeltae / (2.0 * jy);
 // kp_theta = delta_e_max / e_theta_max * 0.80
-kp_theta = delta_e_max / e_theta_max * 4.8;
+kp_theta = delta_e_max / e_theta_max * 0.8;
 omega_n_theta = sqrt(a_theta2 + (delta_e_max / e_theta_max) * abs(a_theta3));
 zeta_theta = 5.0;
 kd_theta = (2 * zeta_theta * omega_n_theta - a_theta1) / a_theta3 / 30;
@@ -212,3 +212,11 @@ kd_theta = (2 * zeta_theta * omega_n_theta - a_theta1) / a_theta3 / 30;
 delta_t_max = 1.0;
 kp_throttle = 0.003;
 ki_throttle = 0.0001;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //	Path Follower Parameters
+///////////////////////////////////////////////////////////////////////////////////////////
+chi_inf = 80 * 3.14159 / 180;
+k_path = 0.005;
+k_orbit = 2;
+t_rad = 275;
