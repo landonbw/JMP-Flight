@@ -7,6 +7,7 @@ Include( "Simulator.jsl" );
 Include( "Controller.jsl" );
 Include( "LateralController.jsl" );
 Include( "LongitudinalController.jsl");
+Include( "PathFollower.jsl");
 //make table to record the state through time
 data_table = createTable_func();
 
@@ -18,7 +19,7 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 100000, ii++, 
+For( ii = 1, ii < 10000, ii++, 
 	//path manager for path
 	
 	//path follower for desired flight state
@@ -29,8 +30,22 @@ For( ii = 1, ii < 100000, ii++,
 	alpha = ArcTan(state[6]/state[4]);
 	beta = ArcSine(state[5]/va);
 	flight_state = matrix({va, alpha, beta, 0, state[9]});
-	if(time>5000, h_req=400, h_req=20);
-	if(time>2500, course_req=0.4, course_req=0.0);
+	pos = matrix({state[1], state[2], state[3]});
+	
+	//if(time>5000, h_req=400, h_req=20);
+	//if(time>2500, course_req=0.4, course_req=0.0);
+	//y_manager = [flag, vg_des, r, q_past, center, rho, direction]
+	y_manager = list(1, 35, list(0, 40, -20), list(1, 1, 0), 0, 0, 0);
+	//y_manager = list(0, 35, list(0, 40, -20), list(1, 1, 0), list(0, 100, -20), 200, 1);
+	//show(y_manager);
+	path_follow_commands = follow_path_func(y_manager, pos, state[9], state[9]);
+	//show(path_follow_commands);
+	
+	h_req = path_follow_commands[1];
+	course_req = path_follow_commands[2];
+	phi_ff = path_follow_commands[3];
+	//show(path_follow_commands);
+	
 	deltaA = lateralControl(state, course_req, flight_state);
 	lon_ret = longitudinalControl(state, flight_state, h_req, 35);
 	deltaE = lon_ret[1];
@@ -45,10 +60,7 @@ For( ii = 1, ii < 100000, ii++,
 	time += ts_simulation;
 	//Show( time );
 	updateTable_func( data_table, state );
-	/*data << Add Rows({:time_col=time, :Pn_col=Pn, :Pe_col=Pe, :Pd_col=Pd, :u_col=u,
-		:v_col=v, :w_col=w, :phi_col=phi, :theta_col=theta, :psi_col=psi, :p_col=p,
-		:q_col=q, :r_col=r});*/
-	//draw the plane in the gui
+
 	Wait( 0.00001 );
 );
 
