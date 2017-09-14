@@ -19,7 +19,7 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 2000, ii++, 
+For( ii = 1, ii < 5000, ii++, 
 	//path manager for path
 	
 	//path follower for desired flight state
