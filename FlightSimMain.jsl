@@ -8,6 +8,7 @@ Include( "Controller.jsl" );
 Include( "LateralController.jsl" );
 Include( "LongitudinalController.jsl");
 Include( "PathFollower.jsl");
+Include( "PathManager.jsl");
 //make table to record the state through time
 data_table = createTable_func();
 
@@ -19,29 +20,29 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 5000, ii++, 
-	//path manager for path
-	
-	//path follower for desired flight state
-	
-	//autopilot for control inputs
-	//flight_state - va, alpha, beta, pathangle, heading
+For( ii = 1, ii < 50, ii++,
+ 
 	va = sqrt(state[4]^2 + state[5]^2 + state[6]^2);
 	alpha = ArcTan(state[6]/state[4]);
 	beta = ArcSine(state[5]/va);
 	flight_state = matrix({va, alpha, beta, 0, state[9]});
 	pos = matrix({state[1], state[2], state[3]});
 	
-	//if(time>5000, h_req=400, h_req=20);
-	//if(time>2500, course_req=0.4, course_req=0.0);
+	//path manager for path
+	wayp1 = matrix({0, 0, -20});
+	wayp2 = matrix({500, 0, -20});
+	wayp3 = matrix({0, 500, -20});
+	wayp4 = matrix({500, 500, -20});
+	waypoint_list = list(wayp1, wayp2, wayp3, wayp4);
+	y_manager = get_path_straight_line_func(waypoint_list, pos);
+	show(y_manager);
 	
+	//path follower for desired flight state
 	//y_manager = [flag, vg_des, r, q_past, center, rho, direction]
-	//y_manager = list(1, 35, list(0, 40, -20), list(1, 0.5, 0), 0, 0, 0);
-	y_manager = list(0, 35, list(0, 40, -20), list(1, 1, 0), list(0, 0, -20), 20, 1);
-	//show(y_manager);
+	//y_manager = list(0, 35, list(0, 40, -20), list(1, 1, 0), list(0, 0, -20), 20, 1);
 	path_follow_commands = follow_path_func(y_manager, pos, state[9], state[9]);
-	//show(path_follow_commands);
 	
+	//autopilot for control inputs
 	h_req = path_follow_commands[1];
 	course_req = path_follow_commands[2];
 	phi_ff = path_follow_commands[3];
