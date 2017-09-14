@@ -167,7 +167,7 @@ kp_roll = delta_a_max / (e_phi_max) * 0.37;
 kd_roll = (2. * zeta_phi * omega_n_phi - a_phi1) / a_phi2 * 4.0;
 
 // Course control values
-phi_max = 30 * 3.14159/180;
+phi_max = 20 * 3.14159/180;
 course_bandwidth_separation = 36.0;
 omega_n_chi = omega_n_phi / course_bandwidth_separation;
 zeta_chi = 3.0;
@@ -175,7 +175,7 @@ kp_chi = 0.8 * zeta_chi * omega_n_chi * Va0 / g;
 //kp_chi = kp_roll;
 //show(kp_chi);
 kd_chi = 0.0;
-ki_chi = omega_n_chi^2 * Va0 / g * 0.02;
+ki_chi = omega_n_chi^2 * Va0 / g * 0.6;
 
 // Sideslip control values
 delta_r_max = 30 * 3.14159/180;
