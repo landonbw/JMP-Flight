@@ -20,7 +20,7 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 50, ii++,
+For( ii = 1, ii < 5000, ii++,
  
 	va = sqrt(state[4]^2 + state[5]^2 + state[6]^2);
 	alpha = ArcTan(state[6]/state[4]);
@@ -30,12 +30,12 @@ For( ii = 1, ii < 50, ii++,
 	
 	//path manager for path
 	wayp1 = matrix({0, 0, -20});
-	wayp2 = matrix({500, 0, -20});
-	wayp3 = matrix({0, 500, -20});
-	wayp4 = matrix({500, 500, -20});
+	wayp2 = matrix({100, 0, -20});
+	wayp3 = matrix({0, 100, -20});
+	wayp4 = matrix({100, 100, -20});
 	waypoint_list = list(wayp1, wayp2, wayp3, wayp4);
 	y_manager = get_path_straight_line_func(waypoint_list, pos);
-	show(y_manager);
+	//show(y_manager);
 	
 	//path follower for desired flight state
 	//y_manager = [flag, vg_des, r, q_past, center, rho, direction]
