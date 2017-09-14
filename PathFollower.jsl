@@ -1,4 +1,4 @@
-//y_manager = [flag, vg_des, r, q_past, center, rho, direction]
+﻿//y_manager = [flag, vg_des, r, q_past, center, rho, direction]
 
 follow_path_func = function({y_manager, pos, chi, phi},
 	follow_line_flag = y_manager[1];
@@ -43,13 +43,13 @@ follow_orbit_func = function({y_manager, pos, chi, phi},
 	pe_follow = pos[2];
 	
 	d_follow = sqrt((pn_follow - cn_follow)^2 + (pe_follow - ce_follow)^2);
-	show(d_follow);
+	//show(d_follow);
 	phi_follow = atan((pe_follow - ce_follow), (pn_follow - cn_follow));
 	while((phi_follow - chi) < -3.14159,
         phi_follow += 2 * 3.14159);
     while((phi_follow - chi) > 3.14159,
         phi_follow -= 2 * 3.14159);
-	chi_follow_c = phi + direction * ((3.14159 / 2) + atan(k_orbit * ((d_follow-rho_follow) / rho)));
+	chi_follow_c = phi_follow + (direction * ((3.14159 / 2) + atan(k_orbit * ((d_follow-rho_follow) / rho_follow))));
 	phi_ff = direction * atan(vg_des_follow^2 / g / rho_follow);
 	follow_commands = matrix({h_follow_c, chi_follow_c, phi_ff})
 );
