@@ -1,0 +1,372 @@
+﻿clear globals();
+clear log();
+/*
+LightAmbient1 = 0; LightAmbient2 = 0; LightAmbient3 = 0; LightAmbient4 = 1;
+LightDiffuse1 = 1; LightDiffuse2 = 1; LightDiffuse3 = 1; LightDiffuse4 = 1;
+LightSpecular1 = 1; LightSpecular2 = 1; LightSpecular3 = 1; LightSpecular4 = 1;
+LightModelAmbient1 = .2; LightModelAmbient2 = .2; LightModelAmbient3 = .2; LightModelAmbient4 = 1;
+MaterialAmbient1 = 0; MaterialAmbient2 = .5; MaterialAmbient3 = .5; MaterialAmbient4 = 1;
+MaterialDiffuse1 = .4; MaterialDiffuse2 = .4; MaterialDiffuse3 = .8; MaterialDiffuse4 = 1;
+MaterialSpecular1 = 1; MaterialSpecular2 = 1; MaterialSpecular3 = 1; MaterialSpecular4 = 1;
+MaterialEmission1 = 0; MaterialEmission2 = 0; MaterialEmission3 = 0; MaterialEmission4 = 1;
+MaterialShininess = 50;
+slices = 50;
+stacks = 50;
+useFlatNormal = 0;
+useFlatShaded = 0;
+lightPosition = 5;
+
+anglerudder = 10;
+angleflap = 10;
+x_coor = [0];
+y_coor = [0];
+
+vec_x = [1];
+vec_y = [1];
+vec_z = [1];
+
+angleperspective = 45;
+nearperspective = 1;
+farperspective = 200;
+
+translateto_x_val = 0;
+translateto_y_val = -5;
+translateto_z_val = -26;
+
+lookat_x_val = 0;
+lookat_y_val = 60;
+lookat_z_val = 20;
+
+moveto_x_val = 0;
+moveto_y_val = 0;
+moveto_z_val = 4;
+
+rotateto_x_val = 0;
+rotateto_y_val = 0;
+rotateto_z_val = 0;
+
+rotateACto_x_val = 0;
+rotateACto_y_val = 180;
+rotateACto_z_val = 180;
+
+centerpoint_x_val = 0;
+centerpoint_y_val = 0;
+centerpoint_z_val = 6;*/
+
+Include("simpleairplaneparts.jsl");
+drawtheairplane_expr = expr(
+
+plane = SceneDisplayList(1);
+/*
+plane << pushmatrix;
+   plane  << Enable(Lighting); 
+   plane  << Enable(Light0); 
+   plane  << Light(Light0,AMBIENT,LightAmbient1,LightAmbient2,LightAmbient3,LightAmbient4);  
+   plane  << Light(Light0,DIFFUSE,LightDiffuse1,LightDiffuse2,LightDiffuse3,LightDiffuse4);  
+   plane  << Light(Light0,SPECULAR,LightSpecular1,LightSpecular2,LightSpecular3,LightSpecular4);  
+   plane  << LightModel( LIGHT_MODEL_AMBIENT, LightModelAmbient1, LightModelAmbient2, LightModelAmbient3, LightModelAmbient4 );
+   plane  << Material(Front,Ambient,MaterialAmbient1,MaterialAmbient2,MaterialAmbient3,MaterialAmbient4);
+   plane  << Material(Front,Diffuse,MaterialDiffuse1,MaterialDiffuse2,MaterialDiffuse3,MaterialDiffuse4);
+   plane  << Material(Front,Specular,MaterialSpecular1,MaterialSpecular2,MaterialSpecular3,MaterialSpecular4);
+   plane  << Material(Front,Emission,MaterialEmission1,MaterialEmission2,MaterialEmission3,MaterialEmission4);
+   plane  << Material(Front,Shininess,MaterialShininess);
+plane << popmatrix;*/
+
+
+
+
+//plane << sphere(0.1,30,30);
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(nose);
+plane << popmatrix;
+
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(tail);
+plane << popmatrix;
+
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(body1);
+plane << popmatrix;
+
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(body2);
+plane << popmatrix;
+
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(leftwingtip);
+plane << popmatrix;
+
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(rightwingtip);
+plane << popmatrix;
+
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(leftwing);
+plane << popmatrix;
+
+plane << pushmatrix;
+//plane << translate( -2,-1,0 );
+plane << call list(rightwing);
+plane << popmatrix;
+
+plane << pushmatrix;
+plane << translate(2, 0, -.5);
+plane << Rotate(angleflap,1,0,0);
+plane << call list(leftflap);
+plane << popmatrix;
+
+plane << pushmatrix;
+plane << translate(-2, 0, -.5);
+plane << Rotate(angleflap,1,0,0);
+plane << call list(rightflap);
+plane << popmatrix;
+
+plane << pushmatrix;
+plane << call list(tailwing);
+plane << popmatrix;
+
+plane << pushmatrix;
+//tailwing << translate( 0, 0, -4.5 );
+plane << translate (0, 0, -4.5);
+plane << Rotate( anglerudder, 0, 1, 0 );
+plane << call list(rudder);
+plane << popmatrix;
+
+plane << pushmatrix;
+//Enable(POLYGON_OFFSET_LINE);
+//Polygon Offset(1,1);
+plane << call list(cockpit);
+plane << popmatrix;
+
+//plane << Enable(POLYGON_OFFSET_LINE);
+//plane << Polygon Offset(1,1);
+/*plane << Color( 0.5, 0, 0 );
+plane << pushmatrix;
+plane<<Enable(Lighting);
+plane<<Enable(Light0);
+plane<<Light(Light0,POSITION,10,10,10,1); //near viewer
+scene<<Light(Light0,DIFFUSE,.5,.5,1,1); //blue-gray light
+plane << popmatrix;*/
+
+);
+
+/*
+listofblocks_x = J(1,150,Random Integer(300)-150);
+listofblocks_y = J(1,150,Random Integer(2000)-1000);
+listofblocks_z = J(1,150,Random Integer(100));
+listofblockdims_x = J(1,150,Random Integer(50));
+listofblockdims_y = J(1,150,Random Integer(50));
+listofblockdims_z = J(1,150,Random Integer(50));
+*/
+
+/*
+makethebox_expr = expr(
+box = Scene Display List( 1 );
+//box << PolygonMode(FRONT_AND_BACK, LINE);
+
+
+for(i=1, i<80, i++,
+	//moveto_x_val = listofmoves_x[i];
+	//moveto_y_val = listofmoves_y[i];
+	blockdim_x = listofblockdims_x[i];
+	blockdim_y = listofblockdims_y[i];
+	blockdim_z = listofblockdims_z[i];
+
+	box << pushmatrix;
+	box << Translate(listofblocks_x[i+60],listofblocks_y[i+60],listofblocks_z[i+60]);
+	box << Color(0.9,0.9,0.9);
+	box << sphere(listofblocks_z[i]/10, 20, 20);
+	box << popmatrix;
+	
+	box << pushmatrix;
+	box << Translate(listofblocks_y[i+60],listofblocks_x[i+60],listofblocks_z[i+60]);
+	box << Rotate(90,1,0,0);
+	box << Color(0.9,0.9,0.9);
+	//box << sphere(listofblocks_z[i]/10, 20, 20);
+	box << disk(listofblocks_z[i]/10, 20, 20,20);
+	box << popmatrix;
+	
+	box << pushmatrix;
+	//box << Translate(lookat_x_val,lookat_y_val,lookat_z_val);
+	box << Translate(listofblocks_x[i],listofblocks_y[i],1);
+	box << linewidth(2);
+	box << Begin( QUADS );
+	box << Color(0.7,0.7,0.7);
+	box<<Vertex(0, 0, 0);
+	box<<Vertex(0, 0, blockdim_z);
+	box<<Vertex(0, blockdim_y, blockdim_z);
+	box<<Vertex(0, blockdim_y, 0);
+	
+	box<<Vertex(blockdim_x, 0, 0);
+	box<<Vertex(blockdim_x, 0, blockdim_z);
+	box<<Vertex(blockdim_x, blockdim_y, blockdim_z);
+	box<<Vertex(blockdim_x, blockdim_y, 0);
+	
+	box << Color(0.3,0.3,0.3);
+	box<<Vertex(0,	0, 0);
+	box<<Vertex(blockdim_x,	0, 0);
+	box<<Vertex(blockdim_x,	0, blockdim_z);
+	box<<Vertex(0,	0, blockdim_z);
+	
+	box<<Vertex(0,	blockdim_y, 0);
+	box<<Vertex(blockdim_x,	blockdim_y, 0);
+	box<<Vertex(blockdim_x,	blockdim_y, blockdim_z);
+	box<<Vertex(0,	blockdim_y, blockdim_z);
+	
+	
+	
+	box << Color(0.5,0.5,0.5);
+	box<<Vertex(0,0,	0);
+	box<<Vertex(0,blockdim_y,	0);
+	box<<Vertex(blockdim_x,blockdim_y,	0);
+	box<<Vertex(blockdim_x,0,	0);
+	
+	box<<Vertex(0,0,	blockdim_z);
+	box<<Vertex(0,blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x,blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x,0,	blockdim_z);
+	box<<End();
+	box << popmatrix;
+
+);
+*/
+
+/*
+box << Color(0.4,1,0.4);
+box << Begin( QUADS );
+box<<Vertex(-1000, -1000, 0);
+box<<Vertex(1000, -1000, 0);
+box<<Vertex(1000, 1000, 0);
+box<<Vertex(-1000, 1000, 0);
+box<<End();
+
+box << Color(1,0,0);
+box<<sphere(0.1, 20, 20);
+
+box << pushmatrix;
+box << translate(-1, -6, 0);
+box<<sphere(0.1, 20, 20);
+box << popmatrix;
+);
+
+nw = New Window( "Test Window",
+	hlistbox(
+		ob_test = outlinebox("My outline box",
+			scene = SceneBox(1000,800),
+			sb_perspective = sliderbox(15,180,angleperspective,myscript),
+			sb_perspective_near = sliderbox(2,18,nearperspective,myscript),
+			sb_perspective_far = sliderbox(0,200,farperspective,myscript),
+			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-200,200,lookat_x_val,myscript)),
+			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-200,200,lookat_y_val,myscript)),
+			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,200,lookat_z_val,myscript)),
+			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-200,200,centerpoint_x_val,myscript)),
+			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-200,200,centerpoint_y_val,myscript)),
+			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,200,centerpoint_z_val,myscript)),
+	
+			hlistbox(textbox("Move To X"), sb_moveto_x = sliderbox(-200,200,moveto_x_val,myscript)),
+			hlistbox(textbox("Move To Y"), sb_moveto_y = sliderbox(-200,200,moveto_y_val,myscript)),
+			hlistbox(textbox("Move To Z"), sb_moveto_z = sliderbox(-1000,1000,moveto_z_val,myscript)),
+			hlistbox(textbox("Rotate To X"), sb_rotateto_x = sliderbox(-360,0,rotateto_x_val,myscript)),
+			hlistbox(textbox("Rotate  To Y"), sb_rotateto_y = sliderbox(-180,180,rotateto_y_val,myscript)),
+			hlistbox(textbox("Rotate  To Z"), sb_rotateto_z = sliderbox(-180,180,rotateto_z_val,myscript)),
+			hlistbox(textbox("Translate X"), sb_translateto_x = sliderbox(-200,200,translateto_x_val,myscript)),
+			hlistbox(textbox("Translate Y"), sb_translateto_y = sliderbox(-200,200,translateto_y_val,myscript)),
+			hlistbox(textbox("Translate Z"), sb_translateto_z = sliderbox(-200,200,translateto_z_val,myscript)),
+			
+			hlistbox(textbox("Rotate Aircraft X"), sb_rotateACto_x = sliderbox(0,360,rotateACto_x_val,myscript)),
+			hlistbox(textbox("Rotate Aircraft Y"), sb_rotateACto_y = sliderbox(0,360,rotateACto_y_val,myscript)),
+			hlistbox(textbox("Rotate Aircraft Z"), sb_rotateACto_z = sliderbox(-180,180,rotateACto_z_val,myscript)),
+		),
+		graphbox("the graph box",
+			Frame Size( 200, 200 ),
+			xscale(-10,10),
+			yscale(-10,10),
+			markersize(5);
+			dragmarker(x_coor, y_coor,
+				//moveto_x_val = y_coor;
+				rotateACto_x_val = -10*y_coor;
+				//rotateto_x_val = rotateto_x_val;
+				//centerpoint_z_val = -y_coor;
+				//moveto_y_val = x_coor;
+				rotateACto_z_val = 40*x_coor;
+				//centerpoint_x_val = -x_coor;
+				myscript;
+			),	
+		)
+	)
+);
+nw << move window(1,1);
+sb_moveto_x << setwidth(200);
+sb_moveto_y << setwidth(200);
+sb_moveto_z << setwidth(200);
+*/
+
+ii=0;
+myscript5 = expr(
+	scene << clear;
+	makethebox_expr;
+	drawtheairplane_expr;
+	
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	//scene << Color(0.1, .1, .1 );
+	//scene << sphere(5,30,30);
+	/*
+	   scene  << Enable(Lighting); 
+   scene  << Enable(Light0); 
+   scene  << Light(Light0,AMBIENT,LightAmbient1,LightAmbient2,LightAmbient3,LightAmbient4);  
+   scene  << Light(Light0,DIFFUSE,LightDiffuse1,LightDiffuse2,LightDiffuse3,LightDiffuse4);  
+   scene  << Light(Light0,SPECULAR,LightSpecular1,LightSpecular2,LightSpecular3,LightSpecular4);  
+   scene  << LightModel( LIGHT_MODEL_AMBIENT, LightModelAmbient1, LightModelAmbient2, LightModelAmbient3, LightModelAmbient4 );
+   scene  << Material(Front,Ambient,MaterialAmbient1,MaterialAmbient2,MaterialAmbient3,MaterialAmbient4);
+   scene  << Material(Front,Diffuse,MaterialDiffuse1,MaterialDiffuse2,MaterialDiffuse3,MaterialDiffuse4);
+   scene  << Material(Front,Specular,MaterialSpecular1,MaterialSpecular2,MaterialSpecular3,MaterialSpecular4);
+   scene  << Material(Front,Emission,MaterialEmission1,MaterialEmission2,MaterialEmission3,MaterialEmission4);
+   scene  << Material(Front,Shininess,MaterialShininess);*/
+	
+	scene << pushmatrix;
+	scene << Translate(0, 1, 7);
+	scene << Rotate(rotateACto_x_val, 1, 0, 0 );
+	scene << Rotate(rotateACto_y_val, 0, 1, 0 );
+	scene << Rotate(rotateACto_z_val, 0, 0, 1 );
+	scene << Color(1, .1, .1 );
+	scene << arcball(plane,10);
+	scene << popmatrix;
+	//scene<<arcball(box,3);
+	//scene << Translate( 1, 1, 1 );
+	//scene << Call list(box);
+	scene << Rotate(90, 1, 0, 0 );
+	scene << Translate(-moveto_y_val, moveto_z_val, moveto_x_val);
+	scene << Rotate(rotateto_x_val, 1, 0, 0 );
+	scene << Rotate(rotateto_y_val, 0, 1, 0 );
+	scene << Rotate(rotateto_z_val, 0, 0, 1 );
+	scene << Call list(box);
+	scene << Color(0.1, .1, .1 );
+	//scene << Call list(plane);
+	//scene << Call list(box);
+	//scene << arcball(plane,10);
+	scene << Update;
+);
+//myscript;
+
+/*
+for(ii=1, ii<2000, ii++,
+	lookat_y_val = 100-ii;
+	moveto_y_val = moveto_y_val+x_coor ;
+	moveto_x_val = moveto_x_val-y_coor ;
+	if (moveto_x_val < 5, moveto_x_val = 5;);
+	moveto_z_val = -400+2*ii;
+	//centerpoint_y_val = centerpoint_y_val-ii;
+	//centerpoint_y_val = -500;
+	myscript;
+	wait(0.1);
+);
+*/
