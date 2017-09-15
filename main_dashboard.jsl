@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Try(nw << Close Window);
 clear globals();
 clear log();
@@ -690,3 +691,697 @@ for(ii=1, ii<50, ii=ii+10,
 	);
 	wait(0.001);
 );
+=======
+Try(nw << Close Window);
+clear globals();
+clear log();
+
+
+Include( "toyplane_integrated.jsl" );
+
+dt = open("plane_sim_test.jmp");
+
+dtmat =  dt << Get as Matrix();
+
+north = dtmat[0,2]/3;
+east = dtmat[0,3]/3;
+down = dtmat[0,4]*3;
+
+a_phi = dtmat[0,8];
+a_theta = dtmat[0,9];
+a_psi = dtmat[0,10];
+
+/*
+LightAmbient1 = 0; LightAmbient2 = 0; LightAmbient3 = 0; LightAmbient4 = 1;
+LightDiffuse1 = 1; LightDiffuse2 = 1; LightDiffuse3 = 1; LightDiffuse4 = 1;
+LightSpecular1 = 1; LightSpecular2 = 1; LightSpecular3 = 1; LightSpecular4 = 1;
+LightModelAmbient1 = .2; LightModelAmbient2 = .2; LightModelAmbient3 = .2; LightModelAmbient4 = 1;
+MaterialAmbient1 = 0; MaterialAmbient2 = .5; MaterialAmbient3 = .5; MaterialAmbient4 = 1;
+MaterialDiffuse1 = .4; MaterialDiffuse2 = .4; MaterialDiffuse3 = .8; MaterialDiffuse4 = 1;
+MaterialSpecular1 = 1; MaterialSpecular2 = 1; MaterialSpecular3 = 1; MaterialSpecular4 = 1;
+MaterialEmission1 = 0; MaterialEmission2 = 0; MaterialEmission3 = 0; MaterialEmission4 = 1;
+MaterialShininess = 50;
+*/
+
+scenex = 800;
+sceney = 800;
+
+slices = 50;
+stacks = 50;
+useFlatNormal = 0;
+useFlatShaded = 0;
+lightPosition = 5;
+
+anglerudder = 10;
+angleflap = 10;
+
+x_coor = [5];
+y_coor = [5];
+
+vec_x = [1];
+vec_y = [1];
+vec_z = [1];
+
+angleperspective = 45;
+nearperspective = 1;
+farperspective = 800;
+
+lookat_x_val = -50;
+lookat_y_val = -50;
+lookat_z_val = 200;
+
+moveto_x_val = 0;
+moveto_y_val = 0;
+moveto_z_val = 4;
+
+rotateto_x_val = -180;
+rotateto_y_val = 0;
+rotateto_z_val = 0;
+
+rotateACto_x_val = 0;
+rotateACto_y_val = 180;
+rotateACto_z_val = 180;
+
+centerpoint_x_val = 50;
+centerpoint_y_val = 50;
+centerpoint_z_val = 0;
+
+avgheight = 20;
+rangeheight = 10;
+lLow = 0.1;
+lHigh = 0.2;
+NumberStreets = 5;
+numj = NumberStreets;
+numi = NumberStreets;
+	
+StreetGap = 4;
+
+x_coor2 = [90];
+y_coor2 = [10];
+
+blockdim_x = 10;
+blockdim_y = 10;
+blockdim_z = 40;
+
+
+maximum_aileron_angle = 30; //deg_(10-60)
+proportional_gain_on_roll = 0.2775; //_(0-0.5)
+derivative_gain_on_roll = -0.0747; //_(-0.1-0)
+
+maximum_commanded_roll = 30; //deg (_10-60)
+proportional_gain_on_course = 1.455; //_(1-2)
+derivative_gain_on_course = 0; //_(0-0.5)
+integral_gain_on_course = 0.00526963; //_(0-0.01)
+
+maximum_rudder_angle = 30; //_deg_(10-60)
+proportional_gain_on_sideslip = 0.1; //_(0-0.2)
+integral_gain_on_sideslip = 0.05; //_(0-0.1)
+
+
+Height_error_saturation_value = 10; //_(5-100)
+
+maximum_commanded_theta = 30; //deg_(10-60)
+proportional_gain_on_energy_balance = 0.0001; //_(0.0_-_0.001)
+derivative_gain_on_energy_balance = 0.00006; //_(0.0_-_0.0001)
+
+maximum_commanded_pitch_value = 30; //deg_(10-60)
+proportional_gain_on_pitch = 4.8; //_(2-6)
+derivative_gain_on_pitch = -0.073; //_(-0.2_-_0)
+
+maximum_allowable_throttle = 1; //_(0-1)
+proportional_gain_on_throttle = 0.003; //_(0-0.01)
+integral_gain_on_throttle = 0.0001; //_(0-0.001)
+
+
+maximum_path_approach_angle = 80; //_deg_(10-90)
+path_transition_rate_for_line = 0.05; //_(0_-_1)
+path_transition_rate_for_orbit = 2; //_(0-3)
+orbit_radius = 275; //_(200-300)
+
+
+step_size = 900; //_(500-1200)
+
+
+simulation_time_step = 0.01; //_(0.0001_-_0.1)
+
+
+
+nw = new window("UAV Flight City",
+	hlb = hlistbox(
+		ob_test1 = outlinebox("Parameters",
+			hlistbox(cb = Check Box({"Update Live"}, << Set( 1, 1 )), Buttonbox("Add path", addingpathandplane;)),
+			
+			outlinebox("City Definition Parameters",
+			H List Box(
+				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Average Height (m)" )),
+				sb_avgheight = sliderbox(1,100, avgheight, myscript),
+			),
+			H List Box(
+				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Height Range" )),
+				sb_rangeheight = sliderbox(1,50, rangeheight, myscript),
+			),
+			H List Box(
+				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Roof Height" )),
+				sb = Range Slider Box( 0.01, 0.5, lLow, lHigh, listofpeakdims = J( numi, numj, 1+Random Uniform(lLow,lHigh)); myscript )
+				),
+			H List Box(
+				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Number of Streets" )),
+				sb = Slider Box( 5, 20, NumberStreets, NumberStreets = round(NumberStreets); update_birdseye; myscript )
+				),
+			H List Box(
+				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Street Gap" )),
+				sb = Slider Box( 1, 20, StreetGap, StreetGap = round(StreetGap); update_birdseye; myscript )
+				),
+			),
+			outlinebox("Lateral Control Values",
+				Textbox(" Roll Control Values", set font style("bold"), font color("blue")),
+				H List Box(
+				vlistbox(spacerbox(Size(200,0),Color("red")),TexT Box( "Maximum Aileron Angle" )),
+					sb = Slider Box( 10, 60, maximum_aileron_angle, tempemptyfunction; myscript )
+				),
+			H List Box(
+				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Proportional Gain On Roll" )),
+					sb = Slider Box( 0, 0.5, proportional_gain_on_roll, tempemptyfunction; myscript )
+				),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text BOx( "Derivative Gain On Roll" )),
+					sb = Slider Box( -0.1, 0, derivative_gain_on_roll,  tempemptyfunction; myscript )
+				),
+				Textbox(" Course control values", set font style("bold"), font color("blue")),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Maximum Commanded Roll" )),
+					sb = Slider Box( 30, 60, maximum_commanded_roll,  tempemptyfunction; myscript )
+				),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Proportional Gain On Course" )),
+					sb = Slider Box( 1, 2, proportional_gain_on_course,  tempemptyfunction; myscript )
+				),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text BoX( "Derivative Gain On Course" )),
+					sb = Slider Box( 0, 0.5, derivative_gain_on_course,  tempemptyfunction; myscript )
+				),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text BoX( "Integral Gain On Course" )),
+					sb = Slider Box( 0, 0.01, integral_gain_on_course,  tempemptyfunction; myscript )
+				),
+				Textbox(" Sideslip control values", set font style("bold"), font color("blue")),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Maximum Rudder Angle" )),
+					sb = Slider Box( 10, 60, maximum_rudder_angle,  tempemptyfunction; myscript )
+				),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Proportional Gain On Sideslip" )),
+					sb = Slider Box( 0, 0.2, proportional_gain_on_sideslip,  tempemptyfunction; myscript )
+				),
+						H List Box(
+							vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Integral Gain On Sideslip" )),
+					sb = Slider Box( 0, 0.1, integral_gain_on_sideslip,  tempemptyfunction; myscript )
+				),
+			),
+			outlinebox("Longitudinal Control Values",
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Height Error Saturation Value" )),
+				sb = Slider Box( 5, 100, Height_error_saturation_value,  tempemptyfunction; myscript )
+			),
+			Textbox(" Energy Balance Control Values", set font style("bold"), font color("blue")),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "maximum commanded theta" )),
+				sb = Slider Box( 10, 60, maximum_commanded_theta,  tempemptyfunction; myscript )
+			),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Proportional Gain On Energy Balance" )),
+				sb = Slider Box( 0, 0.001, proportional_gain_on_energy_balance,  tempemptyfunction; myscript )
+			),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Derivative Gain On Energy Balance" )),
+				sb = Slider Box( 0, 0.0001, derivative_gain_on_energy_balance,  tempemptyfunction; myscript )
+			),
+			Textbox(" Pitch control values", set font style("bold"), font color("blue")),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Maximum Commanded Pitch Value" )),
+				sb = Slider Box( 10, 60, maximum_commanded_pitch_value,  tempemptyfunction; myscript )
+			),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Proportional Gain On Pitch" )),
+				sb = Slider Box( 2, 6, proportional_gain_on_pitch,  tempemptyfunction; myscript )
+			),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Derivative Gain On Pitch" )),
+				sb = Slider Box( -0.2, 0, derivative_gain_on_pitch,  tempemptyfunction; myscript )
+			),
+			Textbox(" Throttle control values", set font style("bold"), font color("blue")),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Maximum Allowable Throttle" )),
+				sb = Slider Box( 0, 1, maximum_allowable_throttle,  tempemptyfunction; myscript )
+			),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Proportional Gain On Throttle" )),
+				sb = Slider Box( 0, 0.01, proportional_gain_on_throttle,  tempemptyfunction; myscript )
+			),
+		H List Box(
+				vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Integral Gain On Throttle " )),
+				sb = Slider Box(
+					0,
+					0.001,
+					integral_gain_on_throttle,
+					tempemptyfunction;
+					myscript;
+				)
+			),
+			),
+			Outlinebox("Simulation Parameters",
+			Textbox(" Path Following Parameters", set font style("bold"), font color("blue")),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Maximum Path Approach Angle" )),
+				sb = Slider Box( 10, 90, maximum_path_approach_angle,  tempemptyfunction; myscript )
+			),
+					H List Box(
+						vlistbox(spacerbox(Size(250,0),Color("red")),TexT Box( "Path Transition Rate For Line") ),
+				sb = Slider Box( 0, 1, path_transition_rate_for_line,  tempemptyfunction; myscript )
+			),
+			H List Box(
+			vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Path Transition Rate For Orbit" )),
+				sb = Slider Box( 0, 3, path_transition_rate_for_orbit,  tempemptyfunction; myscript )
+			),
+			H List Box(
+			vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Orbit Radius" )),
+				sb = Slider Box( 200, 300, orbit_radius,  tempemptyfunction; myscript )
+			),
+			Textbox(" Path Following Parameters", set font style("bold"), font color("blue")),
+			H List Box(
+			vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Step Size" )),
+				sb = Slider Box( 500, 1200, step_size,  tempemptyfunction; myscript )
+			),
+			Textbox(" Simulation Time parameters", set font style("bold"), font color("blue")),
+			H List Box(
+			vlistbox(spacerbox(Size(250,0),Color("red")), Text Box( "Simulation Time Step" )),
+				sb = Slider Box( 0.0001, 0.1, simulation_time_step,  tempemptyfunction; myscript )
+			),
+			)
+
+
+
+
+
+
+
+
+//			sb_avgpeakheight = sliderbox(0,0.1,avgpeakheight,listofpeakdims = J( numi, numj, 1+Random Uniform(0.01+avgpeakheight-rangepeakheight,0.01+avgpeakheight+rangepeakheight)); myscript),
+//			sb_rangepeakheight = sliderbox(0.01,0.3,rangepeakheight,listofpeakdims = J( numi, numj, 1+Random Uniform(0.01+avgpeakheight-rangepeakheight,0.01+avgpeakheight+rangepeakheight)); myscript),
+
+			
+		),
+		ob_test2 = outlinebox("Simulation",
+		Hlistbox(textbox("x"), sliderbox(300,1000, scenex, updatescenesize;myscript;), 
+		textbox("   y"), sliderbox(300,1000, sceney, updatescenesize;myscript;)), 
+		vlbscene = vlistbox(
+			scene = SceneBox(800,800),
+			),
+			hlistbox(textbox("Zoom Angle"), sb_perspective = sliderbox(15,180,angleperspective,myscript)),
+			sb_perspective_near = sliderbox(2,18,nearperspective,myscript),
+			sb_perspective_far = sliderbox(0,300,farperspective,myscript),
+			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-200,200,lookat_x_val,myscript)),
+			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-200,200,lookat_y_val,myscript)),
+			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,300,lookat_z_val,myscript)),
+			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-200,200,centerpoint_x_val,myscript)),
+			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-200,200,centerpoint_y_val,myscript)),
+			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,200,centerpoint_z_val,myscript)),
+
+			
+			
+			
+//			hlistbox(textbox("Move To X"), sb_moveto_x = sliderbox(-200,200,moveto_x_val,myscript)),
+//			hlistbox(textbox("Move To Y"), sb_moveto_y = sliderbox(-200,200,moveto_y_val,myscript)),
+//			hlistbox(textbox("Move To Z"), sb_moveto_z = sliderbox(-1000,1000,moveto_z_val,myscript)),
+//			hlistbox(textbox("Rotate To X"), sb_rotateto_x = sliderbox(-360,0,rotateto_x_val,myscript)),
+//			hlistbox(textbox("Rotate  To Y"), sb_rotateto_y = sliderbox(-180,180,rotateto_y_val,myscript)),
+//			hlistbox(textbox("Rotate  To Z"), sb_rotateto_z = sliderbox(-180,180,rotateto_z_val,myscript)),
+/*			hlistbox(textbox("Translate X"), sb_translateto_x = sliderbox(-200,200,translateto_x_val,myscript)),
+			hlistbox(textbox("Translate Y"), sb_translateto_y = sliderbox(-200,200,translateto_y_val,myscript)),
+			hlistbox(textbox("Translate Z"), sb_translateto_z = sliderbox(-200,200,translateto_z_val,myscript)),*/
+
+		),
+		ob_test3 = outlinebox("Views",
+			gb1 = graphbox(
+				Frame Size( 200, 200 ),
+				xscale(-10,100),
+				yscale(-10,100),
+				markersize(5);
+				//marker(3,1::10,1::10);
+				
+				
+				dragmarker(x_coor, y_coor,
+					//moveto_x_val = y_coor;
+					//rotateACto_x_val = -10*y_coor;
+					lookat_x_val = x_coor[1]-50;
+					//rotateto_x_val = rotateto_x_val;
+					//centerpoint_z_val = -y_coor;
+					//moveto_y_val = x_coor;
+					//rotateACto_z_val = 40*x_coor;
+					lookat_y_val = y_coor[1]-50;
+					//lookat_z_val
+					centerpoint_x_val = lookat_x_val + 100;
+					centerpoint_y_val = lookat_y_val + 100;
+					myscript;
+				),	
+			),
+			gb2 = graphbox(
+				Frame Size( 200, 200 ),
+				xname("X"),
+				yname("Z Height"),
+				xscale(0,100),
+				yscale(-0.5,11),
+				markersize(5);
+				dragmarker(x_coor2, y_coor2,
+					x_coor2 = [90];
+					if (y_coor2[1] <= 0,
+						y_coor2 = [0];
+					);
+					lookat_z_val = y_coor2[1]*20;
+					if (y_coor2[1] > 10,
+						gb2[axisbox(1)] << Max(y_coor2[1]*1.1);
+					);
+					myscript;
+				),
+				line({0,0},{x_coor2,y_coor2});	
+			)
+		)
+	)
+);
+nw << move window(1,1);
+
+tempemptyfunction = function({},
+	a = 9;
+);
+update_birdseye2 = function({},
+	a = 9;
+);
+updatescenesize = function({},
+	(vlbscene << child) << delete;
+	vlbscene << append(scene = SceneBox(scenex,sceney));
+	
+);
+
+update_birdseye = function({},
+	
+	numj = NumberStreets;
+	numi = NumberStreets;
+	
+	Try(gb1[framebox(1)] << Remove Graphics Script( 2 ));
+	Try(gb1[framebox(1)] << Remove Graphics Script( 1 ));
+	
+	str = "gb1[framebox(1)] << Add Graphics Script(";
+	
+	for(i=0, i<numi, i++,
+		for(j=0, j<numj, j++,
+			str = str || "rect("|| char(i) || "*(blockdim_x+StreetGap),"|| char(j) || "*(blockdim_y+StreetGap)+10,"|| char(i) || "*(blockdim_x+StreetGap)+10,"|| char(j) || "*(blockdim_y+StreetGap));\!n";
+		);
+	);
+	str = str || ");";
+
+	strparsed = parse(str);
+	eval(strparsed);
+
+	gb1[axisbox(1)] << Max( numi*(blockdim_x+StreetGap)+10 );
+	gb1[axisbox(2)] << Max( numj*(blockdim_y+StreetGap)+10 );
+
+	gb1 << Reshow;
+	//wait(0.01);
+	
+);
+update_birdseye;
+
+//scene << clear;
+
+translateto_x_val = -80;
+translateto_y_val = -80;
+translateto_z_val = -80;
+
+//numj = NumberStreets;
+//numi = NumberStreets;
+//
+//listofblockdims_z = J( numi, numj, Random Integer(avgheight-rangeheight,avgheight+rangeheight));
+//listofpeakdims = J( numi, numj, 1+Random Uniform(lLow,lHigh));
+
+makethepath_expr = expr(
+
+	ppath = Scene Display List( 1 );
+  ppath << Color( 1, 0, 0 );
+	ppath << Begin( LINE_STRIP );
+
+	for(i=1, i<20000, i++,
+
+		ppath<<Vertex(north[i], east[i], -down[i],);
+
+	);
+
+	ppath<<End();
+
+);
+makethebuildings_expr = expr(
+
+box = Scene Display List( 1 );
+
+for(i=0, i<numi, i++,
+for(j=0, j<numj, j++,
+	blockdim_z = listofblockdims_z[i+1,j+1];
+	peakdim_z = listofpeakdims[i+1,j+1];
+	
+	box << pushmatrix;
+	box << Translate(i*(blockdim_x+StreetGap),j*(blockdim_y+StreetGap),0);
+	//box << Color(0.1,0.9,0.9);
+	//box << sphere(5, 20, 20);
+	//box << popmatrix;
+
+	//box << pushmatrix;
+	
+	box << linewidth(2);
+	
+	box << Begin( QUADS );
+	
+	box << Color(0.7,0.7,0.7);
+	box<<Vertex(0, 0, 0);
+	box<<Vertex(0, 0, blockdim_z);
+	box<<Vertex(0, blockdim_y, blockdim_z);
+	box<<Vertex(0, blockdim_y, 0);
+	
+	box<<Vertex(blockdim_x, 0, 0);
+	box<<Vertex(blockdim_x, 0, blockdim_z);
+	box<<Vertex(blockdim_x, blockdim_y, blockdim_z);
+	box<<Vertex(blockdim_x, blockdim_y, 0);
+	
+	box << Color(0.3,0.3,0.3);
+	box<<Vertex(0,	0, 0);
+	box<<Vertex(blockdim_x,	0, 0);
+	box<<Vertex(blockdim_x,	0, blockdim_z);
+	box<<Vertex(0,	0, blockdim_z);
+	
+	box<<Vertex(0,	blockdim_y, 0);
+	box<<Vertex(blockdim_x,	blockdim_y, 0);
+	box<<Vertex(blockdim_x,	blockdim_y, blockdim_z);
+	box<<Vertex(0,	blockdim_y, blockdim_z);
+	
+	box << Color(0.1,0.1,0.1);
+	box<<Vertex(0,0,	0);
+	box<<Vertex(0,blockdim_y,	0);
+	box<<Vertex(blockdim_x,blockdim_y,	0);
+	box<<Vertex(blockdim_x,0,	0);
+	
+	box<<Vertex(0,0,	blockdim_z);
+	box<<Vertex(0,blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x,blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x,0,	blockdim_z);
+	
+	box<<End();
+	
+	
+	
+	box << Begin( TRIANGLE_STRIP);
+	
+	box << Color(0.1,0.1,0.8);
+	//box << Color(0.1,0.1,0.7);
+	//box << Color(0.1,0.9,0.1);
+	box<<Vertex(0,0,	blockdim_z);
+	box<<Vertex(0,blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x/2,blockdim_y/2,	blockdim_z*peakdim_z);
+
+	box << Color(0.1,0.1,0.3);
+	//box << Color(0.5,0.5,0.5);
+	//box << Color(0.5,0.5,0.5);
+	//box<<Vertex(0,0,	blockdim_z);
+	box<<Vertex(blockdim_x,0,	blockdim_z);
+	box<<Vertex(blockdim_x/2,blockdim_y/2,	blockdim_z*peakdim_z);
+	box<<Vertex(0,0,	blockdim_z);
+	
+	//box << Color(0.7,0.1,0.7);
+	//box << Color(0.7,0.1,0.8);
+	box << Color(0.3,0.3,0.99);
+	box<<Vertex(0,blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x,blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x/2,blockdim_y/2,	blockdim_z*peakdim_z);
+	
+	box << Color(0.5,0.5,0.99);
+	//box<<Vertex(blockdim_x,0,	blockdim_z);
+	box<<Vertex(blockdim_x, blockdim_y,	blockdim_z);
+	box<<Vertex(blockdim_x/2,blockdim_y/2,	blockdim_z*peakdim_z);
+	box<<Vertex(blockdim_x,0,	blockdim_z);
+	box<<End();
+	
+	box << popmatrix;
+	);
+);
+);
+
+myscript = expr(
+
+
+if(cb << Get( 1 ),
+	numj = NumberStreets;
+	numi = NumberStreets;
+
+	listofblockdims_z = J( numi, numj, max(1,Random Integer(avgheight-rangeheight,avgheight+rangeheight)));
+	listofpeakdims = J( numi, numj, 1+max(0, Random Uniform(lLow,lHigh)));
+
+	makethebuildings_expr;
+);
+
+	//drawtheairplane_expr;
+
+	//makethepath_expr;
+
+	scene << clear;
+	
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	//scene << Color(0.1, .1, .1 );
+	//scene << sphere(5,30,30);
+	
+	scene << Color(0.1, .1, .1 );
+	//scene << sphere(5,30,30);
+	
+	
+/*	scene << Rotate(90, 1, 0, 0 );
+	scene << Translate(-moveto_y_val, moveto_z_val, moveto_x_val);
+	scene << Rotate(rotateto_x_val, 1, 0, 0 );
+	scene << Rotate(rotateto_y_val, 0, 1, 0 );
+	scene << Rotate(rotateto_z_val, 0, 0, 1 );*/
+	//scene << Call list(box);
+	//scene << pushmatrix;
+	//scene << Translate(0, 1, 7);
+	//scene << arcball(plane,10);
+	//scene << popmatrix;
+	
+	//box << Call list(ppath);
+	scene << Call list(box);
+	//scene << arcball(box,100);
+	scene << Update;
+);
+myscript;
+
+//hlb << insert(box = Scene Display List( 1 );
+
+drawtheairplane_expr;
+makethepath_expr;
+
+ii = 1;
+
+addingpathandplane = function({},
+	
+
+	scene << clear;
+		scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+	box << clear;
+	makethebuildings_expr;
+		
+	plane << clear;
+	drawtheairplane_expr;
+	
+	ppath << clear;
+	makethepath_expr;
+	
+	box << Call list(ppath);
+	
+	box << pushmatrix;
+	//box << Rotate(90, 1, 0, 0 );
+	box << Translate(north[ii], east[ii], -down[ii]);
+	//a_phi = dtmat[0,8];
+	//a_theta = dtmat[0,9];
+	//a_psi = dtmat[0,10];
+	//box << Rotate(a_theta[ii]*180/pi(), 0, 1, 0 );
+	//box << Rotate(90, 1, 0, 0 );
+	box << Rotate(90, 1, 0, 0 );
+	box << Rotate(90, 0, 1, 0 );
+	//box << Rotate(90, 0, 0, 1 );
+	box << Rotate(-a_theta[ii]*180/pi()*10, 1, 0, 0 ); // pitch
+	box << Rotate(-a_psi[ii]*180/pi()*10, 0, 1, 0 ); // roll?
+	//box << Rotate(-a_phi[ii]*180/pi(), 0, 0, 1 ); // yaw?
+	box << Call list(plane);
+	//box << sphere(1,20,20);
+	//scene << arcball(ppath,100);
+	box << popmatrix;
+	
+	scene << arcball(box,100);
+	
+	scene << Update;
+
+);
+
+for(ii=1, ii<50, ii=ii+10,
+	//lookat_y_val = 100-ii;
+	//moveto_y_val = moveto_y_val+x_coor ;
+	//moveto_x_val = moveto_x_val-y_coor ;
+	//if (moveto_x_val < 5, moveto_x_val = 5;);
+	//moveto_z_val = -400+2*ii;
+	//centerpoint_y_val = centerpoint_y_val-ii;
+	//centerpoint_y_val = -500;
+	
+	//myscript;
+	
+	if(cb << Get( 1 ),
+	
+	scene << clear;
+		scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+	box << clear;
+	makethebuildings_expr;
+		
+	plane << clear;
+	drawtheairplane_expr;
+	
+	ppath << clear;
+	makethepath_expr;
+	
+	box << Call list(ppath);
+	
+	box << pushmatrix;
+	//box << Rotate(90, 1, 0, 0 );
+	box << Translate(north[ii], east[ii], -down[ii]);
+	//a_phi = dtmat[0,8];
+	//a_theta = dtmat[0,9];
+	//a_psi = dtmat[0,10];
+	//box << Rotate(a_theta[ii]*180/pi(), 0, 1, 0 );
+	//box << Rotate(90, 1, 0, 0 );
+	box << Rotate(90, 1, 0, 0 );
+	box << Rotate(90, 0, 1, 0 );
+	//box << Rotate(90, 0, 0, 1 );
+	box << Rotate(-a_theta[ii]*180/pi()*10, 1, 0, 0 ); // pitch
+	box << Rotate(-a_psi[ii]*180/pi()*10, 0, 1, 0 ); // roll?
+	//box << Rotate(-a_phi[ii]*180/pi(), 0, 0, 1 ); // yaw?
+	box << Call list(plane);
+	//box << sphere(1,20,20);
+	//scene << arcball(ppath,100);
+	box << popmatrix;
+	
+	scene << arcball(box,100);
+	
+	scene << Update;
+	);
+	wait(0.001);
+);
+>>>>>>> efc854e4d37b89db04110cc0779e742e921336dc
