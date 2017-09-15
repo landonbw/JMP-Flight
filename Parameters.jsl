@@ -219,4 +219,4 @@ ki_throttle = 0.0001;
 chi_inf = 80 * 3.14159 / 180;
 k_path = 0.005;
 k_orbit = 2;
-t_rad = 275;
+t_rad = 175;

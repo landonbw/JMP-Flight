@@ -1,14 +1,14 @@
-﻿clear globals();
-clear log();
+﻿Clear Globals();
+Clear Log();
 
 Include( "Parameters.jsl" );
 Include( "TableManager.jsl" );
 Include( "Simulator.jsl" );
 Include( "Controller.jsl" );
 Include( "LateralController.jsl" );
-Include( "LongitudinalController.jsl");
-Include( "PathFollower.jsl");
-Include( "PathManager.jsl");
+Include( "LongitudinalController.jsl" );
+Include( "PathFollower.jsl" );
+Include( "PathManager.jsl" );
 //make table to record the state through time
 data_table = createTable_func();
 
@@ -20,27 +20,28 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 20000, ii++,
+For( ii = 1, ii < 20000, ii++, 
  
-	va = sqrt(state[4]^2 + state[5]^2 + state[6]^2);
-	alpha = ArcTan(state[6]/state[4]);
-	beta = ArcSine(state[5]/va);
-	flight_state = matrix({va, alpha, beta, 0, state[9]});
-	pos = matrix({state[1], state[2], state[3]});
+	va = Sqrt( state[4] ^ 2 + state[5] ^ 2 + state[6] ^ 2 );
+	alpha = ArcTan( state[6] / state[4] );
+	beta = ArcSine( state[5] / va );
+	flight_state = Matrix( {va, alpha, beta, 0, state[9]} );
+	pos = Matrix( {state[1], state[2], state[3]} );
 	
 	//path manager for path
-	wayp1 = matrix({0, 0, -20});
-	wayp2 = matrix({200, 0, -20});
-	wayp3 = matrix({0, 200, -20});
-	wayp4 = matrix({200, 200, -20});
-	waypoint_list = list(wayp1, wayp2, wayp3, wayp4);
-	y_manager = get_path_straight_line_func(waypoint_list, pos);
+	wayp1 = Matrix( {0, 0, -100} );
+	wayp2 = Matrix( {300, 0, -120} );
+	wayp3 = Matrix( {0, 300, -200} );
+	wayp4 = Matrix( {100, 400, -230} );
+	wayp5 = Matrix( {300, 300, -200} );
+	waypoint_list = List( wayp1, wayp2, wayp3, wayp4, wayp5);
+	y_manager = get_path_straight_line_func( waypoint_list, pos );
 	//show(y_manager);
 	
 	//path follower for desired flight state
 	//y_manager = [flag, vg_des, r, q_past, center, rho, direction]
 	//y_manager = list(0, 35, list(0, 40, -20), list(1, 1, 0), list(0, 0, -20), 20, 1);
-	path_follow_commands = follow_path_func(y_manager, pos, state[9], state[9]);
+	path_follow_commands = follow_path_func( y_manager, pos, state[9], state[9] );
 	
 	//autopilot for control inputs
 	h_req = path_follow_commands[1];
@@ -48,12 +49,12 @@ For( ii = 1, ii < 20000, ii++,
 	phi_ff = path_follow_commands[3];
 	//show(path_follow_commands);
 	
-	deltaA = lateralControl(state, course_req, flight_state);
-	lon_ret = longitudinalControl(state, flight_state, h_req, 35);
+	deltaA = lateralControl( state, course_req, flight_state );
+	lon_ret = longitudinalControl( state, flight_state, h_req, 35 );
 	deltaE = lon_ret[1];
 	deltaT = lon_ret[2];
 	//simulator for plane response
-	for( jj = 0, jj < num_steps, jj++,
+	For( jj = 0, jj < num_steps, jj++,
 		forces = getForces_func( state );
 
 		state = updateState_func( state, forces );
@@ -67,55 +68,19 @@ For( ii = 1, ii < 20000, ii++,
 );
 
 ///////////////////////// Show the data table
-data_table << ShowWindow(1);
+data_table << ShowWindow( 1 );
 
 //////////////////////// Plot some of the results
 Fit Group(
-	Bivariate(
-		Y( :Pn_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-	),
-	Bivariate(
-		Y( :Pe_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-	),
-	Bivariate(
-		Y( :Pd_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-		),
-	Bivariate(
-		Y( :u_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-	),
-	Bivariate(
-		Y( :v_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-	),
-	Bivariate(
-		Y( :w_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-		),
-	Bivariate(
-		Y( :phi_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-	),
-	Bivariate(
-		Y( :theta_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-	),
-	Bivariate(
-		Y( :psi_col ),
-		X( :time_col ),
-		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
-		),
+	Bivariate( Y( :Pn_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :Pe_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :Pd_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :u_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :v_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :w_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :phi_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :theta_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
+	Bivariate( Y( :psi_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ), 
 /*	Bivariate(
 		Y( :p_col ),
 		X( :time_col ),
