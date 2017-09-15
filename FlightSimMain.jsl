@@ -20,7 +20,7 @@ data_table = createTable_func();
 ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
-For( ii = 1, ii < 20000, ii++, 
+For( ii = 1, ii < 5000, ii++, 
  
 	va = Sqrt( state[4] ^ 2 + state[5] ^ 2 + state[6] ^ 2 );
 	alpha = ArcTan( state[6] / state[4] );
@@ -29,10 +29,10 @@ For( ii = 1, ii < 20000, ii++,
 	pos = Matrix( {state[1], state[2], state[3]} );
 	
 	//path manager for path
-	wayp1 = Matrix( {0, 0, -100} );
-	wayp2 = Matrix( {300, 0, -120} );
+	wayp1 = Matrix( {0, 0, -200} );
+	wayp2 = Matrix( {300, 0, -200} );
 	wayp3 = Matrix( {0, 300, -200} );
-	wayp4 = Matrix( {100, 400, -230} );
+	wayp4 = Matrix( {100, 400, -200} );
 	wayp5 = Matrix( {300, 300, -200} );
 	waypoint_list = List( wayp1, wayp2, wayp3, wayp4, wayp5);
 	y_manager = get_path_straight_line_func( waypoint_list, pos );
@@ -81,6 +81,7 @@ Fit Group(
 	Bivariate( Y( :phi_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
 	Bivariate( Y( :theta_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
 	Bivariate( Y( :psi_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ), 
+	Bivariate( Y( :Pn_col ), X( :Pe_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
 /*	Bivariate(
 		Y( :p_col ),
 		X( :time_col ),
