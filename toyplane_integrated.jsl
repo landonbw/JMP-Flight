@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-﻿clear globals();
-clear log();
+﻿
 /*
 LightAmbient1 = 0; LightAmbient2 = 0; LightAmbient3 = 0; LightAmbient4 = 1;
 LightDiffuse1 = 1; LightDiffuse2 = 1; LightDiffuse3 = 1; LightDiffuse4 = 1;
@@ -55,6 +53,7 @@ centerpoint_y_val = 0;
 centerpoint_z_val = 6;*/
 
 Include("simpleairplaneparts.jsl");
+
 drawtheairplane_expr = expr(
 
 plane = SceneDisplayList(1);
