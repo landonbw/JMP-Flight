@@ -1,4 +1,4 @@
-﻿
+﻿include("Parameters.jsl");
 
 generate_random_point = function({map, height_c_planner},
 	//map[1] = x limit
@@ -17,20 +17,21 @@ find_nearest_point = function({points, new_point},
 	ang = 0;
 	for(i=1, i<=nrow(points), i++,
 
-		check_point = points[1, 1::3];
-		show(check_point);
+		check_point = points[i, 1::3];
+		is_end = points[i, 6];
+		//show(check_point);
 		//dist_to = sqrt((new_point[1]-check_point[1])^2 + (new_point[2]-check_point[2])^2);
 	
 		dist_to = dist_between_points(new_point, check_point);
-		show(dist_to);
-		if(dist_to<shortest_dist & dist_to>3*175,
-			shortest_point = check_point
+		//show(dist_to);
+		if(dist_to<shortest_dist & dist_to>3*t_rad & !is_end,
+			shortest_point = check_point;
 			shortest_dist = dist_to;
 			shortest_idx = i;
-			ang = atan(new_point[1]-check_point[1], new_point[2]-check_point[2])
-		);
+			ang = atan(new_point[2]-check_point[2], new_point[1]-check_point[1])
+		)
 	);
-	show(shortest_dist, shortest_idx);
+	//show(shortest_dist, shortest_idx);
 	nearest_point_found = matrix({shortest_point[1], shortest_point[2], shortest_point[3], shortest_dist, shortest_idx, ang});
 );
 
@@ -48,44 +49,67 @@ dist_between_points = function({point_a, point_b},
 
 //waypoint_list
 
+find_shortest_path = function({waypoints, shortest_end_idx},
+	path_waypoints = waypoints[shortest_end_idx, 1::3];
+	prev_idx = waypoints[shortest_end_idx, 4];
+	while(prev_idx > 0,
+	//for(i=1, i<3, i++,
+		path_waypoints = waypoints[prev_idx, 1::3] |/ path_waypoints;
+		prev_idx = waypoints[prev_idx, 4];
+	);
+	path_waypoints;
+);
+
 find_path = function({map, start, end},
-	waypoint_list = matrix({{start[1], start[2], start[3], -1, 0}});
+	//matrix row information is as follows
+	//[coor_n, coor_e, coor_d, parent_waypoint, path_cost, is_end]
+	waypoint_list = matrix({{start[1], start[2], start[3], -1, 0, 0}});
 	show(waypoint_list);
 	
 	feasible_path_count = 0;
 	height_c_planner = start[3];
-	//while(feasible_path_count < 1,
-	for(i=1, i<2, i++,
-		show("while loop");
+	
+	shortest_end_dist = map[1] * map[2];
+	shortest_end_idx = -1;
+	while(feasible_path_count < 4,
+	//for(i=1, i<=15, i++,
 		test_point = generate_random_point(map, height_c_planner);
-		show("test point");
 		nearest_point_info = find_nearest_point(waypoint_list, test_point);
-		show(nearest_point_info);
+		nearest_point = nearest_point_info[1::3];
 		nearest_idx = nearest_point_info[5];
 		nearest_dist = nearest_point_info[4];
+		nearest_ang = nearest_point_info[6];
 		//check if path is feasible.  for now assume that it is
 		
 		//ensure that the random point was good
-		if(nearest_point_info[2] > 0,
-			new_waypoint_data = matrix({{test_point[1], test_point[2], test_point[3], nearest_idx, waypoint_list[nearest_idx, 5] + nearest_dist}});
+		if(nearest_point_info[5] > 0,
+			new_n = nearest_point_info[1] + step_size * cos(nearest_ang);
+			new_e = nearest_point_info[2] + step_size * sin(nearest_ang);
+			new_waypoint_data = matrix({{new_n, new_e, test_point[3], nearest_idx, waypoint_list[nearest_idx, 5] + step_size, 0}});
 			waypoint_list |/= new_waypoint_data;
-			show("waypoint added");
+			//show("waypoint added");
 		);
 		
 		//check if the end is reachable
 		dist_to_end = dist_between_points(end, test_point);
-		if(dist_to_end < 150,
+		if(dist_to_end < step_size,
 			last_idx = nrow(waypoint_list);
-			new_waypoint_data = matris({{end[1], end[2], end[3], last_idx, waypoint_list[last_idx, 5]+dist_to_end}});
-			waypoint_list ||= list(new_waypoint_data);
+			new_waypoint_data = matrix({{end[1], end[2], end[3], last_idx, waypoint_list[last_idx, 5]+dist_to_end, 1}});
+			waypoint_list |/= new_waypoint_data;
 			feasible_path_count += 1;
 			show("end added");
+			end_idx = nrow(waypoint_list);
+			if(waypoint_list[end_idx, 6]<shortest_end_dist,
+				shortest_end_dist = waypoint_list[end_idx, 6];
+				shortest_end_idx = end_idx;
+			);
 		);
 		
 	);
-	//shortest_path = find_shortest_path(waypoint_list);
-	//shortest_path;
-	//waypoint_list;
+	show(waypoint_list);
+	//dt = as table(waypoint_list);
+	shortest_path = find_shortest_path(waypoint_list, shortest_end_idx);
+	dt = as table(shortest_path);
 );
 
 
