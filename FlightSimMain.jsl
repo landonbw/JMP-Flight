@@ -34,7 +34,7 @@ For( ii = 1, ii < 20000, ii++,
 	wayp3 = Matrix( {0, 300, -200} );
 	wayp4 = Matrix( {100, 400, -230} );
 	wayp5 = Matrix( {300, 300, -200} );
-	waypoint_list = List( wayp1, wayp2, wayp3, wayp4, wayp5);
+	waypoint_list = List( wayp1, wayp2, wayp3, wayp4, wayp5 );
 	y_manager = get_path_straight_line_func( waypoint_list, pos );
 	//show(y_manager);
 	
@@ -72,15 +72,51 @@ data_table << ShowWindow( 1 );
 
 //////////////////////// Plot some of the results
 Fit Group(
-	Bivariate( Y( :Pn_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :Pe_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :Pd_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :u_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :v_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :w_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :phi_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :theta_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ),
-	Bivariate( Y( :psi_col ), X( :time_col ), SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) ) ), 
+	Bivariate(
+		Y( :Pn_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :Pe_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :Pd_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :u_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :v_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :w_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :phi_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :theta_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	),
+	Bivariate(
+		Y( :psi_col ),
+		X( :time_col ),
+		SendToReport( Dispatch( {}, "Bivar Plot", FrameBox, {Marker Size( 0 )} ) )
+	), 
 /*	Bivariate(
 		Y( :p_col ),
 		X( :time_col ),
