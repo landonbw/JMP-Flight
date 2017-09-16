@@ -98,11 +98,12 @@ find_path = function({map, start, end},
 		);
 		
 		//check if the end is reachable
-		//dist_to_end = dist_between_points(end, waypoint_list[nrow(waypoint_list),1::3];
+		
 		//if(dist_to_end < step_size,
 		//show(end);
 		//show(waypoint_list[nrow(waypoint_list),1], waypoint_list[nrow(waypoint_list),2]);
 		if(!inside_a_buildling(waypoint_list[nrow(waypoint_list),1::3], end[1],end[2]),
+			dist_to_end = dist_between_points(end, waypoint_list[nrow(waypoint_list),1::3]);
 			last_idx = nrow(waypoint_list);
 			new_waypoint_data = matrix({{end[1], end[2], end[3], last_idx, waypoint_list[last_idx, 5]+dist_to_end, 1}});
 			waypoint_list |/= new_waypoint_data;

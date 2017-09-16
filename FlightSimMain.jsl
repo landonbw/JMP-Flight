@@ -22,8 +22,9 @@ ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
 
-waypoint_mat = find_path(matrix({2000, 2000}), matrix({Pn, Pe, Pd}), matrix({1000, 1000, -50}));
+waypoint_mat = find_path(matrix({endpointgoal*1.1, endpointgoal*1.1}), matrix({Pn, Pe, Pd}), matrix({endpointgoal, endpointgoal, Pd}));
 end_reached = 0;
+
 
 
 //For( ii = 1, ii < 20000, ii++,

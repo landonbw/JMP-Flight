@@ -73,7 +73,7 @@ plane << pushmatrix;
 plane << popmatrix;*/
 
 
-
+plane << Color(1,0,0);
 
 //plane << sphere(0.1,30,30);
 plane << pushmatrix;

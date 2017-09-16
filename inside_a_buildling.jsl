@@ -61,24 +61,32 @@ inside_a_buildling = function({point1,x2, y2},
 		//print(insidecheck);
 		//print(xmat);
 		//print(ymat);
-		if(insidecheck == 1,
-			break();
-		);
-	);
+		//if(insidecheck == 1,
+		//	break();
+		//);
+
 	// now check for below height of building.
 	if(insidecheck == 1,
 		maxheight_all = listofblockdims_z :* listofpeakdims;
 
 		maxheight_of_inside = maxheight_all[i+1,j+1];
 
-		if(maxheight_of_inside > zp,
-			insidecheck_all_three = 1;,
+		if(maxheight_of_inside > -zp,
+			insidecheck_all_three = 1;
+			,
 			insidecheck_all_three = 0;
 		);
 		,
 		insidecheck_all_three = 0;
 	);
+	
 	//show(insidecheck_all_three);
-
+	if(insidecheck_all_three == 1,
+		break();
+	);
+	
+	);
+	
+	
 	insidecheck_all_three;
 );

@@ -12,6 +12,12 @@ waypoint_mat = [0 0 0];
 
 north = [0];
 
+xpathmat = [];
+ypathmat = [];
+xcurpoint = 0;
+ycurpoint = 0;
+
+endpointgoal = 5*(200+40)+200+100;
 
 //dt = open("plane_sim_test.jmp");
 
@@ -40,8 +46,8 @@ lightPosition = 5;
 anglerudder = 10;
 angleflap = 10;
 
-x_coor = [5];
-y_coor = [5];
+x_coor = [50];
+y_coor = [50];
 
 vec_x = [1];
 vec_y = [1];
@@ -57,7 +63,7 @@ lookat_z_val = 100; //800;
 
 lookat_x_val = -170;
 lookat_y_val = -170;
-lookat_z_val = 650;
+lookat_z_val = 760;
 
 show(lookat_x_val);
 show(lookat_y_val);
@@ -94,10 +100,10 @@ NumberStreets = 5;
 numj = NumberStreets;
 numi = NumberStreets;
 	
-StreetGap = 57;
+StreetGap = 40;
 
 x_coor2 = [900];
-y_coor2 = [100];
+y_coor2 = [38];
 
 blockdim_x = 200;
 blockdim_y = 200;
@@ -149,7 +155,7 @@ animation_time_step = 10;
 nw = new window("UAV Flight City",
 	hlb = hlistbox(
 		ob_test1 = outlinebox("Parameters",
-			hlistbox(cb = Check Box({"Update Live"}, << Set( 1, 1 )), Buttonbox("Add path", addingpathandplane;)),
+			hlistbox(cb = Check Box({"Update Live"}, << Set( 1, 1 )), ),
 			
 			outlinebox("City Definition Parameters",
 			H List Box(
@@ -290,16 +296,16 @@ nw = new window("UAV Flight City",
 			Textbox(" Path Following Parameters", set font style("bold"), font color("blue")),
 			H List Box(
 			vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Step Size" )),
-				sb = Slider Box( 50, 1000, step_size,  tempemptyfunction; myscript )
+				sb = Slider Box( 50, 1000, step_size,  tempemptyfunction; myscriptnobuildings )
 			),
 			Textbox(" Simulation Time Parameters", set font style("bold"), font color("blue")),
 			H List Box(
 			vlistbox(spacerbox(Size(250,0),Color("red")), Text Box( "Simulation Time Step" )),
-				sb = Slider Box( 0.0001, 0.1, simulation_time_step,  tempemptyfunction; myscript )
+				sb = Slider Box( 0.0001, 0.1, simulation_time_step,  tempemptyfunction; myscriptnobuildings )
 			),
 			H List Box(
 			vlistbox(spacerbox(Size(250,0),Color("red")), Text Box( "Animation Time Step" )),
-				sb = Slider Box( 1, 1000, animation_time_step,  tempemptyfunction; myscript )
+				sb = Slider Box( 1, 1000, animation_time_step,  tempemptyfunction; myscriptnobuildings )
 			),
 			)
 
@@ -316,20 +322,20 @@ nw = new window("UAV Flight City",
 			
 		),
 		ob_test2 = outlinebox("Simulation",
-		Hlistbox(textbox("x"), sliderbox(300,1000, scenex, updatescenesize;myscript;), 
-		textbox("   y"), sliderbox(300,1000, sceney, updatescenesize;myscript;)), 
+		Hlistbox(textbox("x"), sliderbox(300,1000, scenex, updatescenesize;myscriptnobuildings;), 
+		textbox("   y"), sliderbox(300,1000, sceney, updatescenesize;myscriptnobuildings;)), 
 		vlbscene = vlistbox(
 			scene = SceneBox(800,800),
 			),
-			hlistbox(textbox("Zoom Angle"), sb_perspective = sliderbox(15,180,angleperspective,myscript)),
-			sb_perspective_near = sliderbox(2,18,nearperspective,myscript),
-			sb_perspective_far = sliderbox(0,300,farperspective,myscript),
-			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-500,500,lookat_x_val,myscript)),
-			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-500,500,lookat_y_val,myscript)),
-			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,700,lookat_z_val,myscript)),
-			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-500,500,centerpoint_x_val,myscript)),
-			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-500,500,centerpoint_y_val,myscript)),
-			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,500,centerpoint_z_val,myscript)),
+			hlistbox(textbox("Zoom Angle"), sb_perspective = sliderbox(15,180,angleperspective,myscriptnobuildings)),
+			sb_perspective_near = sliderbox(2,18,nearperspective,myscriptnobuildings),
+			sb_perspective_far = sliderbox(0,300,farperspective,myscriptnobuildings),
+			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-500,500,lookat_x_val,myscriptnobuildings)),
+			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-500,500,lookat_y_val,myscriptnobuildings)),
+			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,700,lookat_z_val,myscriptnobuildings)),
+			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-500,500,centerpoint_x_val,myscriptnobuildings)),
+			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-500,500,centerpoint_y_val,myscriptnobuildings)),
+			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,500,centerpoint_z_val,myscriptnobuildings)),
 
 			
 			
@@ -348,12 +354,11 @@ nw = new window("UAV Flight City",
 		ob_test3 = outlinebox("Views",
 			gb1 = graphbox(
 				Frame Size( 200, 200 ),
-				xscale(-10,100),
-				yscale(-10,100),
+				xscale(-50,100),
+				yscale(-50,100),
 				markersize(5);
 				//marker(3,1::10,1::10);
-				
-				
+			
 				dragmarker(x_coor, y_coor,
 					//moveto_x_val = y_coor;
 					//rotateACto_x_val = -10*y_coor;
@@ -366,28 +371,40 @@ nw = new window("UAV Flight City",
 					//lookat_z_val
 					centerpoint_x_val = lookat_x_val + 100;
 					centerpoint_y_val = lookat_y_val + 100;
-					myscript;
-				),	
+					myscriptnobuildings;
+				);
+				pencolor("Green");
+				pen size(2);
+				line(xpathmat, ypathmat);
+				
+				marker({xcurpoint,ycurpoint});
 			),
 			gb2 = graphbox(
 				Frame Size( 200, 200 ),
 				xname("X"),
 				yname("Z Height"),
-				xscale(0,100),
-				yscale(-0.5,11),
+				xscale(0,1000),
+				yscale(-0.5,110),
 				markersize(5);
 				dragmarker(x_coor2, y_coor2,
-					x_coor2 = [90];
+					x_coor2 = [900];
 					if (y_coor2[1] <= 0,
 						y_coor2 = [0];
 					);
 					lookat_z_val = y_coor2[1]*20;
-					if (y_coor2[1] > 10,
+					if (y_coor2[1] > 100,
 						gb2[axisbox(1)] << Max(y_coor2[1]*1.1);
 					);
-					myscript;
+					myscriptnobuildings;
 				),
 				line({0,0},{x_coor2,y_coor2});
+			),
+			gb3 = graphbox(
+				Frame Size( 200, 200 ),
+				xname("North"),
+				yname("East"),
+				xscale(-60,1000),
+				yscale(-60,1000),
 			),
 			buttonbox("Define Path", Include(dir || "FlightSimMain.jsl")),
 			buttonbox("Extract Path",
@@ -404,13 +421,39 @@ nw = new window("UAV Flight City",
 				a_theta = dtmat[0,9];
 				a_psi = dtmat[0,10];
 				
+				xpathmat = north;
+				ypathmat = east;
+				
+				gb1[framebox(1)] << reshow;
+				
 				show(waypoint_mat);
 				
 				print("Path extracted");
 			),
+			Buttonbox("Add path", addingpathandplane;),
+			Buttonbox("Show RRT", 
+				//waypoint_list
+				//dttest = Current Data table();
+
+				mattest = waypoint_list; //dttest << get as matrix;
+
+				gb3[axisbox(1)] << max(max(mattest[0,1]));
+				gb3[axisbox(2)] << max(max(mattest[0,1]));
+
+				for(b = 2, b<=nrows(mattest), b++,
+						temp = eval expr(
+						gb3[framebox(1)] << Add graphics script(
+							line({mattest[expr(b),1],mattest[expr(b),2]},{mattest[mattest[expr(b),4],1],mattest[mattest[expr(b),4],2]})
+						);
+					);
+					eval(temp);
+
+				);
+			),
+			
 			buttonbox("Simulate", simulatebutton;),
-			buttonbox("Simulate One Step", simulate_onestep;),
-			buttonbox("Simulate 10 Steps", simulate_tenstep;),
+			//buttonbox("Simulate One Step", simulate_onestep;),
+			//buttonbox("Simulate 10 Steps", simulate_tenstep;),
 		)
 	)
 );
@@ -490,15 +533,22 @@ makethewaypoints_expr = expr(
 	waypath = Scene Display List( 1 );
   
   waypath << Point Size (10);
-	waypath << Begin( POINTS );
-	waypath << Color( 0.2, 0.2, 0.2 );
+	//waypath << Begin( POINTS );
+	waypath << Color( 1, 0.7, 0.0 );
+	//ppath << Color( 0, 0.9, 0 );
+	
 	for(i=1, i<=nrows(waypoint_mat), i++,
 
-		waypath<<Vertex(waypoint_mat[i,1], waypoint_mat[i,2], -waypoint_mat[i,3]);
+		waypath << Push Matrix;
+		waypath << Translate(waypoint_mat[i,1], waypoint_mat[i,2], -waypoint_mat[i,3]);
+		waypath << Sphere( 7, 15, 15);
+		waypath << pop Matrix;
+
+		//waypath<<Vertex(waypoint_mat[i,1], waypoint_mat[i,2], -waypoint_mat[i,3]);
 
 	);
 
-	waypath<<End();
+	//waypath<<End();
 
 );
 
@@ -597,7 +647,31 @@ for(j=0, j<numj, j++,
 );
 );
 
+myscriptnobuildings = expr(
+	//if(cb << Get( 1 ),
+		//numj = NumberStreets;
+		//numi = NumberStreets;
+
+		makethebuildings_expr;
+	//);
+
+		//drawtheairplane_expr;
+
+		//makethepath_expr;
+
+		scene << clear;
+		
+		scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+		scene << Color(0.1, .1, .1 );
+		scene << Call list(box);
+		//scene << arcball(box,100);
+		scene << Update;
+);
+
+
 myscript = expr(
+
 
 
 	if(cb << Get( 1 ),
@@ -609,6 +683,10 @@ myscript = expr(
 
 		makethebuildings_expr;
 	);
+	
+	endpointgoal = numj*(blockdim_y+StreetGap)+100;
+	show(endpointgoal);
+	
 
 		//drawtheairplane_expr;
 
@@ -654,7 +732,6 @@ ii = 1;
 
 addingpathandplane = function({},
 	
-
 	scene << clear;
 	scene << Perspective( angleperspective, nearperspective, farperspective );
 	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
@@ -780,6 +857,10 @@ for(ii=1, ii<nrow(north), ii=ii+animation_time_step,
 	scene << popmatrix;
 	
 	//scene << arcball(box,100);
+	
+	xcurpoint = north[ii];
+	ycurpoint = east[ii];
+	gb1[framebox(1)] << reshow;
 	
 	scene << Update;
 	//);

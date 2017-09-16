@@ -1,0 +1,32 @@
+new window("test",
+		gb3 = graphbox(
+				Frame Size( 600, 600 ),
+				xname("X"),
+				yname("Z Height"),
+				xscale(-60,1000),
+				yscale(-60,1000),
+			),
+);
+
+
+
+dttest = Current Data table();
+
+mattest = dttest << get as matrix;
+
+gb3[axisbox(1)] << max(max(mattest[0,1]));
+gb3[axisbox(2)] << max(max(mattest[0,1]));
+
+for(b = 2, b<=nrows(mattest), b++,
+
+
+temp = eval expr(
+	gb3[framebox(1)] << Add graphics script(
+
+		line({mattest[expr(b),1],mattest[expr(b),2]},{mattest[mattest[expr(b),4],1],mattest[mattest[expr(b),4],2]})
+		
+	);
+	);
+eval(temp);
+
+);
