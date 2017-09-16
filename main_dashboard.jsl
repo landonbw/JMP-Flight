@@ -1,20 +1,20 @@
 Try(nw << Close Window);
-//clear globals();
+Clear globals();
 Clear Log();
+
+Random Reset( 1 );
+
+dir = Get Default Directory();
 
 Include("toyplane_integrated.jsl");
 
-dt = open("plane_sim_test.jmp");
+waypoint_mat = [0 0 0];
 
-dtmat =  dt << Get as Matrix();
+north = [0];
 
-north = dtmat[0,2]/3;
-east = dtmat[0,3]/3;
-down = dtmat[0,4]*3;
 
-a_phi = dtmat[0,8];
-a_theta = dtmat[0,9];
-a_psi = dtmat[0,10];
+//dt = open("plane_sim_test.jmp");
+
 
 /*
 LightAmbient1 = 0; LightAmbient2 = 0; LightAmbient3 = 0; LightAmbient4 = 1;
@@ -47,13 +47,21 @@ vec_x = [1];
 vec_y = [1];
 vec_z = [1];
 
-angleperspective = 45;
+angleperspective = 95;
 nearperspective = 1;
-farperspective = 800;
+farperspective = 8000;
 
-lookat_x_val = -50;
-lookat_y_val = -50;
-lookat_z_val = 200;
+lookat_x_val = -150;
+lookat_y_val = -150;
+lookat_z_val = 100; //800;
+
+lookat_x_val = -170;
+lookat_y_val = -170;
+lookat_z_val = 650;
+
+show(lookat_x_val);
+show(lookat_y_val);
+show(lookat_z_val);
 
 moveto_x_val = 0;
 moveto_y_val = 0;
@@ -67,26 +75,33 @@ rotateACto_x_val = 0;
 rotateACto_y_val = 180;
 rotateACto_z_val = 180;
 
-centerpoint_x_val = 50;
-centerpoint_y_val = 50;
+centerpoint_x_val = 122;
+centerpoint_y_val = 72;
 centerpoint_z_val = 0;
+centerpoint_x_val = 244.6593916;
+centerpoint_y_val = 232.27834765;
+centerpoint_z_val = 73.86;
 
-avgheight = 20;
-rangeheight = 10;
+show(centerpoint_x_val);
+show(centerpoint_y_val);
+show(centerpoint_z_val);
+
+avgheight = 200;
+rangeheight = 100;
 lLow = 0.1;
 lHigh = 0.2;
 NumberStreets = 5;
 numj = NumberStreets;
 numi = NumberStreets;
 	
-StreetGap = 4;
+StreetGap = 57;
 
-x_coor2 = [90];
-y_coor2 = [10];
+x_coor2 = [900];
+y_coor2 = [100];
 
-blockdim_x = 10;
-blockdim_y = 10;
-blockdim_z = 40;
+blockdim_x = 200;
+blockdim_y = 200;
+blockdim_z = 800;
 
 
 maximum_aileron_angle = 30; //deg_(10-60)
@@ -124,11 +139,11 @@ path_transition_rate_for_orbit = 2; //_(0-3)
 orbit_radius = 275; //_(200-300)
 
 
-step_size = 900; //_(500-1200)
+step_size = 100; //_(500-1200)
 
 
 simulation_time_step = 0.01; //_(0.0001_-_0.1)
-
+animation_time_step = 10;
 
 
 nw = new window("UAV Flight City",
@@ -139,11 +154,11 @@ nw = new window("UAV Flight City",
 			outlinebox("City Definition Parameters",
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Average Height (m)" )),
-				sb_avgheight = sliderbox(1,100, avgheight, myscript),
+				sb_avgheight = sliderbox(10,1000, avgheight, myscript),
 			),
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Height Range" )),
-				sb_rangeheight = sliderbox(1,50, rangeheight, myscript),
+				sb_rangeheight = sliderbox(10,200, rangeheight, myscript),
 			),
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Roof Height" )),
@@ -155,7 +170,7 @@ nw = new window("UAV Flight City",
 				),
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Street Gap" )),
-				sb = Slider Box( 1, 20, StreetGap, StreetGap = round(StreetGap); update_birdseye; myscript )
+				sb = Slider Box( 10, 100, StreetGap, StreetGap = round(StreetGap); update_birdseye; myscript )
 				),
 			),
 			outlinebox("Lateral Control Values",
@@ -275,12 +290,16 @@ nw = new window("UAV Flight City",
 			Textbox(" Path Following Parameters", set font style("bold"), font color("blue")),
 			H List Box(
 			vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Step Size" )),
-				sb = Slider Box( 500, 1200, step_size,  tempemptyfunction; myscript )
+				sb = Slider Box( 50, 1000, step_size,  tempemptyfunction; myscript )
 			),
-			Textbox(" Simulation Time parameters", set font style("bold"), font color("blue")),
+			Textbox(" Simulation Time Parameters", set font style("bold"), font color("blue")),
 			H List Box(
 			vlistbox(spacerbox(Size(250,0),Color("red")), Text Box( "Simulation Time Step" )),
 				sb = Slider Box( 0.0001, 0.1, simulation_time_step,  tempemptyfunction; myscript )
+			),
+			H List Box(
+			vlistbox(spacerbox(Size(250,0),Color("red")), Text Box( "Animation Time Step" )),
+				sb = Slider Box( 1, 1000, animation_time_step,  tempemptyfunction; myscript )
 			),
 			)
 
@@ -305,12 +324,12 @@ nw = new window("UAV Flight City",
 			hlistbox(textbox("Zoom Angle"), sb_perspective = sliderbox(15,180,angleperspective,myscript)),
 			sb_perspective_near = sliderbox(2,18,nearperspective,myscript),
 			sb_perspective_far = sliderbox(0,300,farperspective,myscript),
-			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-200,200,lookat_x_val,myscript)),
-			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-200,200,lookat_y_val,myscript)),
-			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,300,lookat_z_val,myscript)),
-			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-200,200,centerpoint_x_val,myscript)),
-			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-200,200,centerpoint_y_val,myscript)),
-			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,200,centerpoint_z_val,myscript)),
+			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-500,500,lookat_x_val,myscript)),
+			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-500,500,lookat_y_val,myscript)),
+			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,700,lookat_z_val,myscript)),
+			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-500,500,centerpoint_x_val,myscript)),
+			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-500,500,centerpoint_y_val,myscript)),
+			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,500,centerpoint_z_val,myscript)),
 
 			
 			
@@ -368,8 +387,30 @@ nw = new window("UAV Flight City",
 					);
 					myscript;
 				),
-				line({0,0},{x_coor2,y_coor2});	
-			)
+				line({0,0},{x_coor2,y_coor2});
+			),
+			buttonbox("Define Path", Include(dir || "FlightSimMain.jsl")),
+			buttonbox("Extract Path",
+				
+				dttemp = data table("plane_sim.jmp");
+
+				dtmat =  dttemp << Get as Matrix();
+
+				north = dtmat[0,2];
+				east = dtmat[0,3];
+				down = dtmat[0,4];
+
+				a_phi = dtmat[0,8];
+				a_theta = dtmat[0,9];
+				a_psi = dtmat[0,10];
+				
+				show(waypoint_mat);
+				
+				print("Path extracted");
+			),
+			buttonbox("Simulate", simulatebutton;),
+			buttonbox("Simulate One Step", simulate_onestep;),
+			buttonbox("Simulate 10 Steps", simulate_tenstep;),
 		)
 	)
 );
@@ -384,7 +425,6 @@ update_birdseye2 = function({},
 updatescenesize = function({},
 	(vlbscene << child) << delete;
 	vlbscene << append(scene = SceneBox(scenex,sceney));
-	
 );
 
 update_birdseye = function({},
@@ -399,7 +439,7 @@ update_birdseye = function({},
 	
 	for(i=0, i<numi, i++,
 		for(j=0, j<numj, j++,
-			str = str || "rect("|| char(i) || "*(blockdim_x+StreetGap),"|| char(j) || "*(blockdim_y+StreetGap)+10,"|| char(i) || "*(blockdim_x+StreetGap)+10,"|| char(j) || "*(blockdim_y+StreetGap));\!n";
+			str = str || "rect("|| char(i) || "*(blockdim_x+StreetGap),"|| char(j) || "*(blockdim_y+StreetGap)+200,"|| char(i) || "*(blockdim_x+StreetGap)+200,"|| char(j) || "*(blockdim_y+StreetGap));\!n";
 		);
 	);
 	str = str || ");";
@@ -431,10 +471,11 @@ translateto_z_val = -80;
 makethepath_expr = expr(
 
 	ppath = Scene Display List( 1 );
-  ppath << Color( 1, 0, 0 );
+  ppath << Color( 0, 0.9, 0 );
+  ppath << LineWidth(5);
 	ppath << Begin( LINE_STRIP );
 
-	for(i=1, i<20000, i++,
+	for(i=1, i<nrow(north), i++,
 
 		ppath<<Vertex(north[i], east[i], -down[i],);
 
@@ -453,7 +494,7 @@ makethewaypoints_expr = expr(
 	waypath << Color( 0.2, 0.2, 0.2 );
 	for(i=1, i<=nrows(waypoint_mat), i++,
 
-		waypath<<Vertex(waypoint_mat[i,1]/3, waypoint_mat[i,2]/3, -waypoint_mat[i,3]/3);
+		waypath<<Vertex(waypoint_mat[i,1], waypoint_mat[i,2], -waypoint_mat[i,3]);
 
 	);
 
@@ -559,47 +600,47 @@ for(j=0, j<numj, j++,
 myscript = expr(
 
 
-if(cb << Get( 1 ),
-	numj = NumberStreets;
-	numi = NumberStreets;
+	if(cb << Get( 1 ),
+		numj = NumberStreets;
+		numi = NumberStreets;
 
-	listofblockdims_z = J( numi, numj, max(1,Random Integer(avgheight-rangeheight,avgheight+rangeheight)));
-	listofpeakdims = J( numi, numj, 1+max(0, Random Uniform(lLow,lHigh)));
+		listofblockdims_z = J( numi, numj, max(1,Random Integer(avgheight-rangeheight,avgheight+rangeheight)));
+		listofpeakdims = J( numi, numj, 1+max(0, Random Uniform(lLow,lHigh)));
 
-	makethebuildings_expr;
-);
+		makethebuildings_expr;
+	);
 
-	//drawtheairplane_expr;
+		//drawtheairplane_expr;
 
-	//makethepath_expr;
+		//makethepath_expr;
 
-	scene << clear;
-	
-	scene << Perspective( angleperspective, nearperspective, farperspective );
-	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
-	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
-	//scene << Color(0.1, .1, .1 );
-	//scene << sphere(5,30,30);
-	
-	scene << Color(0.1, .1, .1 );
-	//scene << sphere(5,30,30);
-	
-	
-/*	scene << Rotate(90, 1, 0, 0 );
-	scene << Translate(-moveto_y_val, moveto_z_val, moveto_x_val);
-	scene << Rotate(rotateto_x_val, 1, 0, 0 );
-	scene << Rotate(rotateto_y_val, 0, 1, 0 );
-	scene << Rotate(rotateto_z_val, 0, 0, 1 );*/
-	//scene << Call list(box);
-	//scene << pushmatrix;
-	//scene << Translate(0, 1, 7);
-	//scene << arcball(plane,10);
-	//scene << popmatrix;
-	
-	//box << Call list(ppath);
-	scene << Call list(box);
-	//scene << arcball(box,100);
-	scene << Update;
+		scene << clear;
+		
+		scene << Perspective( angleperspective, nearperspective, farperspective );
+		//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+		scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+		//scene << Color(0.1, .1, .1 );
+		//scene << sphere(5,30,30);
+		
+		scene << Color(0.1, .1, .1 );
+		//scene << sphere(5,30,30);
+		
+		
+	/*	scene << Rotate(90, 1, 0, 0 );
+		scene << Translate(-moveto_y_val, moveto_z_val, moveto_x_val);
+		scene << Rotate(rotateto_x_val, 1, 0, 0 );
+		scene << Rotate(rotateto_y_val, 0, 1, 0 );
+		scene << Rotate(rotateto_z_val, 0, 0, 1 );*/
+		//scene << Call list(box);
+		//scene << pushmatrix;
+		//scene << Translate(0, 1, 7);
+		//scene << arcball(plane,10);
+		//scene << popmatrix;
+		
+		//box << Call list(ppath);
+		scene << Call list(box);
+		//scene << arcball(box,100);
+		scene << Update;
 );
 myscript;
 
@@ -615,15 +656,15 @@ addingpathandplane = function({},
 	
 
 	scene << clear;
-		scene << Perspective( angleperspective, nearperspective, farperspective );
+	scene << Perspective( angleperspective, nearperspective, farperspective );
 	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
 	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
 
 	box << clear;
 	makethebuildings_expr;
 	
-	plane << clear;
-	drawtheairplane_expr;
+	//plane << clear;
+	//drawtheairplane_expr;
 	
 	ppath << clear;
 	makethepath_expr;
@@ -634,39 +675,43 @@ addingpathandplane = function({},
 	box << Call list(ppath);
 	box << Call list(waypath);
 	
-	box << pushmatrix;
+	//box << pushmatrix;
 	//box << Rotate(90, 1, 0, 0 );
-	box << Translate(north[ii], east[ii], -down[ii]);
+	//box << Translate(north[ii], east[ii], -down[ii]);
 	//a_phi = dtmat[0,8];
 	//a_theta = dtmat[0,9];
 	//a_psi = dtmat[0,10];
 	//box << Rotate(a_theta[ii]*180/pi(), 0, 1, 0 );
 	//box << Rotate(90, 1, 0, 0 );
-	box << Rotate(90, 1, 0, 0 );
-	box << Rotate(90, 0, 1, 0 );
+	//box << Rotate(90, 1, 0, 0 );
+	//box << Rotate(90, 0, 1, 0 );
 	//box << Rotate(90, 0, 0, 1 );
-	box << Rotate(-a_theta[ii]*180/pi()*10, 1, 0, 0 ); // pitch
-	box << Rotate(-a_psi[ii]*180/pi()*10, 0, 1, 0 ); // roll?
+	//box << Rotate(-a_theta[ii]*180/pi()*10, 1, 0, 0 ); // pitch
+	//box << Rotate(-a_psi[ii]*180/pi()*10, 0, 1, 0 ); // roll?
 	//box << Rotate(-a_phi[ii]*180/pi(), 0, 0, 1 ); // yaw?
-	box << Call list(plane);
+	//box << Call list(plane);
 	//box << sphere(1,20,20);
 	//scene << arcball(ppath,100);
-	box << popmatrix;
+	//box << popmatrix;
 	
 	scene << arcball(box,100);
 	
 	scene << Update;
+	print("addingpathandplane run.")
 
 );
-addingpathandplane;
+//addingpathandplane;
 
 
 //for(iii=1, iii<50, iii=iii+1,
 
 
 
+ii = 1;
 
-for(ii=1, ii<50, ii=ii+10,
+simulatebutton = function({},
+
+for(ii=1, ii<nrow(north), ii=ii+animation_time_step,
 	//lookat_y_val = 100-ii;
 	//moveto_y_val = moveto_y_val+x_coor ;
 	//moveto_x_val = moveto_x_val-y_coor ;
@@ -677,46 +722,232 @@ for(ii=1, ii<50, ii=ii+10,
 	
 	//myscript;
 	
-	if(cb << Get( 1 ),
-	
+	//if(cb << Get( 1 ),
+	/*
 	scene << clear;
 		scene << Perspective( angleperspective, nearperspective, farperspective );
 	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
 	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
 
 	box << clear;
+	makethebuildings_expr;*/
+	
+	scene << clear;
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+
+	box << clear;
 	makethebuildings_expr;
+
+	ppath << clear;
+	makethepath_expr;
+	
+	waypath << clear;
+	makethewaypoints_expr;
+	
+	box << Call list(waypath);
+	
+	box << Call list(ppath);
+
+	scene << arcball(box,100);
 		
 	plane << clear;
 	drawtheairplane_expr;
 	
-	ppath << clear;
-	makethepath_expr;
+	//scene <<Look At( /*eye*/ north[ii]-20,east[ii]-20,-down[ii]+20, /*center*/ north[ii],east[ii],down[ii], /*up*/ 0,0,1 );
 	
-	box << Call list(ppath);
-	
-	box << pushmatrix;
+	scene << pushmatrix;
 	//box << Rotate(90, 1, 0, 0 );
-	box << Translate(north[ii], east[ii], -down[ii]);
+	scene << Translate(north[ii], east[ii], -down[ii]);
 	//a_phi = dtmat[0,8];
 	//a_theta = dtmat[0,9];
 	//a_psi = dtmat[0,10];
 	//box << Rotate(a_theta[ii]*180/pi(), 0, 1, 0 );
 	//box << Rotate(90, 1, 0, 0 );
-	box << Rotate(90, 1, 0, 0 );
-	box << Rotate(90, 0, 1, 0 );
+	scene << Rotate(90, 1, 0, 0 );
+	scene << Rotate(90, 0, 1, 0 );
 	//box << Rotate(90, 0, 0, 1 );
-	box << Rotate(-a_theta[ii]*180/pi()*10, 1, 0, 0 ); // pitch
-	box << Rotate(-a_psi[ii]*180/pi()*10, 0, 1, 0 ); // roll?
-	//box << Rotate(-a_phi[ii]*180/pi(), 0, 0, 1 ); // yaw?
-	box << Call list(plane);
+	scene << Rotate(a_psi[ii]*180/pi(), 0, 1, 0 ); // yaw
+	scene << Rotate(-a_phi[ii]*180/pi(), 0, 0, 1 ); // roll
+	scene << Rotate(-a_theta[ii]*180/pi(), 1, 0, 0 ); // pitch
+	scene << Call list(plane);
 	//box << sphere(1,20,20);
 	//scene << arcball(ppath,100);
-	box << popmatrix;
+	scene << popmatrix;
 	
-	scene << arcball(box,100);
+	//scene << arcball(box,100);
 	
 	scene << Update;
-	);
+	//);
 	wait(0.001);
+);
+
+
+);
+
+
+simulate_onestep = function({},
+ii = ii+1;
+
+//for(iia=ii, iia<ii+10, iia++,
+	//lookat_y_val = 100-ii;
+	//moveto_y_val = moveto_y_val+x_coor ;
+	//moveto_x_val = moveto_x_val-y_coor ;
+	//if (moveto_x_val < 5, moveto_x_val = 5;);
+	//moveto_z_val = -400+2*ii;
+	//centerpoint_y_val = centerpoint_y_val-ii;
+	//centerpoint_y_val = -500;
+	
+	//myscript;
+	
+	//if(cb << Get( 1 ),
+	/*
+	scene << clear;
+		scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+	box << clear;
+	makethebuildings_expr;*/
+	
+	scene << clear;
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+
+	box << clear;
+	makethebuildings_expr;
+
+	ppath << clear;
+	makethepath_expr;
+	
+	waypath << clear;
+	makethewaypoints_expr;
+	
+	box << Call list(waypath);
+	
+	box << Call list(ppath);
+
+	scene << arcball(box,100);
+		
+	plane << clear;
+	drawtheairplane_expr;
+	
+	//scene <<Look At( /*eye*/ north[ii]-20,east[ii]-20,-down[ii]+20, /*center*/ north[ii],east[ii],down[ii], /*up*/ 0,0,1 );
+	
+	scene << pushmatrix;
+	//box << Rotate(90, 1, 0, 0 );
+	scene << Translate(north[ii]-20, -east[ii], -down[ii]);
+	//a_phi = dtmat[0,8];
+	//a_theta = dtmat[0,9];
+	//a_psi = dtmat[0,10];
+	//box << Rotate(a_theta[ii]*180/pi(), 0, 1, 0 );
+	//box << Rotate(90, 1, 0, 0 );
+	scene << Rotate(90, 1, 0, 0 );
+	scene << Rotate(90, 0, 1, 0 );
+	//box << Rotate(90, 0, 0, 1 );
+	scene << Rotate(-a_theta[ii]*180/pi(), 1, 0, 0 ); // pitch
+	//scene << Rotate(a_psi[ii]*180/pi()*10, 0, 1, 0 ); // roll?
+	//box << Rotate(-a_phi[ii]*180/pi(), 0, 0, 1 ); // yaw?
+	scene << Call list(plane);
+	//box << sphere(1,20,20);
+	//scene << arcball(ppath,100);
+	scene << popmatrix;
+	
+	//scene << arcball(box,100);
+	
+	scene << Update;
+	//);
+	//wait(0.001);
+//);
+
+
+);
+
+simulate_tenstep = function({},
+ii = ii+10;
+
+//for(iia=ii, iia<ii+10, iia++,
+	//lookat_y_val = 100-ii;
+	//moveto_y_val = moveto_y_val+x_coor ;
+	//moveto_x_val = moveto_x_val-y_coor ;
+	//if (moveto_x_val < 5, moveto_x_val = 5;);
+	//moveto_z_val = -400+2*ii;
+	//centerpoint_y_val = centerpoint_y_val-ii;
+	//centerpoint_y_val = -500;
+	
+	//myscript;
+	
+	//if(cb << Get( 1 ),
+	/*
+	scene << clear;
+		scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+	box << clear;
+	makethebuildings_expr;*/
+	
+	scene << clear;
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+
+
+	box << clear;
+	makethebuildings_expr;
+
+	ppath << clear;
+	makethepath_expr;
+	
+	waypath << clear;
+	makethewaypoints_expr;
+	
+	box << Call list(waypath);
+	
+	box << Call list(ppath);
+
+	scene << arcball(box,100);
+		
+	plane << clear;
+	drawtheairplane_expr;
+	
+	//scene <<Look At( /*eye*/ north[ii]-20,east[ii]-20,-down[ii]+20, /*center*/ north[ii],east[ii],down[ii], /*up*/ 0,0,1 );
+	
+	scene << pushmatrix;
+	//box << Rotate(90, 1, 0, 0 );
+	scene << Translate(north[ii]-20, -east[ii], -down[ii]);
+	//a_phi = dtmat[0,8];
+	//a_theta = dtmat[0,9];
+	//a_psi = dtmat[0,10];
+	//box << Rotate(a_theta[ii]*180/pi(), 0, 1, 0 );
+	//box << Rotate(90, 1, 0, 0 );
+	scene << Rotate(90, 1, 0, 0 );
+	scene << Rotate(90, 0, 1, 0 );
+	//box << Rotate(90, 0, 0, 1 );
+	scene << Rotate(-a_theta[ii]*180/pi(), 1, 0, 0 ); // pitch
+	//scene << Rotate(a_psi[ii]*180/pi()*10, 0, 1, 0 ); // roll?
+	//box << Rotate(-a_phi[ii]*180/pi(), 0, 0, 1 ); // yaw?
+	scene << Call list(plane);
+	//box << sphere(1,20,20);
+	//scene << arcball(ppath,100);
+	scene << popmatrix;
+	
+	//scene << arcball(box,100);
+	
+	scene << Update;
+	//);
+	//wait(0.001);
+//);
+
+
 );

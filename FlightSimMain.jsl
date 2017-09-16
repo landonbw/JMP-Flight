@@ -1,4 +1,4 @@
-﻿Clear Globals();
+﻿//Clear Globals();
 Clear Log();
 
 Include( "Parameters.jsl" );
@@ -22,9 +22,16 @@ ii = 0;
 time = 0;
 state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
 
-waypoint_mat = find_path(matrix({1000, 1000}), matrix({0, 0, -50}), matrix({1000, 1000, -50}));
-	
-For( ii = 1, ii < 20000, ii++, 
+waypoint_mat = find_path(matrix({2000, 2000}), matrix({Pn, Pe, Pd}), matrix({1000, 1000, -50}));
+end_reached = 0;
+
+
+//For( ii = 1, ii < 20000, ii++,
+while(!end_reached,
+ ii++;
+ if(mod(ii, 1000) == 0,
+	show(ii);
+ );
  
 	va = Sqrt( state[4] ^ 2 + state[5] ^ 2 + state[6] ^ 2 );
 	alpha = ArcTan( state[6] / state[4] );
@@ -33,13 +40,14 @@ For( ii = 1, ii < 20000, ii++,
 	pos = Matrix( {state[1], state[2], state[3]} );
 	
 	//path manager for path
-	//wayp1 = Matrix( {0, 0, -100} );
+	//wayp1 = Matrix( {0, -50, -200} );
 	//wayp2 = Matrix( {300, 0, -120} );
 	//wayp3 = Matrix( {0, 300, -200} );
 	//wayp4 = Matrix( {100, 400, -230} );
-	//wayp5 = Matrix( {300, 300, -200} );
+	//wayp5 = Matrix( {-50, -500, -200} );
 	//waypoint_list = List( wayp1, wayp2, wayp3, wayp4, wayp5 );
 	//waypoint_mat = wayp1` |/ wayp2` |/ wayp3` |/ wayp4` |/ wayp5`;
+	//waypoint_mat = wayp1` |/ wayp5`;
 	y_manager = get_path_straight_line_func( waypoint_mat, pos` );
 	//show(y_manager);
 	
@@ -69,7 +77,7 @@ For( ii = 1, ii < 20000, ii++,
 	//Show( time );
 	updateTable_func( data_table, state );
 
-	Wait( 0.00001 );
+	//Wait( 0.00001 );
 );
 
 ///////////////////////// Show the data table

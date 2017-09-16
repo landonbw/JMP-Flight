@@ -1,6 +1,6 @@
-xp = Random Integer(100);
-yp = Random Integer(100);
-zp = Random Integer(100);
+//xp = Random Integer(100);
+//yp = Random Integer(100);
+//zp = Random Integer(100);
 
 // This functions needs the building matrix (listofblockdims_z), 
 // the roof matrix (listofpeakdims), the StreetGap, blockdim_x,
@@ -9,45 +9,62 @@ zp = Random Integer(100);
 // them in the parameter list but time is short...
 // the function returns a 1 if the point it in some building
 
-inside_a_buildling = function({},
+inside_a_buildling = function({point1,x2, y2},
 
-	for(i=0, i<numi, i++,
-		for(j=0, j<numj, j++,
+	xrange = abs(point1[1] - x2);
+	yrange = abs(point1[2] - y2);
+	zrange = abs(point1[3] - height_c_planner);
+	
+	numchecks = Ceiling( max(xrange, yrange)/10);
 		
-			xmat = i*(blockdim_x+StreetGap) || 
-				i*(blockdim_x+StreetGap) || 
-				i*(blockdim_x+StreetGap)+10 || 
-				i*(blockdim_x+StreetGap)+10 ||
-				i*(blockdim_x+StreetGap);
-				
-			ymat = j*(blockdim_y+StreetGap) || 
-				j*(blockdim_y+StreetGap)+10 || 
-				j*(blockdim_y+StreetGap)+10 || 
-				j*(blockdim_y+StreetGap) || 
-				j*(blockdim_y+StreetGap);
-				
-			insidecheck = in polygon(xp,yp,xmat,ymat);
-			//print(xmat);
-			//print(ymat);
-			//print(insidecheck);
+	for(pq=0, pq<numchecks+1, pq++,
+	
+	xp = point1[1]+xrange/numchecks*pq;
+	yp = point1[2]+yrange/numchecks*pq;
+	zp = point1[3]+zrange/numchecks*pq;
+
+	//show(xp,yp,zp);
+
+		for(i=0, i<numi, i++,
+			for(j=0, j<numj, j++,
 			
+				xmat = i*(blockdim_x+StreetGap) || 
+					i*(blockdim_x+StreetGap) || 
+					i*(blockdim_x+StreetGap)+200 || 
+					i*(blockdim_x+StreetGap)+200 ||
+					i*(blockdim_x+StreetGap);
+					
+				ymat = j*(blockdim_y+StreetGap) || 
+					j*(blockdim_y+StreetGap)+200 || 
+					j*(blockdim_y+StreetGap)+200 || 
+					j*(blockdim_y+StreetGap) || 
+					j*(blockdim_y+StreetGap);
+					
+				insidecheck = in polygon(xp,yp,xmat,ymat);
+				//print(xmat);
+				//print(ymat);
+				//show(insidecheck);
+				
+				if(insidecheck == 1,
+					break();
+				);
+			);
 			if(insidecheck == 1,
 				break();
 			);
 		);
+		//print(xp);
+		//print(yp);
+		//print(zp);
+		//print(i);
+		//print(j);
+		//print(insidecheck);
+		//print(xmat);
+		//print(ymat);
 		if(insidecheck == 1,
 			break();
 		);
 	);
-	//print(xp);
-	//print(yp);
-	//print(zp);
-	//print(i);
-	//print(j);
-	//print(insidecheck);
-	//print(xmat);
-	//print(ymat);
-	
 	// now check for below height of building.
 	if(insidecheck == 1,
 		maxheight_all = listofblockdims_z :* listofpeakdims;
@@ -61,75 +78,7 @@ inside_a_buildling = function({},
 		,
 		insidecheck_all_three = 0;
 	);
-	//print(insidecheck_all_three);
+	//show(insidecheck_all_three);
 
 	insidecheck_all_three;
-=======
-xp = Random Integer(100);
-yp = Random Integer(100);
-zp = Random Integer(100);
-
-// This functions needs the building matrix (listofblockdims_z), 
-// the roof matrix (listofpeakdims), the StreetGap, blockdim_x,
-// and blockdim_y (among other things that should be defined.)
-// Everything is global so note the xp, yp and zp above. I can put 
-// them in the parameter list but time is short...
-// the function returns a 1 if the point it in some building
-
-inside_a_buildling = function({},
-
-	for(i=0, i<numi, i++,
-		for(j=0, j<numj, j++,
-		
-			xmat = i*(blockdim_x+StreetGap) || 
-				i*(blockdim_x+StreetGap) || 
-				i*(blockdim_x+StreetGap)+10 || 
-				i*(blockdim_x+StreetGap)+10 ||
-				i*(blockdim_x+StreetGap);
-				
-			ymat = j*(blockdim_y+StreetGap) || 
-				j*(blockdim_y+StreetGap)+10 || 
-				j*(blockdim_y+StreetGap)+10 || 
-				j*(blockdim_y+StreetGap) || 
-				j*(blockdim_y+StreetGap);
-				
-			insidecheck = in polygon(xp,yp,xmat,ymat);
-			//print(xmat);
-			//print(ymat);
-			//print(insidecheck);
-			
-			if(insidecheck == 1,
-				break();
-			);
-		);
-		if(insidecheck == 1,
-			break();
-		);
-	);
-	//print(xp);
-	//print(yp);
-	//print(zp);
-	//print(i);
-	//print(j);
-	//print(insidecheck);
-	//print(xmat);
-	//print(ymat);
-	
-	// now check for below height of building.
-	if(insidecheck == 1,
-		maxheight_all = listofblockdims_z :* listofpeakdims;
-
-		maxheight_of_inside = maxheight_all[i+1,j+1];
-
-		if(maxheight_of_inside > zp,
-			insidecheck_all_three = 1;,
-			insidecheck_all_three = 0;
-		);
-		,
-		insidecheck_all_three = 0;
-	);
-	//print(insidecheck_all_three);
-
-	insidecheck_all_three;
->>>>>>> efc854e4d37b89db04110cc0779e742e921336dc
 );
