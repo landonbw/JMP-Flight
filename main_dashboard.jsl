@@ -193,7 +193,7 @@ nw = new window("UAV Flight City",
 							vlistbox(spacerbox(Size(200,0),Color("red")),Text BOx( "Derivative Gain On Roll" )),
 					sb = Slider Box( -0.1, 0, derivative_gain_on_roll,  tempemptyfunction; myscript )
 				),
-				Textbox(" Course control values", set font style("bold"), font color("blue")),
+				Textbox(" Course Control Values", set font style("bold"), font color("blue")),
 						H List Box(
 							vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Maximum Commanded Roll" )),
 					sb = Slider Box( 30, 60, maximum_commanded_roll,  tempemptyfunction; myscript )
@@ -210,7 +210,7 @@ nw = new window("UAV Flight City",
 							vlistbox(spacerbox(Size(200,0),Color("red")),Text BoX( "Integral Gain On Course" )),
 					sb = Slider Box( 0, 0.01, integral_gain_on_course,  tempemptyfunction; myscript )
 				),
-				Textbox(" Sideslip control values", set font style("bold"), font color("blue")),
+				Textbox(" Sideslip Control Values", set font style("bold"), font color("blue")),
 						H List Box(
 							vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Maximum Rudder Angle" )),
 					sb = Slider Box( 10, 60, maximum_rudder_angle,  tempemptyfunction; myscript )
@@ -242,7 +242,7 @@ nw = new window("UAV Flight City",
 						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Derivative Gain On Energy Balance" )),
 				sb = Slider Box( 0, 0.0001, derivative_gain_on_energy_balance,  tempemptyfunction; myscript )
 			),
-			Textbox(" Pitch control values", set font style("bold"), font color("blue")),
+			Textbox(" Pitch Control Values", set font style("bold"), font color("blue")),
 					H List Box(
 						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Maximum Commanded Pitch Value" )),
 				sb = Slider Box( 10, 60, maximum_commanded_pitch_value,  tempemptyfunction; myscript )
@@ -327,16 +327,17 @@ nw = new window("UAV Flight City",
 		vlbscene = vlistbox(
 			scene = SceneBox(800,800),
 			),
-			hlistbox(textbox("Zoom Angle"), sb_perspective = sliderbox(15,180,angleperspective,myscriptnobuildings)),
-			sb_perspective_near = sliderbox(2,18,nearperspective,myscriptnobuildings),
-			sb_perspective_far = sliderbox(0,300,farperspective,myscriptnobuildings),
-			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-500,500,lookat_x_val,myscriptnobuildings)),
-			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-500,500,lookat_y_val,myscriptnobuildings)),
-			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,700,lookat_z_val,myscriptnobuildings)),
-			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-500,500,centerpoint_x_val,myscriptnobuildings)),
-			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-500,500,centerpoint_y_val,myscriptnobuildings)),
-			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,500,centerpoint_z_val,myscriptnobuildings)),
-
+			outlinebox("View Controls",
+			hlistbox(textbox("Zoom Angle"), sb_perspective = sliderbox(15,180,angleperspective, myscriptnobuildings;)),
+			sb_perspective_near = sliderbox(2,18,nearperspective,myscriptnobuildings;),
+			sb_perspective_far = sliderbox(0,300,farperspective,myscriptnobuildings;),
+			hlistbox(textbox("Look From X"), sb_lookat_x = sliderbox(-500,500,lookat_x_val,myscriptnobuildings;)),
+			hlistbox(textbox("Look From Y"), sb_lookat_y = sliderbox(-500,500,lookat_y_val,myscriptnobuildings;)),
+			hlistbox(textbox("Look From Z"), sb_lookat_z = sliderbox(0,700,lookat_z_val,myscriptnobuildings;)),
+			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-500,500,centerpoint_x_val,myscriptnobuildings;)),
+			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-500,500,centerpoint_y_val,myscriptnobuildings;)),
+			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,500,centerpoint_z_val,myscriptnobuildings;)),
+			),
 			
 			
 			
@@ -356,6 +357,8 @@ nw = new window("UAV Flight City",
 				Frame Size( 200, 200 ),
 				xscale(-50,100),
 				yscale(-50,100),
+				xname("North"),
+				yname("East"),
 				markersize(5);
 				//marker(3,1::10,1::10);
 			
@@ -379,10 +382,21 @@ nw = new window("UAV Flight City",
 				
 				marker({xcurpoint,ycurpoint});
 			),
+			gb3 = graphbox(
+				Frame Size( 200, 200 ),
+				xname("North"),
+				yname("East"),
+				xscale(-60,1000),
+				yscale(-60,1000),
+				
+				Transparency(0.5);
+				pencolor("blue");
+
+			),
 			gb2 = graphbox(
 				Frame Size( 200, 200 ),
-				xname("X"),
-				yname("Z Height"),
+				xname("North"),
+				yname("View Height"),
 				xscale(0,1000),
 				yscale(-0.5,110),
 				markersize(5);
@@ -399,15 +413,9 @@ nw = new window("UAV Flight City",
 				),
 				line({0,0},{x_coor2,y_coor2});
 			),
-			gb3 = graphbox(
-				Frame Size( 200, 200 ),
-				xname("North"),
-				yname("East"),
-				xscale(-60,1000),
-				yscale(-60,1000),
-			),
-			buttonbox("Define Path", Include(dir || "FlightSimMain.jsl")),
-			buttonbox("Extract Path",
+			
+			buttonbox("Calculate Flight Path", Include(dir || "FlightSimMain.jsl")),
+/*			buttonbox("Extract Flight Path",
 				
 				dttemp = data table("plane_sim.jmp");
 
@@ -429,16 +437,67 @@ nw = new window("UAV Flight City",
 				show(waypoint_mat);
 				
 				print("Path extracted");
-			),
-			Buttonbox("Add path", addingpathandplane;),
+			),*/
+			Buttonbox("Show Flight Path", 
+			
+				dttemp = data table("plane_sim.jmp");
+
+				dtmat =  dttemp << Get as Matrix();
+
+				north = dtmat[0,2];
+				east = dtmat[0,3];
+				down = dtmat[0,4];
+
+				a_phi = dtmat[0,8];
+				a_theta = dtmat[0,9];
+				a_psi = dtmat[0,10];
+				
+				xpathmat = north;
+				ypathmat = east;
+				
+				gb1[framebox(1)] << reshow;
+				
+				show(waypoint_mat);
+				
+				print("Path extracted");
+			
+			
+			
+				addingpathandplane;
+					
+				),
 			Buttonbox("Show RRT", 
 				//waypoint_list
 				//dttest = Current Data table();
 
+
+
+				str = "gb3[framebox(1)] << Add Graphics Script(
+					Transparency(0.5);
+					pencolor(\!"blue\!");";
+				
+				for(i=0, i<numi, i++,
+					for(j=0, j<numj, j++,
+						str = str || "rect("|| char(i) || "*(blockdim_x+StreetGap),"|| char(j) || "*(blockdim_y+StreetGap)+200,"|| char(i) || "*(blockdim_x+StreetGap)+200,"|| char(j) || "*(blockdim_y+StreetGap));\!n";
+					);
+				);
+				str = str || ");";
+
+				strparsed = parse(str);
+				eval(strparsed);
+
+				gb3[axisbox(1)] << Max( numi*(blockdim_x+StreetGap)+10 );
+				gb3[axisbox(2)] << Max( numj*(blockdim_y+StreetGap)+10 );
+				
+				gb3[framebox(1)] << Add graphics script(
+					pencolor("black");
+				);
+
+
 				mattest = waypoint_list; //dttest << get as matrix;
 
-				gb3[axisbox(1)] << max(max(mattest[0,1]));
-				gb3[axisbox(2)] << max(max(mattest[0,1]));
+				//gb3[axisbox(1)] << max(max(mattest[0,1]));
+				//gb3[axisbox(2)] << max(max(mattest[0,1]));
 
 				for(b = 2, b<=nrows(mattest), b++,
 						temp = eval expr(
@@ -447,11 +506,11 @@ nw = new window("UAV Flight City",
 						);
 					);
 					eval(temp);
-
 				);
+				
 			),
 			
-			buttonbox("Simulate", simulatebutton;),
+			buttonbox("Animate", simulatebutton;),
 			//buttonbox("Simulate One Step", simulate_onestep;),
 			//buttonbox("Simulate 10 Steps", simulate_tenstep;),
 		)
