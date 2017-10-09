@@ -1,0 +1,21 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+//	Find Dubins Parameters
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/// takes the start and exit positions and calculates the distances of the paths
+/// between them
+find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_rad},
+	// require that the distance between the points is at least three times
+	// the turning radius
+	dub_point_dist = sqrt((dub_pos_s[1]-dub_pos_e[1])^2 + (dub_pos_s[2]-dub_pos_e[2])^2 + (dub_pos_s[3]-dub_pos_e[3])^2)
+	if(dub_point_dist < 3*dub_rad, is_valid = 0, is_valid = 1);
+	
+	// calculate the centers of the turning circles
+	dub_c_r_s = dub_pos_s + dub_rad * 
+	
+	// calculate the lengths of each possible dubins path
+	
+	// assign the output values corresponding to the shortest path
+	
+	// return the right data (silly jmp with no returns)
+)
