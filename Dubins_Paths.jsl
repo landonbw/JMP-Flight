@@ -90,7 +90,7 @@ find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_cour
 		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(-pi()/2), dub_q1);
 		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(-pi()/2), dub_q1);,
 		// if else
-		dub_min_length == dub_l2;
+		dub_min_length == dub_l2,
 		dub_cs = dub_c_r_s;
 		dub_lam_s = 1;
 		dub_ce = dub_c_l_e;
@@ -102,7 +102,7 @@ find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_cour
 		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(dub_ang2), dub_e1);
 		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(dub_ang2 + pi()), dub_e1);,
 		// if else
-		dub_min_length == dub_l3;
+		dub_min_length == dub_l3,
 		dub_cs = dub_c_l_s;
 		dub_lam_s = -1;
 		dub_ce = dub_c_r_e;
@@ -113,7 +113,8 @@ find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_cour
 		dub_q1 = Multiply(rotate_z(dub_ang + dub_ang_2 - pi()/2), dub_e1);
 		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(dub_ang + dub_ang2), dub_e1);
 		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(dub_ang + dub_ang2 - pi()), dub_e1);,
-		// else case (case 4 L-S-L)
+		// else case (case 4 L-S-L) 
+		// dub_min_length == dub_l4
 		dub_cs = dub_c_l_s;
 		dub_lam_s = -1;
 		dub_ce = dub_c_l_e;
