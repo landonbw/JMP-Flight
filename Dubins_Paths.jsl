@@ -16,47 +16,130 @@ vec_mag = Function( {mag_x},
 	sqrt(mag_x`*mag_x)[1];
 );
 
+min_val = Function( {min_numbers},
+	// loop through list to find the minimum value
+	minimum_value = min_numbers[1];
+	For(i = 1, i <= length(min_numbers), i += 1,
+		if(eval(min_numbers[i]) < minimum_value,
+			minimum_value = min_numbers[i]
+		);
+	);
+	minimum_value;
+);
+
 /// takes the start and exit positions and calculates the distances of the paths
 /// between them
-find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_rad},
+find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_course_e, dub_rad},
 	// require that the distance between the points is at least three times
 	// the turning radius
 	dub_point_dist = sqrt((dub_pos_s[1]-dub_pos_e[1])^2 + (dub_pos_s[2]-dub_pos_e[2])^2 + (dub_pos_s[3]-dub_pos_e[3])^2);
+	
+	dub_e1 = matrix({1, 0, 0});
+	
 	if(dub_point_dist < 3*dub_rad, is_valid = 0, is_valid = 1);
 	
 	
 	
 	// calculate the centers of the turning circles
-	dub_c_r_s = dub_pos_s + dub_rad * rotate_z((pi()/2)) * matrix({cos(dub_couse_s), sin(dub_course_s), 0});
-	dub_c_l_s = dub_pos_s + dub_rad * rotate_z((-pi()/2)) * matrix({cos(dub_couse_s), sin(dub_course_s), 0});
-	dub_c_r_e = dub_pos_e + dub_rad * rotate_z((pi()/2)) * matrix({cos(dub_couse_e), sin(dub_course_e), 0});
-	dub_c_l_e = dub_pos_e + dub_rad * rotate_z((-pi()/2)) * matrix({cos(dub_couse_e), sin(dub_course_e), 0});
+	dub_c_r_s = dub_pos_s + dub_rad * rotate_z((pi()/2)) * matrix({cos(dub_course_s), sin(dub_course_s), 0});
+	dub_c_l_s = dub_pos_s + dub_rad * rotate_z((-pi()/2)) * matrix({cos(dub_course_s), sin(dub_course_s), 0});
+	dub_c_r_e = dub_pos_e + dub_rad * rotate_z((pi()/2)) * matrix({cos(dub_course_e), sin(dub_course_e), 0});
+	dub_c_l_e = dub_pos_e + dub_rad * rotate_z((-pi()/2)) * matrix({cos(dub_course_e), sin(dub_course_e), 0});
+	show(dub_c_r_s, dub_c_l_s, dub_c_r_e, dub_c_l_e);
 		
 	// calculate the lengths of each possible dubins path
 	
 	// calculate the length of R-S-R
 	dub_ang = atan(dub_c_r_e[2] - dub_c_r_s[2], dub_c_r_e[1] - dub_c_r_s[1]);
-	dub_l1 = vec_mag(dub_c_r_s - dub_c_r_e) + dub_rad * mod_2_pi(2 * pi() + mod_2_pi(ang - pi()/2) - mod_2_pi(dub_course_s - pi()/2))
-			+ dub_rad + mod_2_pi(2 * pi() + mod_2_pi(dub_course_e - pi()/2) - mod_2_pi(ang - pi()/2));
+	dub_l1 = vec_mag(dub_c_r_s - dub_c_r_e) + dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_ang - pi()/2) - mod_2_pi(dub_course_s - pi()/2))
+			+ dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_course_e - pi()/2) - mod_2_pi(dub_ang - pi()/2));
+	show(dub_l1);
 			
 	// calculate the length of R-S-L
 	dub_ang = atan(dub_c_r_e[2] - dub_c_r_s[2], dub_c_r_e[1] - dub_c_r_s[1]);
 	small_l = vec_mag(dub_c_l_e - dub_c_r_s);
-	dub_ang2 = ang - pi()/2 + arcsine((2 * dub_rad) / small_l);
+	dub_ang2 = dub_ang - pi()/2 + arcsine((2 * dub_rad) / small_l);
 	dub_l2 = sqrt(small_l^2 - (2 * dub_rad^2)) + dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_ang2) - mod_2_pi(dub_course_s - pi()/2))
 			+ dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_ang2 + pi()) - mod_2_pi(dub_course_e + Pi()/2));
+	show(dub_l2);
 	
 	// calculate the length of L-S-R
 	dub_ang = atan(dub_c_r_e[2] - dub_c_r_s[2], dub_c_r_e[1] - dub_c_r_s[1]);
 	small_l = vec_mag(dub_c_r_e - dub_c_l_s);
 	dub_ang2 = arccosine(2*dub_rad / small_l);
-	dub_l2 = sqrt(small_l^2 - (2 * dub_rad^2)) + dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_course_s + pi() / 2) - mod_2_pi(dub_ang + dub_ang2))
+	dub_l3 = sqrt(small_l^2 - (2 * dub_rad^2)) + dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_course_s + pi() / 2) - mod_2_pi(dub_ang + dub_ang2))
 			+ dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_course_e - pi()/2) - mod_2_pi(dub_ang + dub_ang2 - pi()));
+	show(dub_l3);
+			
+	// calculate the length of L-S-L
+	dub_ang = atan(dub_c_l_e[2] - dub_c_l_s[2], dub_c_l_e[1] - dub_c_l_s[1]);
+	dub_l4 = vec_mag(dub_c_l_s - dub_c_l_e) + dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_course_s + pi()/2) - mod_2_pi(dub_ang + pi()/2))
+			+ dub_rad * mod_2_pi(2 * pi() + mod_2_pi(dub_ang + pi()/2) - mod_2_pi(dub_course_e + pi()/2));
+	show(dub_l4);
+			
+	// find the shortest path
+	dub_min_length = min_val({dub_l1, dub_l2, dub_l3, dub_l4});
 	
 	// assign the output values corresponding to the shortest path
+	if(dub_min_length == dub_l1,
+		dub_cs = dub_c_r_s;
+		dub_lam_s = 1;
+		dub_ce = dub_c_r_e;
+		dub_lam_e = 1;
+		dub_q1 = (dub_ce - dub_cs) / vec_mag(dub_ce - dub_cs);
+		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(-pi()/2), dub_q1);
+		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(-pi()/2), dub_q1);,
+		// if else
+		dub_min_length == dub_l2;
+		dub_cs = dub_c_r_s;
+		dub_lam_s = 1;
+		dub_ce = dub_c_l_e;
+		dub_lam_e = -1;
+		small_l = vec_mag(dub_ce - dub_cs);
+		dub_ang = atan(dub_ce[2] - dub_cs[2], dub_ce[1] - dub_cs[1]);
+		dub_ang2 = dub_ang - pi()/2 + arcsine((2 * dub_rad) / small_l);
+		dub_q1 = Multiply(rotate_z(dub_ang2), dub_e1);
+		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(dub_ang2), dub_e1);
+		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(dub_ang2 + pi()), dub_e1);,
+		// if else
+		dub_min_length == dub_l3;
+		dub_cs = dub_c_l_s;
+		dub_lam_s = -1;
+		dub_ce = dub_c_r_e;
+		dub_lam_e = 1;
+		small_l = vec_mag(dub_ce - dub_cs);
+		dub_ang = atan(dub_ce[2] - dub_cs[2], dub_ce[1] - dub_cs[1]);
+		dub_ang2 = arccosine((2 * dub_rad) / small_l);
+		dub_q1 = Multiply(rotate_z(dub_ang + dub_ang_2 - pi()/2), dub_e1);
+		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(dub_ang + dub_ang2), dub_e1);
+		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(dub_ang + dub_ang2 - pi()), dub_e1);,
+		// else case (case 4 L-S-L)
+		dub_cs = dub_c_l_s;
+		dub_lam_s = -1;
+		dub_ce = dub_c_l_e;
+		dub_lam_e = -1;
+		dub_q1 = (dub_ce - dub_cs) / vec_mag(dub_ce - dub_cs);
+		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(pi()/2), dub_q1);
+		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(pi()/2), dub_q1);
+	);
 	
+	dub_z3 = dub_pos_e;
+	dub_q3 = Multiply(rotate_z(dub_course_e), dub_e1);
 	// return the right data (silly jmp with no returns)
+	dub_output = list(dub_min_length, dub_cs, dub_lam_s, dub_ce, dub_lam_e, dub_z1, dub_q1, dub_z2, dub_z3, dub_q3);
 );
 
 
-show(vec_mag(matrix({-2, 0, 2})));
+//dub_pos_s, dub_course_s, dub_pos_e, dub_rad
+
+a = find_dubins_parameters(matrix({0,0,3}), pi()/2, matrix({100,0,3}), 3*pi()/2, 10);
+show(eval(a[1]));
+show(eval(a[2]));
+show(eval(a[3]));
+show(eval(a[4]));
+show(eval(a[5]));
+show(eval(a[6]));
+show(eval(a[7]));
+show(eval(a[8]));
+show(eval(a[9]));
+show(eval(a[10]));
