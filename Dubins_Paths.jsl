@@ -130,6 +130,36 @@ find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_cour
 	dub_output = list(dub_min_length, dub_cs, dub_lam_s, dub_ce, dub_lam_e, dub_z1, dub_q1, dub_z2, dub_z3, dub_q3);
 );
 
+get_dubins_points({dub_points_params, dub_p_start, dub_p_end},
+	// upack the points params
+	dub_p_L = dub_points_params[1];
+	dub_p_cs = dub_points_params[2];
+	dub_p_lam_s = dub_points_params[3];
+	dub_p_ce = dub_points_params[4];
+	dub_p_lam_e = dub_points_params[5];
+	dub_p_z1 = dub_points_params[6];
+	dub_p_q1 = dub_points_params[7];
+	dub_p_z2 = dub_points_params[8];
+	dub_p_z3 = dub_points_params[9];
+	dub_p_q3 = dub_points_params[10];
+	
+	// find points around the first circle
+	dub_p_rad = vec_mag(dub_p_cs - start);
+	dub_p_start_ang = atan(dub_p_start[2] - dub_p_cs[2], dub_p_start[1] - dub_p_cs[0]);
+	dub_p_end_ang = atan(dub_p_z1[2] - dub_p_cs[2], dub_p_z1[1] - dub_c_cs[1]);
+	dub_p_theta_step = 0.001;
+	dub_p_theta_travel = abs(dub_p_start_ang - dub_p_end_ang);
+	dub_p_num_steps = floor(dub_p_theta_travel / theta_step);
+	
+	
+	
+	
+	// find points along the line
+	
+	// find points along the end circle
+	
+	
+);
 
 //dub_pos_s, dub_course_s, dub_pos_e, dub_rad
 
