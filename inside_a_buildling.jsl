@@ -9,19 +9,19 @@
 // them in the parameter list but time is short...
 // the function returns a 1 if the point it in some building
 
-inside_a_buildling = function({point1,x2, y2},
+inside_a_buildling = function({inside_points},
 
-	xrange = abs(point1[1] - x2);
-	yrange = abs(point1[2] - y2);
-	zrange = abs(point1[3] - height_c_planner);
+	//xrange = abs(point1[1] - x2);
+	//yrange = abs(point1[2] - y2);
+	//zrange = abs(point1[3] - height_c_planner);
 	
-	numchecks = Ceiling( max(xrange, yrange)/10);
+	numchecks = nrows(inside_points);
 		
 	for(pq=0, pq<numchecks+1, pq++,
 	
-	xp = point1[1]+xrange/numchecks*pq;
-	yp = point1[2]+yrange/numchecks*pq;
-	zp = point1[3]+zrange/numchecks*pq;
+	xp = inside_points[pq, 1];
+	yp = inside_points[pq, 2];
+	zp = inside_points[pq, 3];
 
 	//show(xp,yp,zp);
 
@@ -86,7 +86,6 @@ inside_a_buildling = function({point1,x2, y2},
 	);
 	
 	);
-	
 	
 	insidecheck_all_three;
 );

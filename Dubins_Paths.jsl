@@ -30,6 +30,8 @@ min_val = Function( {min_numbers},
 /// takes the start and exit positions and calculates the distances of the paths
 /// between them
 find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_course_e, dub_rad},
+	show(dub_pos_s);
+	show(dub_pos_e);
 	// require that the distance between the points is at least three times
 	// the turning radius
 	dub_point_dist = sqrt((dub_pos_s[1]-dub_pos_e[1])^2 + (dub_pos_s[2]-dub_pos_e[2])^2 + (dub_pos_s[3]-dub_pos_e[3])^2);
@@ -41,11 +43,11 @@ find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_cour
 	
 	
 	// calculate the centers of the turning circles
-	dub_c_r_s = dub_pos_s + dub_rad * rotate_z((pi()/2)) * matrix({cos(dub_course_s), sin(dub_course_s), 0});
+	dub_c_r_s = eval(dub_pos_s) + dub_rad * rotate_z((pi()/2)) * matrix({cos(dub_course_s), sin(dub_course_s), 0});
 	dub_c_l_s = dub_pos_s + dub_rad * rotate_z((-pi()/2)) * matrix({cos(dub_course_s), sin(dub_course_s), 0});
 	dub_c_r_e = dub_pos_e + dub_rad * rotate_z((pi()/2)) * matrix({cos(dub_course_e), sin(dub_course_e), 0});
 	dub_c_l_e = dub_pos_e + dub_rad * rotate_z((-pi()/2)) * matrix({cos(dub_course_e), sin(dub_course_e), 0});
-	show(dub_c_r_s, dub_c_l_s, dub_c_r_e, dub_c_l_e);
+	//show(dub_c_r_s, dub_c_l_s, dub_c_r_e, dub_c_l_e);
 		
 	// calculate the lengths of each possible dubins path
 	
@@ -110,7 +112,7 @@ find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_cour
 		small_l = vec_mag(dub_ce - dub_cs);
 		dub_ang = atan(dub_ce[2] - dub_cs[2], dub_ce[1] - dub_cs[1]);
 		dub_ang2 = arccosine((2 * dub_rad) / small_l);
-		dub_q1 = Multiply(rotate_z(dub_ang + dub_ang_2 - pi()/2), dub_e1);
+		dub_q1 = Multiply(rotate_z(dub_ang + dub_ang2 - pi()/2), dub_e1);
 		dub_z1 = dub_cs + dub_rad * Multiply(rotate_z(dub_ang + dub_ang2), dub_e1);
 		dub_z2 = dub_ce + dub_rad * Multiply(rotate_z(dub_ang + dub_ang2 - pi()), dub_e1);,
 		// else case (case 4 L-S-L) 
@@ -147,7 +149,7 @@ get_dubins_points = Function({dub_points_params, dub_p_start, dub_p_end},
 	dub_p_rad = vec_mag(dub_p_cs - dub_p_start);
 	dub_p_start_ang = atan(dub_p_start[2] - dub_p_cs[2], dub_p_start[1] - dub_p_cs[1]);
 	dub_p_end_ang = atan(dub_p_z1[2] - dub_p_cs[2], dub_p_z1[1] - dub_p_cs[1]);
-	dub_p_theta_step = 0.001;
+	dub_p_theta_step = 0.1;
 	dub_p_theta_travel = abs(dub_p_start_ang - dub_p_end_ang);
 	dub_p_num_steps = floor(dub_p_theta_travel / dub_p_theta_step);
 	// get the points
@@ -163,7 +165,7 @@ get_dubins_points = Function({dub_points_params, dub_p_start, dub_p_end},
 	dub_p_q = (dub_p_z2 - dub_p_z1);
 	dub_p_sl = vec_mag(dub_p_q);
 	dub_p_q = dub_p_q/dub_p_sl;
-	dub_p_delta = 0.01;
+	dub_p_delta = 0.1;
 	dub_p_num_steps = dub_p_sl / dub_p_delta;
 	dub_p_points2 = J(dub_p_num_steps, 3);
 	// get the points
@@ -177,7 +179,6 @@ get_dubins_points = Function({dub_points_params, dub_p_start, dub_p_end},
 	// find points along the end circle
 	dub_p_start_ang = atan(dub_p_z2[2] - dub_p_ce[2], dub_p_z2[1] - dub_p_ce[1]);
 	dub_p_end_ang = atan(dub_p_z3[2] - dub_p_ce[2], dub_p_z3[1] - dub_p_ce[1]);
-	dub_p_theta_step = 0.001;
 	dub_p_theta_travel = abs(dub_p_start_ang - dub_p_end_ang);
 	dub_p_num_steps = floor(dub_p_theta_travel / dub_p_theta_step);
 	// get the points
@@ -189,7 +190,7 @@ get_dubins_points = Function({dub_points_params, dub_p_start, dub_p_end},
 	);
 	dub_p_points = dub_p_points |/ dub_p_points2;
 	
-	as table(dub_p_points);
+	//as table(dub_p_points);
 );
 
 //dub_pos_s, dub_course_s, dub_pos_e, dub_rad

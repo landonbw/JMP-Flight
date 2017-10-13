@@ -221,7 +221,7 @@ chi_inf = 80 * 3.14159 / 180;
 k_path = 0.005;
 k_orbit = 2;
 t_rad = 175;
-//step_size = 3 * t_rad;
+step_size = 4 * t_rad;
 
 print("Parameters runned.");
 

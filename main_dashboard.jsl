@@ -33,7 +33,7 @@ MaterialSpecular1 = 1; MaterialSpecular2 = 1; MaterialSpecular3 = 1; MaterialSpe
 MaterialEmission1 = 0; MaterialEmission2 = 0; MaterialEmission3 = 0; MaterialEmission4 = 1;
 MaterialShininess = 50;
 */
-
+insidecheck_all_three = 1;
 scenex = 800;
 sceney = 800;
 

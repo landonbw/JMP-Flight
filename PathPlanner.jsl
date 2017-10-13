@@ -1,4 +1,5 @@
-Include( "Dubins_Paths.jsl" );
+﻿Include( "Dubins_Paths.jsl" );
+Include( "inside_a_buildling.jsl" );
 
 generate_random_point = function({map, height_c_planner},
 	//map[1] = x limit
@@ -33,8 +34,8 @@ find_nearest_point = function({points, new_point},
 			shortest_point = check_point;
 			shortest_dist = dist_to;
 			shortest_idx = i;
-			ang = atan(new_point[2]-check_point[2], new_point[1]-check_point[1])
-			shortest_course = check_course
+			ang = atan(new_point[2]-check_point[2], new_point[1]-check_point[1]);
+			shortest_course = check_course;
 		)
 	);
 	//show(shortest_dist, shortest_idx);
@@ -48,9 +49,13 @@ dist_between_points = function({point_a, point_b},
 
 
 find_path = function({map, start, end},
+	end = eval(end);
+	start = eval(start);
 	//matrix row information is as follows
 	//[coor_n, coor_e, coor_d, parent_waypoint, path_cost, is_end, course_angle]
 	waypoint_list = matrix({{start[1], start[2], start[3], -1, 0, 0, 0}});
+
+	
 	show(waypoint_list);
 	
 	feasible_path_count = 0;
@@ -69,7 +74,7 @@ find_path = function({map, start, end},
 		nearest_dist = nearest_point_info[4];
 		nearest_ang = nearest_point_info[6];
 		nearest_course = nearest_point_info[7];
-		//check if path is feasible.  for now assume that it is
+		//check if path is feasible.
 		
 		//ensure that the random point was good
 		if(nearest_point_info[5] > 0,
@@ -80,12 +85,12 @@ find_path = function({map, start, end},
 			new_point = matrix({new_n, new_e, start[3]});
 			
 			//calculate the dubins parameters for the path
-			planner_dubins_params = find_dubins_parameters(nearest_point, nearest_course, new_point, test_course);
+			planner_dubins_params = find_dubins_parameters(nearest_point, nearest_course, new_point, test_course, t_rad);
 			planner_potential_points = get_dubins_points(planner_dubins_params, nearest_point, new_point);
 			
 			//check if the points are inside of a building.
-			if(!inside_a_buildling(nearest_point_info,new_n, new_e),
-				new_waypoint_data = matrix({{new_n, new_e, test_point[3], nearest_idx, waypoint_list[nearest_idx, 5] + step_size, 0}});
+			if(!inside_a_buildling(planner_potential_points),
+				new_waypoint_data = matrix({{new_n, new_e, test_point[3], nearest_idx, waypoint_list[nearest_idx, 5]+eval(planner_dubins_params[1]), 0, test_course}});
 				waypoint_list |/= new_waypoint_data;
 				//show(waypoint_list);
 				//print("outside of buildling");
@@ -100,10 +105,14 @@ find_path = function({map, start, end},
 		//if(dist_to_end < step_size,
 		//show(end);
 		//show(waypoint_list[nrow(waypoint_list),1], waypoint_list[nrow(waypoint_list),2]);
-		if(!inside_a_buildling(waypoint_list[nrow(waypoint_list),1::3], end[1],end[2]),
+		last_point = waypoint_list[nrow(waypoint_list), 1::3]`;
+		last_course = waypoint_list[nrow(waypoint_list), 7];
+		planner_dubins_to_end = find_dubins_parameters(last_point, last_course, end, 0, t_rad);
+		planner_to_end_points = get_dubins_points(planner_dubins_to_end, last_point, end);
+		if(!inside_a_buildling(planner_to_end_points),
 			dist_to_end = dist_between_points(end, waypoint_list[nrow(waypoint_list),1::3]);
 			last_idx = nrow(waypoint_list);
-			new_waypoint_data = matrix({{end[1], end[2], end[3], last_idx, waypoint_list[last_idx, 5]+dist_to_end, 1}});
+			new_waypoint_data = matrix({{end[1], end[2], end[3], last_idx, waypoint_list[last_idx, 5]+eval(planner_dubins_to_end[1]), 1, 0}});
 			waypoint_list |/= new_waypoint_data;
 			feasible_path_count += 1;
 			show("end added");

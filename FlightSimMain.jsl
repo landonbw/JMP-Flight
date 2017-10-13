@@ -9,7 +9,7 @@ Include( "LateralController.jsl" );
 Include( "LongitudinalController.jsl" );
 Include( "PathFollower.jsl" );
 Include( "PathManager.jsl" );
-Include( "PathPlannerStraightLines.jsl" );
+Include( "PathPlanner.jsl" );
 //make table to record the state through time
 data_table = createTable_func();
 
