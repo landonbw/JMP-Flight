@@ -130,47 +130,82 @@ find_dubins_parameters = Function( {dub_pos_s, dub_course_s, dub_pos_e, dub_cour
 	dub_output = list(dub_min_length, dub_cs, dub_lam_s, dub_ce, dub_lam_e, dub_z1, dub_q1, dub_z2, dub_z3, dub_q3);
 );
 
-get_dubins_points({dub_points_params, dub_p_start, dub_p_end},
+get_dubins_points = Function({dub_points_params, dub_p_start, dub_p_end},
 	// upack the points params
-	dub_p_L = dub_points_params[1];
-	dub_p_cs = dub_points_params[2];
-	dub_p_lam_s = dub_points_params[3];
-	dub_p_ce = dub_points_params[4];
-	dub_p_lam_e = dub_points_params[5];
-	dub_p_z1 = dub_points_params[6];
-	dub_p_q1 = dub_points_params[7];
-	dub_p_z2 = dub_points_params[8];
-	dub_p_z3 = dub_points_params[9];
-	dub_p_q3 = dub_points_params[10];
+	dub_p_L = eval(dub_points_params[1]);
+	dub_p_cs = eval(dub_points_params[2]);
+	dub_p_lam_s = eval(dub_points_params[3]);
+	dub_p_ce = eval(dub_points_params[4]);
+	dub_p_lam_e = eval(dub_points_params[5]);
+	dub_p_z1 = eval(dub_points_params[6]);
+	dub_p_q1 = eval(dub_points_params[7]);
+	dub_p_z2 = eval(dub_points_params[8]);
+	dub_p_z3 = eval(dub_points_params[9]);
+	dub_p_q3 = eval(dub_points_params[10]);
 	
 	// find points around the first circle
-	dub_p_rad = vec_mag(dub_p_cs - start);
-	dub_p_start_ang = atan(dub_p_start[2] - dub_p_cs[2], dub_p_start[1] - dub_p_cs[0]);
-	dub_p_end_ang = atan(dub_p_z1[2] - dub_p_cs[2], dub_p_z1[1] - dub_c_cs[1]);
+	dub_p_rad = vec_mag(dub_p_cs - dub_p_start);
+	dub_p_start_ang = atan(dub_p_start[2] - dub_p_cs[2], dub_p_start[1] - dub_p_cs[1]);
+	dub_p_end_ang = atan(dub_p_z1[2] - dub_p_cs[2], dub_p_z1[1] - dub_p_cs[1]);
 	dub_p_theta_step = 0.001;
 	dub_p_theta_travel = abs(dub_p_start_ang - dub_p_end_ang);
-	dub_p_num_steps = floor(dub_p_theta_travel / theta_step);
-	
-	
-	
+	dub_p_num_steps = floor(dub_p_theta_travel / dub_p_theta_step);
+	// get the points
+	dub_p_points = J(dub_p_num_steps, 3);
+	for(dub_p_i=1, dub_p_i<=dub_p_num_steps, dub_p_i++,
+		dub_p_points[dub_p_i, 1] = dub_p_cs[1] + dub_p_rad * cos(dub_p_start_ang + dub_p_i * dub_p_theta_step * dub_p_lam_s);
+		dub_p_points[dub_p_i, 2] = dub_p_cs[2] + dub_p_rad * sin(dub_p_start_ang + dub_p_i * dub_p_theta_step * dub_p_lam_s);
+		dub_p_points[dub_p_i, 3] = dub_p_cs[3];
+	);
 	
 	// find points along the line
+	//z1 to z2
+	dub_p_q = (dub_p_z2 - dub_p_z1);
+	dub_p_sl = vec_mag(dub_p_q);
+	dub_p_q = dub_p_q/dub_p_sl;
+	dub_p_delta = 0.01;
+	dub_p_num_steps = dub_p_sl / dub_p_delta;
+	dub_p_points2 = J(dub_p_num_steps, 3);
+	// get the points
+	for(dub_p_i=1, dub_p_i<=dub_p_num_steps, dub_p_i++,
+		dub_p_points2[dub_p_i,1] = dub_p_z1[1] + dub_p_i * dub_p_delta * dub_p_q[1];
+		dub_p_points2[dub_p_i,2] = dub_p_z1[2] + dub_p_i * dub_p_delta * dub_p_q[2];
+		dub_p_points2[dub_p_i,3] = dub_p_z1[3];
+	);
+	dub_p_points = dub_p_points |/ dub_p_points2; 
 	
 	// find points along the end circle
+	dub_p_start_ang = atan(dub_p_z2[2] - dub_p_ce[2], dub_p_z2[1] - dub_p_ce[1]);
+	dub_p_end_ang = atan(dub_p_z3[2] - dub_p_ce[2], dub_p_z3[1] - dub_p_ce[1]);
+	dub_p_theta_step = 0.001;
+	dub_p_theta_travel = abs(dub_p_start_ang - dub_p_end_ang);
+	dub_p_num_steps = floor(dub_p_theta_travel / dub_p_theta_step);
+	// get the points
+	dub_p_points2 = J(dub_p_num_steps, 3);
+	for(dub_p_i=1, dub_p_i<=dub_p_num_steps, dub_p_i++,
+		dub_p_points2[dub_p_i, 1] = dub_p_ce[1] + dub_p_rad * cos(dub_p_start_ang + dub_p_i * dub_p_theta_step * dub_p_lam_e);
+		dub_p_points2[dub_p_i, 2] = dub_p_ce[2] + dub_p_rad * sin(dub_p_start_ang + dub_p_i * dub_p_theta_step * dub_p_lam_e);
+		dub_p_points2[dub_p_i, 3] = dub_p_ce[3];
+	);
+	dub_p_points = dub_p_points |/ dub_p_points2;
 	
-	
+	as table(dub_p_points);
 );
 
 //dub_pos_s, dub_course_s, dub_pos_e, dub_rad
 
 a = find_dubins_parameters(matrix({0,0,3}), pi()/2, matrix({100,0,3}), 3*pi()/2, 10);
-show(eval(a[1]));
-show(eval(a[2]));
-show(eval(a[3]));
-show(eval(a[4]));
-show(eval(a[5]));
-show(eval(a[6]));
-show(eval(a[7]));
-show(eval(a[8]));
-show(eval(a[9]));
-show(eval(a[10]));
+b = get_dubins_points(a, matrix({0,0,3}), matrix({100,0,3}));
+
+
+//show(eval(a[1]));
+//show(eval(a[2]));
+//show(eval(a[3]));
+//show(eval(a[4]));
+//show(eval(a[5]));
+//show(eval(a[6]));
+//show(eval(a[7]));
+//show(eval(a[8]));
+//show(eval(a[9]));
+//show(eval(a[10]));
+
