@@ -154,6 +154,35 @@ animation_time_step = 10;
 
 nw = new window("UAV Flight City",
 	hlb = hlistbox(
+		ob_slides =outlinebox("Background",
+			vlb_slides = tabbox(
+				"Introduction",
+				vlistbox(
+					New Image("test1.png")
+				),
+				"Algorithm",
+				vlistbox(
+					New Image("test2.png")
+				),
+				"Flight Dynamics",
+				vlistbox(
+					New Image("test3.png")
+				),
+				"Control Systems",
+				vlistbox(
+					New Image("test3.png")
+				),
+				"Path Planning RRT",
+				vlistbox(
+					New Image("test3.png")
+				),
+				"Monte Carlo RRT",
+				vlistbox(
+					New Image("test3.png")
+				),
+			
+			), << close(1)
+		),
 		ob_test1 = outlinebox("Parameters",
 			hlistbox(cb = Check Box({"Update Live"}, << Set( 1, 1 )), ),
 			
@@ -172,11 +201,11 @@ nw = new window("UAV Flight City",
 				),
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Number of Streets" )),
-				sb = Slider Box( 5, 20, NumberStreets, NumberStreets = round(NumberStreets); update_birdseye; myscript )
+				sb = Slider Box( 2, 20, NumberStreets, NumberStreets = round(NumberStreets); update_birdseye; myscript )
 				),
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Street Gap" )),
-				sb = Slider Box( 10, 100, StreetGap, StreetGap = round(StreetGap); update_birdseye; myscript )
+				sb = Slider Box( 10, 300, StreetGap, StreetGap = round(StreetGap); update_birdseye; myscript )
 				),
 			),
 			outlinebox("Lateral Control Values",
@@ -358,7 +387,7 @@ nw = new window("UAV Flight City",
 				xscale(-50,100),
 				yscale(-50,100),
 				xname("North"),
-				yname("East"),
+				yname("West"),
 				markersize(5);
 				//marker(3,1::10,1::10);
 			
@@ -385,7 +414,7 @@ nw = new window("UAV Flight City",
 			gb3 = graphbox(
 				Frame Size( 200, 200 ),
 				xname("North"),
-				yname("East"),
+				yname("West"),
 				xscale(-60,1000),
 				yscale(-60,1000),
 				
@@ -393,6 +422,7 @@ nw = new window("UAV Flight City",
 				pencolor("blue");
 
 			),
+			outlinebox("View Height Position",
 			gb2 = graphbox(
 				Frame Size( 200, 200 ),
 				xname("North"),
@@ -412,6 +442,8 @@ nw = new window("UAV Flight City",
 					myscriptnobuildings;
 				),
 				line({0,0},{x_coor2,y_coor2});
+			),
+			<< close(1)
 			),
 			
 			buttonbox("Calculate Flight Path", Include(dir || "FlightSimMain.jsl")),
@@ -440,8 +472,8 @@ nw = new window("UAV Flight City",
 			),*/
 			Buttonbox("Show Flight Path", 
 			
-				dttemp = data table("plane_sim.jmp");
-
+				//dttemp = data table("plane_sim.jmp");
+				
 				dtmat =  dttemp << Get as Matrix();
 
 				north = dtmat[0,2];
@@ -460,8 +492,6 @@ nw = new window("UAV Flight City",
 				show(waypoint_mat);
 				
 				print("Path extracted");
-			
-			
 			
 				addingpathandplane;
 					
