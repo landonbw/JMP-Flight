@@ -1,7 +1,7 @@
 ﻿//Clear Globals();
 Clear Log();
 
-Include( "Parameters.jsl" );
+Include( "Parameters_v2.jsl" );
 Include( "TableManager.jsl" );
 Include( "Simulator.jsl" );
 Include( "Controller.jsl" );
@@ -24,6 +24,7 @@ state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
 
 waypoint_mat = find_path(matrix({endpointgoal*1.1, endpointgoal*1.1}), matrix({Pn, Pe, Pd}), matrix({endpointgoal, endpointgoal, Pd}));
 end_reached = 0;
+
 
 
 

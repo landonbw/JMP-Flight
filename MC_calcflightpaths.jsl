@@ -1,0 +1,41 @@
+Clear Log();
+
+Include( "Parameters.jsl" );
+Include( "TableManager.jsl" );
+Include( "Simulator.jsl" );
+Include( "Controller.jsl" );
+Include( "LateralController.jsl" );
+Include( "LongitudinalController.jsl" );
+Include( "PathFollower.jsl" );
+Include( "PathManager.jsl" );
+Include( "PathPlannerStraightLines.jsl" );
+//make table to record the state through time
+data_table = createTable_func();
+
+//make the gui
+
+//calculate the flight path
+
+// loop for each step of the program
+ii = 0;
+time = 0;
+state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
+
+
+waypoint_mat_master = [];
+waypoint_mat_masterRRT = [];
+for(mlk = 1, mlk<10,mlk++,
+	show(mlk);
+
+	waypoint_mat = find_path(matrix({endpointgoal*1.1, endpointgoal*1.1}), matrix({Pn, Pe, Pd}), matrix({endpointgoal, endpointgoal, Pd}));
+
+	waypoint_mat_master = waypoint_mat_master |/ (waypoint_mat || J(nrow(waypoint_mat),1,mlk));
+	waypoint_mat_masterRRT = waypoint_mat_masterRRT |/ (waypoint_list || J(nrow(waypoint_list),1,mlk));
+	
+	
+	
+	
+);
+
+//as table(waypoint_mat_master);
+as table(waypoint_mat_masterRRT);

@@ -1,0 +1,100 @@
+Clear Log();
+/*
+Include( "Parameters.jsl" );
+Include( "TableManager.jsl" );
+Include( "Simulator.jsl" );
+Include( "Controller.jsl" );
+Include( "LateralController.jsl" );
+Include( "LongitudinalController.jsl" );
+Include( "PathFollower.jsl" );
+Include( "PathManager.jsl" );
+Include( "PathPlannerStraightLines.jsl" );
+//make table to record the state through time
+data_table = createTable_func();
+
+//make the gui
+
+//calculate the flight path
+
+// loop for each step of the program
+ii = 0;
+time = 0;
+state = Matrix( {Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r} );
+
+
+waypoint_mat_master = [];
+waypoint_mat_masterRRT = [];
+*/
+for(mlk = 1, mlk<=10,mlk++,
+
+	show(mlk);
+	StreetGap = round(Random Uniform(100,300)); 
+	NumberStreets = round(Random Uniform(2,8)); 
+	numi = NumberStreets; 
+	numj = NumberStreets;
+	update_birdseye; myscript;
+	
+				Pn = -50.0;
+Pe = -50.0;
+Pd = -200.0;
+u = 3.49997970e+01;
+v = -2.76273829e-05;
+w = 1.19203683e-01;
+phi = -1.52263833e-06;
+theta =  0.08;
+psi = 0.0;
+p = 0;
+q = 0;
+r = 0;
+
+Pn0 = 0.0;
+Pe0 = 0.0;
+Pd0 = -50.0;
+u0 = 3.49997970e+01;
+v0 = -2.76273829e-05;
+w0 = 1.19203683e-01;
+phi0 = -1.52263833e-06;
+theta0 =  3.40582609e-03;
+psi0 = 0.0;
+p0 = 0;
+q0 = 0;
+r0 = 0;
+
+//state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r});
+
+fx = 0.0;
+fy = 0.0;
+fz = 0.0;
+ml = 0.0;
+mm = 0.0;
+mn = 0.0;
+
+deltaA = 0.0;
+deltaE = -0.049348;
+deltaR = 0.0;
+deltaT = 0.46382;
+	
+	
+	
+
+	Include(dir || "FlightSimMain_v2.jsl");
+
+	//waypoint_mat = find_path(matrix({endpointgoal*1.1, endpointgoal*1.1}), matrix({Pn, Pe, Pd}), matrix({endpointgoal, endpointgoal, Pd}));
+
+	//waypoint_mat_master = waypoint_mat_master |/ (waypoint_mat || J(nrow(waypoint_mat),1,mlk));
+	//waypoint_mat_masterRRT = waypoint_mat_masterRRT |/ (waypoint_list || J(nrow(waypoint_list),1,mlk));
+	
+	savecurrentFP;
+	
+);
+beep();wait(1);
+beep();wait(1);
+beep();wait(1);
+beep();wait(1);
+beep();wait(1);
+beep();wait(1);
+beep();wait(1);
+//as table(waypoint_mat_master);
+//as table(waypoint_mat_masterRRT);
+
+

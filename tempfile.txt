@@ -1,0 +1,2272 @@
+a = 0.98019801980198   ;
+
+a_beta1 = 0.886096036877906   ;
+
+a_beta2 = -0.153710537009433   ;
+
+a_phi1 = 16.2073359961748   ;
+
+a_phi2 = 127.482894396162   ;
+
+a_theta1 = 0.698389976892758   ;
+
+a_theta2 = 27.1681896359247   ;
+
+a_theta3 = -35.7476179420062   ;
+
+a2 = 19.8019801980198   ;
+
+addingpathandplane = Function( {},
+	scene << clear;
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	scene << Look At(
+		lookat_x_val,
+		lookat_y_val,
+		lookat_z_val,
+		centerpoint_x_val,
+		centerpoint_y_val,
+		centerpoint_z_val,
+		0,
+		0,
+		1
+	);
+	box << clear;
+	makethebuildings_expr;
+	ppath << clear;
+	makethepath_expr;
+	waypath << clear;
+	makethewaypoints_expr;
+	box << Call list( ppath );
+	box << Call list( waypath );
+	scene << arcball( box, 100 );
+	scene << Update;
+	Print( "addingpathandplane run." );
+)   ;
+
+alpha = 0.0775452720935287   ;
+
+alpha0 = 0.4712   ;
+
+altitude0 = 50   ;
+
+ang = 0.397891113294196   ;
+
+angleflap = 10   ;
+
+angleperspective = 95   ;
+
+anglerudder = 10   ;
+
+animation_time_step = 10   ;
+
+AR = 15.2445442909091   ;
+
+avgheight = 200   ;
+
+b = 2.8956   ;
+
+B_d1 = -2.21312207326965   ;
+
+B_lon = -2.21312207326965   ;
+
+balance_integrator = 3496.90114121498   ;
+
+balance_loop = Function( {B_lon},
+	balance_integrator += (ts_control / 2) * (B_lon + B_d1);
+	B_d1 = B_lon;
+	theta_c_unsat = kp_bal * B_lon + ki_bal * balance_integrator;
+	theta_c = saturate_val( theta_c_unsat, theta_max );
+	balance_integrator += (ts_control / ki_bal) * (theta_c - theta_c_unsat);
+	theta_c;
+)   ;
+
+beta = 0.0000042580298412815   ;
+
+beta_fs = 0.0000042594432352088   ;
+
+beta0 = 0   ;
+
+blockdim_x = 200   ;
+
+blockdim_y = 200   ;
+
+blockdim_z = 134   ;
+
+body1 = Scene Display List()   ;
+
+body2 = Scene Display List()   ;
+
+box = Scene Display List()   ;
+
+c = 0.18994   ;
+
+cb = DisplayBox[CheckBoxBox]   ;
+
+cd_alpha = Function( {alpha},
+	ret_cd = Cd0 + CdAlpha * alpha;
+	Return( ret_cd );
+)   ;
+
+Cd0 = 0.03   ;
+
+CdAlpha = 0.3   ;
+
+CdDeltae = 0   ;
+
+Cdp = 0.0437   ;
+
+Cdq = 0   ;
+
+centerpoint_x_val = 244.6593916   ;
+
+centerpoint_y_val = 232.27834765   ;
+
+centerpoint_z_val = 73.86   ;
+
+check_point = [490.77704947895 391.909970308341 -200]   ;
+
+chi_d1 = 0.702913609851014   ;
+
+chi_dot = 999.999993087873   ;
+
+chi_follow_c = 0.702911946280411   ;
+
+chi_inf = 1.39626222222222   ;
+
+chi_q = 0.700302350342155   ;
+
+cl_alpha = Function( {alpha},
+	ret_cl = CL0 + ClAlpha * alpha;
+	Return( ret_cl );
+)   ;
+
+CL0 = 0   ;
+
+ClAlpha = 3.45   ;
+
+ClBeta = -0.12   ;
+
+ClDeltaa = 0.08   ;
+
+ClDeltae = -0.36   ;
+
+ClDeltar = 0.105   ;
+
+ClP = -0.26   ;
+
+Clq = 0   ;
+
+Clr = 0.14   ;
+
+Cm0 = -0.02338   ;
+
+CmAlpha = -0.38   ;
+
+CmDeltae = -0.5   ;
+
+Cmq = -3.6   ;
+
+Cn0 = 0   ;
+
+CnBeta = 0.25   ;
+
+CnDeltaa = 0.06   ;
+
+CnDeltar = -0.032   ;
+
+CnP = 0.022   ;
+
+Cnr = -0.35   ;
+
+cockpit = Scene Display List()   ;
+
+compliment_angle = 6.2831836436094   ;
+
+course_bandwidth_separation = 36   ;
+
+course_control_loop = Function( {chi, chi_c, phi_ff = 0},
+	phi_c_max = 1;
+	a = (2 * sigma - ts_control) / (2 * sigma + ts_control);
+	a2 = 2 / (2 * sigma + ts_control);
+	error1 = chi_c - chi;
+	error2 = unit_circle_compliment( error1 );
+	If( Abs( error1 ) <= Abs( error2 ),
+		error_chi = error1,
+		error_chi = error2
+	);
+	course_integrator += (ts_simulation / 2) * (error_chi + course_e_d1);
+	chi_dot = a * chi_dot + a2 + (chi_d1 - chi);
+	phi_c_unsat = kp_chi * error_chi + kd_chi * chi_dot + ki_chi * course_integrator
+	 + phi_ff;
+	course_e_d1 = error_chi;
+	chi_d1 = chi;
+	phi_c = saturate_val( phi_c_unsat, phi_c_max );
+	course_integrator = course_integrator + (ts_control / ki_chi) * (phi_c
+	-phi_c_unsat);
+	phi_c;
+)   ;
+
+course_e_d1 = -0.0000016635706032719   ;
+
+course_integrator = 0.0000280177389897985   ;
+
+course_req = 0.702911946280411   ;
+
+Cp0 = 0   ;
+
+CpBeta = -0.126063698151933   ;
+
+CpDeltaA = 0.103052092824564   ;
+
+CpDeltaR = 0.125967711978846   ;
+
+cphi = 1   ;
+
+CpP = -0.316720378987404   ;
+
+CpR = 0.142182130991118   ;
+
+Cprop = 1   ;
+
+cpsi = 1   ;
+
+Cr0 = 0   ;
+
+CrBeta = 0.133497402355035   ;
+
+CrDeltaA = 0.0411639977123806   ;
+
+CrDeltaR = -0.00956991897541043   ;
+
+createTable_func = Function( {name = "plane_sim.jmp"},
+	Try( dtsim = Data Table( "plane_sim.jmp" ) );
+	Try( dtsim << Close Window() );
+	data = New Table( "plane_sim.jmp", visibility( "invisible" ) );
+	data << New Column( "time_col" );
+	data << New Column( "Pn_col" );
+	data << New Column( "Pe_col" );
+	data << New Column( "Pd_col" );
+	data << New Column( "u_col" );
+	data << New Column( "v_col" );
+	data << New Column( "w_col" );
+	data << New Column( "phi_col" );
+	data << New Column( "theta_col" );
+	data << New Column( "psi_col" );
+	data << New Column( "p_col" );
+	data << New Column( "q_col" );
+	data << New Column( "r_col" );
+	data;
+)   ;
+
+crossed_plane_func = Function( {plane_point_crossed, normal_crossed, pos_crossed},
+	point_diff_crossed = pos_crossed - plane_point_crossed;
+	dot_prod_crossed = point_diff_crossed[1] * normal_crossed[1] + point_diff_crossed[
+	2] * normal_crossed[2] + point_diff_crossed[3] * normal_crossed[3];
+	If( dot_prod_crossed > 0,
+		crossed_ret = 1,
+		crossed_ret = 0
+	);
+	crossed_ret;
+)   ;
+
+crossed_ret = 1   ;
+
+CrP = -0.00917176442870005   ;
+
+CrR = -0.189244611386395   ;
+
+ctheta = 1   ;
+
+cx_alpha = Function( {alpha},
+	ret_cx = -cdAlpha( alpha ) * Cos( alpha ) + clAlpha( alpha ) * Sin( alpha );
+	Return( ret_cx );
+)   ;
+
+cx_del_e = Function( {alpha},
+	ret_cxdel = -CdDeltae * Cos( alpha ) + ClDeltae * Sin( alpha );
+	Return( ret_cxdel );
+)   ;
+
+cx_q = Function( {alpha},
+	ret_cxq = -Cdq * Cos( alpha ) + Clq * Sin( alpha );
+	Return( ret_cxq );
+)   ;
+
+Cy0 = 0   ;
+
+CyBeta = -0.98   ;
+
+CyDeltaa = 0   ;
+
+CyDeltar = -0.17   ;
+
+CyP = 0   ;
+
+CYr = 0   ;
+
+cz_alpha = Function( {alpha},
+	ret_cz = -cd_Alpha( alpha ) * Sin( alpha ) - cl_Alpha( alpha ) * Cos( alpha );
+	Return( ret_cz );
+)   ;
+
+cz_del_e = Function( {alpha},
+	ret_czdel = -CdDeltae * Sin( alpha ) - ClDeltae * Cos( alpha );
+	Return( ret_czdel );
+)   ;
+
+cz_q = Function( {alpha},
+	ret_czq = -Cdq * Sin( alpha ) - Clq * Cos( alpha );
+	Return( ret_czq );
+)   ;
+
+data = Data Table( "plane_sim" )   ;
+
+data_table = Data Table( "plane_sim" )   ;
+
+delta_a = -0.0000047504183388659   ;
+
+delta_a_max = 1   ;
+
+delta_a_prime = -0.0000042640481865366   ;
+
+delta_a_unsaturated = -0.0000047504183388659   ;
+
+delta_e = -0.105694688450463   ;
+
+delta_e_max = 0.523598333333333   ;
+
+delta_e_prime = -0.10569602984592   ;
+
+delta_e_unsat = -0.105694688450463   ;
+
+delta_r_max = 0.5   ;
+
+delta_t_max = 1   ;
+
+deltaA = -0.0000047504183388659   ;
+
+deltaE = -0.105694688450463   ;
+
+deltaR = 0   ;
+
+deltaT = 0.467794002688979   ;
+
+derivative_gain_on_course = 0   ;
+
+derivative_gain_on_energy_balance = 0.00006   ;
+
+derivative_gain_on_pitch = -0.073   ;
+
+derivative_gain_on_roll = -0.0747   ;
+
+derivatives = Function( {state, inputs},
+	pn = state[1];
+	pe = state[2];
+	pd = state[3];
+	u = state[4];
+	v = state[5];
+	w = state[6];
+	phi = state[7];
+	theta = state[8];
+	psi = state[9];
+	p = state[10];
+	q = state[11];
+	r = state[12];
+	fx = inputs[1];
+	fy = inputs[2];
+	fz = inputs[3];
+	l = inputs[4];
+	m = inputs[5];
+	n = inputs[6];
+	cphi = Cos( phi );
+	sphi = Sin( phi );
+	ctheta = Cos( theta );
+	stheta = Sin( theta );
+	ttheta = Tan( theta );
+	cpsi = Cos( psi );
+	spsi = Sin( psi );
+	pn_dot = ctheta * cpsi * u + (sphi * stheta * cpsi - cphi * spsi) * v + (cphi *
+	stheta * cpsi + sphi * spsi) * w;
+	pe_dot = ctheta * spsi * u + (sphi * stheta * spsi + cphi * cpsi) * v + (cphi *
+	stheta * sphi - sphi * cpsi) * w;
+	pd_dot = -stheta * u + sphi * ctheta * v + cphi * ctheta * w;
+	u_dot = r * v - q * w + fx / mass;
+	v_dot = p * w - r * w + fy / mass;
+	w_dot = q * u - P * v + fz / mass;
+	phi_dot = p + sphi * ttheta * q + cphi * ttheta * r;
+	theta_dot = cphi * q - sphi * r;
+	psi_dot = sphi * q / ctheta + cphi * r / ctheta;
+	p_dot = gamma1 * p * q - gamma2 * q * r + gamma3 * l + gamma4 * n;
+	q_dot = gamma5 * p * r - gamma6 * (p ^ 2 - r * 2) + m / jy;
+	r_dot = gamma7 * p * q - gamma1 * q * r + gamma4 * l + gamma8 * n;
+	edgkrsh = Matrix(
+		{pn_dot, pe_dot, pd_dot, u_dot, v_dot, w_dot, phi_dot, theta_dot, psi_dot, p_dot,
+		q_dot, r_dot}
+	);
+)   ;
+
+dir = "/C:/Users/John Salmon/Documents/GitHub/JMP-Flight/"   ;
+
+dist_between = 711.458200488873   ;
+
+dist_between_points = Function( {point_a, point_b},
+	dist_between = Sqrt(
+		(point_a[1] - point_b[1]) ^ 2 + (point_a[2] - point_b[2]) ^ 2 + (point_a[3]
+		-point_b[3]) ^ 2
+	)
+)   ;
+
+dist_to = 1595.5596661827   ;
+
+dist_to_end = 711.458200488873   ;
+
+dot_prod_crossed = 0.0034797481083384   ;
+
+drawtheairplane_expr = plane = Scene Display List( 1 );
+plane << Color( 1, 0, 0 );
+plane << pushmatrix;
+plane << call list( nose );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( tail );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( body1 );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( body2 );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( leftwingtip );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( rightwingtip );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( leftwing );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( rightwing );
+plane << popmatrix;
+plane << pushmatrix;
+plane << translate( 2, 0, -0.5 );
+plane << Rotate( angleflap, 1, 0, 0 );
+plane << call list( leftflap );
+plane << popmatrix;
+plane << pushmatrix;
+plane << translate( -2, 0, -0.5 );
+plane << Rotate( angleflap, 1, 0, 0 );
+plane << call list( rightflap );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( tailwing );
+plane << popmatrix;
+plane << pushmatrix;
+plane << translate( 0, 0, -4.5 );
+plane << Rotate( anglerudder, 0, 1, 0 );
+plane << call list( rudder );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( cockpit );
+plane << popmatrix;   ;
+
+e = 0.9   ;
+
+e_beta_max = 1.04719666666667   ;
+
+E_lon = 0.0000469543049688159   ;
+
+e_phi_max = 0.698131111111111   ;
+
+e_theta_max = 0.523598333333333   ;
+
+edgkrsh = [0.0000066414294097555, 5.24850250135241e-12, -0.0000004837670048841,
+0.000126893207559386, 0.0000234799110139157, -0.000118955903823698,
+-5.68503930758266e-16, -7.40967018495367e-14, -1.09054173382031e-13,
+0.0000000582299951251, -0.0000027016095453648, -0.0000013574060383898]   ;
+
+elevator_control_loop = Function( {state, theta_c},
+	theta = state[8];
+	q = state[11];
+	error_theta = theta - theta_c;
+	delta_e_prime = error_theta * kp_theta;
+	delta_e_unsat = delta_e_prime - kd_theta * q;
+	delta_e = saturate_val( delta_e_unsat, delta_e_max );
+)   ;
+
+end_idx = 144   ;
+
+end_reached = 1   ;
+
+endpointgoal = 1600   ;
+
+energy_control_loop = Function( {E_lon},
+	energy_integrator += (ts_control / 2) * (E_lon + energy_d1);
+	energy_d1 = E_lon;
+	throttle_c_unsat = kp_throttle * E_lon + ki_throttle + energy_integrator;
+	If( throttle_c_unsat < 0,
+		throttle_c_unsat = 0
+	);
+	throttle_c = saturate_val( throttle_c_unsat, delta_t_max );
+	energy_integrator += (ts_control / ki_throttle) * (throttle_c - throttle_c_unsat);
+	throttle_c;
+)   ;
+
+energy_d1 = 0.0000469543049688159   ;
+
+energy_integrator = 0.467693861826064   ;
+
+epsilon = 0.1592   ;
+
+epy = -0.587160773000846   ;
+
+error_chi = -0.0000016635706032719   ;
+
+error_theta = -0.1321200373074   ;
+
+error1 = -0.0000016635706032719   ;
+
+error2 = 6.2831836436094   ;
+
+exception_msg = {"Name Unresolved: dtsim"(1, 2, "dtsim", dtsim/*###*/)}   ;
+
+farperspective = 8000   ;
+
+feasible_path_count = 1   ;
+
+find_nearest_point = Function( {points, new_point},
+	shortest_point = Matrix( {-1, -1, -1} );
+	shortest_dist = 99999999999;
+	shortest_idx = -1;
+	ang = 0;
+	For( i = 1, i <= N Row( points ), i++,
+		check_point = points[i, Index( 1, 3 )];
+		is_end = points[i, 6];
+		dist_to = dist_between_points( new_point, check_point );
+		If( dist_to < shortest_dist & dist_to > 3 * t_rad & !is_end,
+			shortest_point = check_point;
+			shortest_dist = dist_to;
+			shortest_idx = i;
+			ang = ATan( new_point[2] - check_point[2], new_point[1] - check_point[1] );
+		);
+	);
+	nearest_point_found = Matrix(
+		{shortest_point[1], shortest_point[2], shortest_point[3], shortest_dist,
+		shortest_idx, ang}
+	);
+)   ;
+
+find_path = Function( {map, start, end},
+	waypoint_list = Matrix( {{start[1], start[2], start[3], -1, 0, 0}} );
+	Show( waypoint_list );
+	feasible_path_count = 0;
+	height_c_planner = start[3];
+	shortest_end_dist = map[1] * map[2];
+	shortest_end_idx = -1;
+	While( feasible_path_count < 1,
+		test_point = generate_random_point( map, height_c_planner );
+		nearest_point_info = find_nearest_point( waypoint_list, test_point );
+		nearest_point = nearest_point_info[Index( 1, 3 )];
+		nearest_idx = nearest_point_info[5];
+		nearest_dist = nearest_point_info[4];
+		nearest_ang = nearest_point_info[6];
+		If( nearest_point_info[5] > 0,
+			new_n = nearest_point_info[1] + step_size * Cos( nearest_ang );
+			new_e = nearest_point_info[2] + step_size * Sin( nearest_ang );
+			If( !inside_a_buildling( nearest_point_info, new_n, new_e ),
+				new_waypoint_data = Matrix(
+					{{new_n, new_e, test_point[3], nearest_idx, waypoint_list[nearest_idx, 5]
+					 + step_size, 0}}
+				);
+				waypoint_list |/= new_waypoint_data;
+			);
+		);
+		If(
+			!inside_a_buildling(
+				waypoint_list[N Row( waypoint_list ), Index( 1, 3 )],
+				end[1],
+				end[2]
+			),
+			dist_to_end = dist_between_points(
+				end,
+				waypoint_list[N Row( waypoint_list ), Index( 1, 3 )]
+			);
+			last_idx = N Row( waypoint_list );
+			new_waypoint_data = Matrix(
+				{{end[1], end[2], end[3], last_idx, waypoint_list[last_idx, 5] + dist_to_end,
+				1}}
+			);
+			waypoint_list |/= new_waypoint_data;
+			feasible_path_count += 1;
+			Show( "end added" );
+			end_idx = N Row( waypoint_list );
+			If( waypoint_list[end_idx, 6] < shortest_end_dist,
+				shortest_end_dist = waypoint_list[end_idx, 6];
+				shortest_end_idx = end_idx;
+			);
+		);
+	);
+	Show( waypoint_list );
+	shortest_path = find_shortest_path( waypoint_list, shortest_end_idx );
+	shortest_path;
+)   ;
+
+find_shortest_path = Function( {waypoints, shortest_end_idx},
+	path_waypoints = waypoints[shortest_end_idx, Index( 1, 3 )];
+	prev_idx = waypoints[shortest_end_idx, 4];
+	While( prev_idx > 0,
+		path_waypoints = waypoints[prev_idx, Index( 1, 3 )] |/ path_waypoints;
+		prev_idx = waypoints[prev_idx, 4];
+	);
+	path_waypoints;
+)   ;
+
+flight_state = [34.9976579438327, 0.0775452805207882, 0.0000042594432352088, 0, 0.702913609851014]   ;
+
+follow_commands = [200, 0.702911946280411, 0]   ;
+
+follow_line_flag = 1   ;
+
+follow_orbit_func = Function( {y_manager, pos, chi, phi},
+	vg_des_follow = y_manager[2];
+	c_follow = y_manager[5];
+	cn_follow = c_follow[1];
+	ce_follow = c_follow[2];
+	h_follow_c = -c_follow[3];
+	rho_follow = y_manager[6];
+	direction = y_manager[7];
+	pn_follow = pos[1];
+	pe_follow = pos[2];
+	d_follow = Sqrt( (pn_follow - cn_follow) ^ 2 + (pe_follow - ce_follow) ^ 2 );
+	phi_follow = ATan( pe_follow - ce_follow, pn_follow - cn_follow );
+	While( phi_follow - chi < -3.14159, phi_follow += 2 * 3.14159 );
+	While( phi_follow - chi > 3.14159, phi_follow -= 2 * 3.14159 );
+	chi_follow_c = phi_follow + direction * (3.14159 / 2
+	+ATan( k_orbit * ((d_follow - rho_follow) / rho_follow) ));
+	phi_ff = direction * ATan( vg_des_follow ^ 2 / g / rho_follow );
+	follow_commands = Matrix( {h_follow_c, chi_follow_c, phi_ff} );
+)   ;
+
+follow_path_func = Function( {y_manager, pos, chi, phi},
+	follow_line_flag = y_manager[1];
+	If( follow_line_flag,
+		follow_path_return = follow_straight_line_func( y_manager, pos, chi, phi ),
+		follow_path_return = follow_orbit_func( y_manager, pos, chi, phi )
+	);
+	follow_path_return;
+)   ;
+
+follow_path_return = [200, 0.702911946280411, 0]   ;
+
+follow_straight_line_func = Function( {y_manager, pos, chi, phi},
+	r = y_manager[3];
+	q = y_manager[4];
+	chi_q = ATan( q[2], q[1] );
+	While( chi_q - chi < -3.14159, chi_q += 2 * 3.14159 );
+	While( chi_q - chi > 3.14159, chi_q -= 2 * 3.14159 );
+	epy = -Sin( chi_q ) * (pos[1] - r[1]) + Cos( chi_q ) * (pos[2] - r[2]);
+	chi_follow_c = chi_q - chi_inf * (2 / 3.14159) * ATan( k_path * epy );
+	h_follow_c = -1 * r[3];
+	phi_follow_ff = 0;
+	follow_commands = Matrix( {h_follow_c, chi_follow_c, phi_follow_ff} );
+)   ;
+
+forces = [0.00171305830205171, 0.000316978798687863, -0.00160590470161992,
+0.0000002114364950033, -0.0000030663268077288, -0.0000023946881129407]   ;
+
+fx = 0.00171305830205171   ;
+
+fy = 0.000316978798687863   ;
+
+fz = -0.00160590470161992   ;
+
+g = 9.8   ;
+
+gamma = 1.43562344   ;
+
+gamma1 = 0.121471519021729   ;
+
+gamma2 = 0.774654501322436   ;
+
+gamma3 = 1.22525165791386   ;
+
+gamma4 = 0.0838660031909203   ;
+
+gamma5 = 0.823436123348018   ;
+
+gamma6 = 0.106079295154185   ;
+
+gamma7 = -0.168263120585437   ;
+
+gamma8 = 0.574245290951783   ;
+
+gb1 = DisplayBox[OwnerBox]   ;
+
+gb2 = DisplayBox[OwnerBox]   ;
+
+gb3 = DisplayBox[OwnerBox]   ;
+
+generate_random_point = Function( {map, height_c_planner},
+	rand_x_gen = Random Uniform() * map[1];
+	rand_y_gen = Random Uniform() * map[2];
+	random_point_gen = Matrix( {rand_x_gen, rand_y_gen, height_c_planner} );
+)   ;
+
+get_path_straight_line_func = Function( {new_waypoints, pos_get_path},
+	num_waypoints = N Row( new_waypoints );
+	If( waypoint_counter - 1 < 1,
+		prev_indx = num_waypoints,
+		prev_indx = waypoint_counter - 1
+	);
+	waypoint_past = new_waypoints[prev_indx, 0];
+	waypoint_now = new_waypoints[waypoint_counter, 0];
+	If( waypoint_counter + 1 > num_waypoints,
+		next_indx = (waypoint_counter - num_waypoints) + 1,
+		next_indx = waypoint_counter + 1
+	);
+	waypoint_next = new_waypoints[next_indx, 0];
+	r_get_path = waypoint_past;
+	q_past_get_path = waypoint_now - waypoint_past;
+	q_now_get_path = waypoint_next - waypoint_now;
+	q_past_get_path = normalize_vector( q_past_get_path );
+	q_now_get_path = normalize_vector( q_now_get_path );
+	n_now_get_path = q_past_get_path + q_now_get_path;
+	n_now_get_path = normalize_vector( n_now_get_path );
+	If( crossed_plane_func( waypoint_now, n_now_get_path, pos_get_path ),
+		waypoint_counter += 1;
+		Show( q_past_get_path, q_now_get_path );
+	);
+	If( waypoint_counter > num_waypoints,
+		waypoint_counter -= num_waypoints;
+		end_reached = 1;
+	);
+	get_path_straight_line_ret = {1, 35, r_get_path, q_past_get_path, 1, 1, 1};
+)   ;
+
+get_path_straight_line_ret = {1, 35, r_get_path, q_past_get_path, 1, 1, 1}   ;
+
+getForces_func = Function( {state},
+	pn = state[1];
+	pe = state[2];
+	pd = state[3];
+	u = state[4];
+	v = state[5];
+	w = state[6];
+	phi = state[7];
+	theta = state[8];
+	psi = state[9];
+	p = state[10];
+	q = state[11];
+	r = state[12];
+	va = Sqrt( u ^ 2 + v ^ 2 + w ^ 2 );
+	alpha = ArcTan( w / u );
+	beta = ArcSine( v / va );
+	fx = -mass * g * Sin( theta ) + 0.5 * rho * va ^ 2 * S * (cx_alpha( alpha )
+	+cx_q( alpha ) * (c * q / (2 * va)) + cx_del_e( alpha ) * deltaE) + 0.5 * rho *
+	Sprop * Cprop * ((kMotor * deltaT) ^ 2 - va ^ 2);
+	fy = mass * g * Cos( theta ) * Sin( phi ) + 0.5 * rho * va ^ 2 * S * (Cy0 + CyBeta
+	 * beta + CyP * (b * p / (2 * va)) + CYr * (b * r / (2 * va)) + Cydeltaa * deltaA
+	 + CyDeltar * DeltaR);
+	fz = mass * g * Cos( theta ) * Cos( phi ) + 0.5 * rho * va ^ 2 * S * (
+	cz_alpha( alpha ) + cz_q( alpha ) * c * q / (2 * va) + cz_del_e( alpha ) * deltaE);
+	ml = 0.5 * rho * va ^ 2 * S * b * (CL0 * ClBeta * beta + ClP * b * p / (2 * va)
+	+Clr * b * r / (2 * va) + ClDeltaa * deltaA + ClDeltar * deltaR);
+	mm = 0.5 * rho * va ^ 2 * S * c * (Cm0 + CmAlpha * alpha + Cmq * c * q / (2 * va)
+	 + CmDeltae * deltaE);
+	mn = 0.5 * rho * va ^ 2 * S * b * (Cn0 + CnBeta * beta + CnP * b * p / (2 * va)
+	+Cnr * b * r / (2 * va) + CnDeltaa * deltaA + CnDeltaR * deltaR);
+	forces = Matrix( {fx, fy, fz, ml, mm, mn} );
+)   ;
+
+h = 200.008363851546   ;
+
+h_error = -0.00836385154559594   ;
+
+h_error_max = 10   ;
+
+h_follow_c = 200   ;
+
+h_req = 200   ;
+
+heading_fs = 0.702913609851014   ;
+
+heading0 = 0   ;
+
+height_c_planner = -200   ;
+
+Height_error_saturation_value = 10   ;
+
+hlb = DisplayBox[ListBox]   ;
+
+i = 200   ;
+
+ii = 33860   ;
+
+inside_a_buildling = Function( {point1, x2, y2},
+	xrange = Abs( point1[1] - x2 );
+	yrange = Abs( point1[2] - y2 );
+	zrange = Abs( point1[3] - height_c_planner );
+	numchecks = Ceiling( Max( xrange, yrange ) / 10 );
+	For( pq = 0, pq < numchecks + 1, pq++,
+		xp = point1[1] + xrange / numchecks * pq;
+		yp = point1[2] + yrange / numchecks * pq;
+		zp = point1[3] + zrange / numchecks * pq;
+		For( i = 0, i < numi, i++,
+			For( j = 0, j < numj, j++,
+				xmat = i * (blockdim_x + StreetGap) || i * (blockdim_x + StreetGap) || i * (
+				blockdim_x + StreetGap) + 200 || i * (blockdim_x + StreetGap) + 200 || i * (
+				blockdim_x + StreetGap);
+				ymat = j * (blockdim_y + StreetGap) || j * (blockdim_y + StreetGap) + 200
+				 || j * (blockdim_y + StreetGap) + 200 || j * (blockdim_y + StreetGap) || j
+				 * (blockdim_y + StreetGap);
+				insidecheck = In Polygon( xp, yp, xmat, ymat );
+				If( insidecheck == 1,
+					Break()
+				);
+			);
+			If( insidecheck == 1,
+				Break()
+			);
+		);
+		If( insidecheck == 1,
+			maxheight_all = listofblockdims_z :* listofpeakdims;
+			maxheight_of_inside = maxheight_all[i + 1, j + 1];
+			If( maxheight_of_inside > -zp,
+				insidecheck_all_three = 1,
+				insidecheck_all_three = 0
+			);
+		,
+			insidecheck_all_three = 0
+		);
+		If( insidecheck_all_three == 1,
+			Break()
+		);
+	);
+	insidecheck_all_three;
+)   ;
+
+insidecheck = 0   ;
+
+insidecheck_all_three = 0   ;
+
+integral_gain_on_course = 0.00526963   ;
+
+integral_gain_on_sideslip = 0.05   ;
+
+integral_gain_on_throttle = 0.0001   ;
+
+is_end = 0   ;
+
+j = 5   ;
+
+jj = 10   ;
+
+jx = 0.8244   ;
+
+jxz = 0.1204   ;
+
+jy = 1.135   ;
+
+jz = 1.759   ;
+
+K_error = 1.10658451378731   ;
+
+k_orbit = 2   ;
+
+k_path = 0.005   ;
+
+k1 = [26.7018111381888, 22.4884482767527, 0.00253775166906278, 0.0000773283238036795,
+-0.000139377662328348, 0.000519039609812516, -0.0000023509261949851,
+0.0000182837295521218, 0.0000537215140392733, 0.0000000574569013373,
+0.0000086613309737338, -0.0000013575049734773]   ;
+
+k2 = [0.0000020236331560977, -1.55203454588121e-11, 0.0000010554088904906,
+0.000126893207559386, 0.0000234799110139158, -0.000118955903823698,
+-2.80478136191097e-16, 1.18776612747411e-13, -5.45310609197594e-14,
+0.0000000582299951251, -0.0000027016095337973, -0.0000013574060383898]   ;
+
+k3 = [0.0000033207147048777, 2.62425125067621e-12, -0.0000002418835024421,
+0.000126893207559386, 0.0000234799110139158, -0.000118955903823698,
+-2.84251965379133e-16, -3.70483509247799e-14, -5.45270866910157e-14,
+0.0000000582299951251, -0.0000027016095337964, -0.0000013574060383898]   ;
+
+k4 = [0.0000066414294097555, 5.24850250135241e-12, -0.0000004837670048841,
+0.000126893207559386, 0.0000234799110139157, -0.000118955903823698,
+-5.68503930758266e-16, -7.40967018495367e-14, -1.09054173382031e-13,
+0.0000000582299951251, -0.0000027016095453648, -0.0000013574060383898]   ;
+
+kd_chi = 0   ;
+
+kd_roll = -0.0747   ;
+
+kd_theta = -0.0733112674442324   ;
+
+ki_bal = 0.00006   ;
+
+ki_beta = -0.68505568529364   ;
+
+ki_chi = 0.158088906712881   ;
+
+ki_throttle = 0.0001   ;
+
+kMotor = 80   ;
+
+kOmega = 0   ;
+
+kp_bal = 0.0001   ;
+
+kp_beta = 0.1   ;
+
+kp_chi = 2.32813038430527   ;
+
+kp_roll = 0.2775   ;
+
+kp_theta = 0.8   ;
+
+kp_throttle = 0.003   ;
+
+kTp = 0   ;
+
+l = 0.0000002114364950033   ;
+
+last_idx = 143   ;
+
+lateralControl = Function( {state, commanded_course, flight_state, phi_ff = 0},
+	vg_fs = flight_state[1];
+	beta_fs = flight_state[3];
+	heading_fs = flight_state[5];
+	phi_c = course_control_loop( heading_fs, commanded_course, phi_ff );
+	delta_a = roll_control_loop( state, phi_c );
+	ret = delta_a;
+)   ;
+
+leftflap = Scene Display List()   ;
+
+leftwing = Scene Display List()   ;
+
+leftwingtip = Scene Display List()   ;
+
+lHigh = 0.5   ;
+
+lightPosition = 5   ;
+
+listofblockdims_z = 
+[200 224 259 267 140,
+274 192 219 108 278,
+243 128 267 285 142,
+200 291 300 258 210,
+237 259 245 164 134]   ;
+
+listofpeakdims = 
+[1.25772667750018 1.43870729905553 1.491699740435 1.33133922383888 1.30483089121524,
+1.37687636603368 1.45316323990468 1.20190659492044 1.03560594072565 1.16794076579623,
+1.20900515610119 1.08223171730759 1.14325067364611 1.30297982939053 1.09593445796287,
+1.31829272025265 1.31682338650804 1.03090705924435 1.48834702218883 1.05049278207123,
+1.15550923708593 1.28649957098067 1.36308916117065 1.09636367134051 1.48247603307245
+]   ;
+
+lLow = 0.01   ;
+
+lon_pd = -200.008363851546   ;
+
+lon_ret = [-0.105694688450463, 0.467794002688979]   ;
+
+lon_va = 34.9976579438327   ;
+
+longitudinalControl = Function( {state, flight_state, h_command, va_command},
+	lon_pd = state[3];
+	lon_va = flight_state[1];
+	h = -lon_pd;
+	h_error = saturate_val( h_command - h, h_error_max );
+	U_error = mass * g * h_error;
+	K_error = 0.5 * mass * (va_command ^ 2 - lon_va ^ 2);
+	E_lon = U_error + K_error;
+	B_lon = U_error - K_error;
+	theta_command = balance_loop( B_lon );
+	deltaE = elevator_control_loop( state, theta_command );
+	deltaT = energy_control_loop( E_lon );
+	ret = Matrix( {deltaE, deltaT} );
+)   ;
+
+lookat_x_val = -200   ;
+
+lookat_y_val = -170   ;
+
+lookat_z_val = 760   ;
+
+M = -0.0000030663268077288   ;
+
+makethebuildings_expr = box = Scene Display List( 1 );
+For( i = 0, i < numi, i++,
+	For( j = 0, j < numj, j++,
+		blockdim_z = listofblockdims_z[i + 1, j + 1];
+		peakdim_z = listofpeakdims[i + 1, j + 1];
+		box << pushmatrix;
+		box << Translate(
+			i * (blockdim_x + StreetGap),
+			j * (blockdim_y + StreetGap),
+			0
+		);
+		box << linewidth( 2 );
+		box << Begin( QUADS );
+		box << Color( 0.7, 0.7, 0.7 );
+		box << Vertex( 0, 0, 0 );
+		box << Vertex( 0, 0, blockdim_z );
+		box << Vertex( 0, blockdim_y, blockdim_z );
+		box << Vertex( 0, blockdim_y, 0 );
+		box << Vertex( blockdim_x, 0, 0 );
+		box << Vertex( blockdim_x, 0, blockdim_z );
+		box << Vertex( blockdim_x, blockdim_y, blockdim_z );
+		box << Vertex( blockdim_x, blockdim_y, 0 );
+		box << Color( 0.3, 0.3, 0.3 );
+		box << Vertex( 0, 0, 0 );
+		box << Vertex( blockdim_x, 0, 0 );
+		box << Vertex( blockdim_x, 0, blockdim_z );
+		box << Vertex( 0, 0, blockdim_z );
+		box << Vertex( 0, blockdim_y, 0 );
+		box << Vertex( blockdim_x, blockdim_y, 0 );
+		box << Vertex( blockdim_x, blockdim_y, blockdim_z );
+		box << Vertex( 0, blockdim_y, blockdim_z );
+		box << Color( 0.1, 0.1, 0.1 );
+		box << Vertex( 0, 0, 0 );
+		box << Vertex( 0, blockdim_y, 0 );
+		box << Vertex( blockdim_x, blockdim_y, 0 );
+		box << Vertex( blockdim_x, 0, 0 );
+		box << Vertex( 0, 0, blockdim_z );
+		box << Vertex( 0, blockdim_y, blockdim_z );
+		box << Vertex( blockdim_x, blockdim_y, blockdim_z );
+		box << Vertex( blockdim_x, 0, blockdim_z );
+		box << End();
+		box << Begin( TRIANGLE_STRIP );
+		box << Color( 0.1, 0.1, 0.8 );
+		box << Vertex( 0, 0, blockdim_z );
+		box << Vertex( 0, blockdim_y, blockdim_z );
+		box << Vertex( blockdim_x / 2, blockdim_y / 2, blockdim_z * peakdim_z );
+		box << Color( 0.1, 0.1, 0.3 );
+		box << Vertex( blockdim_x, 0, blockdim_z );
+		box << Vertex( blockdim_x / 2, blockdim_y / 2, blockdim_z * peakdim_z );
+		box << Vertex( 0, 0, blockdim_z );
+		box << Color( 0.3, 0.3, 0.99 );
+		box << Vertex( 0, blockdim_y, blockdim_z );
+		box << Vertex( blockdim_x, blockdim_y, blockdim_z );
+		box << Vertex( blockdim_x / 2, blockdim_y / 2, blockdim_z * peakdim_z );
+		box << Color( 0.5, 0.5, 0.99 );
+		box << Vertex( blockdim_x, blockdim_y, blockdim_z );
+		box << Vertex( blockdim_x / 2, blockdim_y / 2, blockdim_z * peakdim_z );
+		box << Vertex( blockdim_x, 0, blockdim_z );
+		box << End();
+		box << popmatrix;
+	)
+);   ;
+
+makethepath_expr = ppath = Scene Display List( 1 );
+ppath << Color( 0, 0.9, 0 );
+ppath << LineWidth( 5 );
+ppath << Begin( LINE_STRIP );
+For( i = 1, i < N Row( north ), i++,
+	ppath << Vertex( north[i], east[i], -down[i] )
+);
+ppath << End();   ;
+
+makethewaypoints_expr = waypath = Scene Display List( 1 );
+waypath << Point Size( 10 );
+waypath << Color( 1, 0.7, 0 );
+For( i = 1, i <= N Rows( waypoint_mat ), i++,
+	waypath << Push Matrix;
+	waypath << Translate(
+		waypoint_mat[i, 1],
+		waypoint_mat[i, 2],
+		-waypoint_mat[i, 3]
+	);
+	waypath << Sphere( 7, 15, 15 );
+	waypath << pop Matrix;
+);   ;
+
+mass = 13.5   ;
+
+maxheight_all = 
+[251.545335500035 322.270434988439 386.350232772664 355.46757276498 182.676324770134,
+377.26412429323 279.007342061698 263.217544287576 111.845441598371 324.687532891352,
+293.78825293259 138.525659815371 305.247929863511 371.349251376302 155.622693030727,
+263.65854405053 383.19560547384 309.272117773304 383.993531724717 220.603484234959,
+273.855689189367 333.203388883993 333.956844486808 179.803642099844 198.651788431709
+]   ;
+
+maxheight_of_inside = 198.651788431709   ;
+
+maximum_aileron_angle = 30   ;
+
+maximum_allowable_throttle = 1   ;
+
+maximum_commanded_pitch_value = 30   ;
+
+maximum_commanded_roll = 30   ;
+
+maximum_commanded_theta = 30   ;
+
+maximum_path_approach_angle = 80   ;
+
+maximum_rudder_angle = 30   ;
+
+ml = 0.0000002114364950033   ;
+
+mm = -0.0000030663268077288   ;
+
+mn = -0.0000023946881129407   ;
+
+moveto_x_val = 0   ;
+
+moveto_y_val = 0   ;
+
+moveto_z_val = 4   ;
+
+myscript = If( cb << Get( 1 ),
+	numj = NumberStreets;
+	numi = NumberStreets;
+	listofblockdims_z = J(
+		numi,
+		numj,
+		Max( 1, Random Integer( avgheight - rangeheight, avgheight + rangeheight ) )
+	);
+	listofpeakdims = J( numi, numj, 1 + Max( 0, Random Uniform( lLow, lHigh ) ) );
+	makethebuildings_expr;
+);
+endpointgoal = numj * (blockdim_y + StreetGap) + 100;
+Show( endpointgoal );
+scene << clear;
+scene << Perspective( angleperspective, nearperspective, farperspective );
+scene << Look At(
+	lookat_x_val,
+	lookat_y_val,
+	lookat_z_val,
+	centerpoint_x_val,
+	centerpoint_y_val,
+	centerpoint_z_val,
+	0,
+	0,
+	1
+);
+scene << Color( 0.1, 0.1, 0.1 );
+scene << Call list( box );
+scene << Update;   ;
+
+myscript5 = scene << clear;
+makethebox_expr;
+drawtheairplane_expr;
+scene << Perspective( angleperspective, nearperspective, farperspective );
+scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
+scene << pushmatrix;
+scene << Translate( 0, 1, 7 );
+scene << Rotate( rotateACto_x_val, 1, 0, 0 );
+scene << Rotate( rotateACto_y_val, 0, 1, 0 );
+scene << Rotate( rotateACto_z_val, 0, 0, 1 );
+scene << Color( 1, 0.1, 0.1 );
+scene << arcball( plane, 10 );
+scene << popmatrix;
+scene << Rotate( 90, 1, 0, 0 );
+scene << Translate( -moveto_y_val, moveto_z_val, moveto_x_val );
+scene << Rotate( rotateto_x_val, 1, 0, 0 );
+scene << Rotate( rotateto_y_val, 0, 1, 0 );
+scene << Rotate( rotateto_z_val, 0, 0, 1 );
+scene << Call list( box );
+scene << Color( 0.1, 0.1, 0.1 );
+scene << Update;   ;
+
+myscriptnobuildings = makethebuildings_expr;
+scene << clear;
+scene << Look At(
+	lookat_x_val,
+	lookat_y_val,
+	lookat_z_val,
+	centerpoint_x_val,
+	centerpoint_y_val,
+	centerpoint_z_val,
+	0,
+	0,
+	1
+);
+scene << Color( 0.1, 0.1, 0.1 );
+scene << Call list( box );
+scene << Update;   ;
+
+n = -0.0000023946881129407   ;
+
+n_now_get_path = [0.676389994917297 -0.736543667935431 0]   ;
+
+nearest_ang = 0.397891113294196   ;
+
+nearest_dist = 812.63633127587   ;
+
+nearest_idx = 140   ;
+
+nearest_point = [963.797337635618, 1102.75403309525, -200]   ;
+
+nearest_point_found = [963.797337635618, 1102.75403309525, -200, 812.63633127587, 140, 0.397891113294196]   ;
+
+nearest_point_info = [963.797337635618, 1102.75403309525, -200, 812.63633127587, 140, 0.397891113294196]   ;
+
+nearperspective = 1   ;
+
+new_e = 1141.50153954656   ;
+
+new_n = 1055.98535607514   ;
+
+new_state = [1589.96194533941, 1590.77194930339, -200.008357502138, 34.8924872673897,
+0.000149015584194247, 2.71118392589398, 0.0000159163459712117, 0.0774727646827515,
+0.702913744177239, -0.0000065086309014278, 0.0000182833703875769,
+0.0000535580484676664]   ;
+
+new_waypoint_data = [1600 1600 -200 143 2911.45820048887 1]   ;
+
+next_indx = 1   ;
+
+normalize_vector = Function( {matrix_to_normalize},
+	vector_length = Sqrt(
+		matrix_to_normalize[1] ^ 2 + matrix_to_normalize[2] ^ 2 + matrix_to_normalize[3]
+		 ^ 2
+	);
+	If( vector_length == 0,
+		normalized_matrix = matrix_to_normalize,
+		normalized_matrix = matrix_to_normalize / vector_length
+	);
+	normalized_matrix;
+)   ;
+
+normalized_matrix = [0.676389994917297 -0.736543667935431 0]   ;
+
+north = [0]   ;
+
+nose = Scene Display List()   ;
+
+num_steps = 10   ;
+
+num_waypoints = 24   ;
+
+NumberStreets = 5   ;
+
+numchecks = 55   ;
+
+numi = 5   ;
+
+numj = 5   ;
+
+nw = DisplayBox[EvalContextBox]   ;
+
+ob_test1 = DisplayBox[OutlineBox]   ;
+
+ob_test2 = DisplayBox[OutlineBox]   ;
+
+ob_test3 = DisplayBox[OutlineBox]   ;
+
+omega_n_chi = 0.27161521155106   ;
+
+omega_n_phi = 9.77814761583815   ;
+
+omega_n_theta = 7.93194853601125   ;
+
+orbit_radius = 275   ;
+
+p = -0.0000065086309014278   ;
+
+p_dot = 0.0000000582299951251   ;
+
+p0 = 0   ;
+
+path_angle0 = 0   ;
+
+path_follow_commands = [200, 0.702911946280411, 0]   ;
+
+path_transition_rate_for_line = 0.05   ;
+
+path_transition_rate_for_orbit = 2   ;
+
+path_waypoints = 
+[-50 -50 -200,
+-39.3869211361043 49.4352178909904 -200,
+-5.74668377066669 143.607052480729 -200,
+-2.05276552219404 243.538804031342 -200,
+97.9394251837662 242.289084933752 -200,
+197.882162904462 238.9054216981 -200,
+282.245666311618 292.597127695122 -200,
+274.606473679744 392.304914431832 -200,
+274.368926337246 492.304632287734 -200,
+280.858860465604 592.093813840694 -200,
+295.322243570216 691.042338585478 -200,
+292.556189522613 791.004075990376 -200,
+357.64571175225 866.920833665592 -200,
+428.097534852972 937.889422645398 -200,
+483.137303716009 1021.37968461351 -200,
+553.199302908598 1092.73314471978 -200,
+650.009646236059 1117.78823252284 -200,
+749.865301662468 1112.41719171474 -200,
+847.336289024698 1090.06978419996 -200,
+771.146134452422 1154.83906971595 -200,
+869.186450557063 1135.13890682063 -200,
+963.797337635618 1102.75403309525 -200,
+1055.98535607514 1141.50153954656 -200,
+1600 1600 -200]   ;
+
+Pd = -200.008357502138   ;
+
+pd_dot = -0.0000004837670048841   ;
+
+Pd0 = -50   ;
+
+Pe = 1590.77194930339   ;
+
+pe_dot = 5.24850250135241e-12   ;
+
+Pe0 = 0   ;
+
+peakdim_z = 1.48247603307245   ;
+
+phi = 0.0000159163459712117   ;
+
+phi_c = 0.0000005562844575497   ;
+
+phi_c_max = 1   ;
+
+phi_c_unsat = 0.0000005562844575497   ;
+
+phi_dot = -5.68503930758266e-16   ;
+
+phi_error = -0.0000153659394109427   ;
+
+phi_ff = 0   ;
+
+phi_follow_ff = 0   ;
+
+phi_max = 0.349065555555556   ;
+
+phi0 = -0.00000152263833   ;
+
+plane = Scene Display List()   ;
+
+Pn = 1589.96194533941   ;
+
+pn_dot = 0.0000066414294097555   ;
+
+Pn0 = 0   ;
+
+point_diff_crossed = [-10.1048092341093 -9.28427181211919 -0.00836385154559594]   ;
+
+pos = [1589.89519076589, 1590.71572818788, -200.008363851546]   ;
+
+ppath = Scene Display List()   ;
+
+pq = 56   ;
+
+prev_idx = -1   ;
+
+prev_indx = 23   ;
+
+proportional_gain_on_course = 1.455   ;
+
+proportional_gain_on_energy_balance = 0.0001   ;
+
+proportional_gain_on_pitch = 4.8   ;
+
+proportional_gain_on_roll = 0.2775   ;
+
+proportional_gain_on_sideslip = 0.1   ;
+
+proportional_gain_on_throttle = 0.003   ;
+
+psi = 0.702913744177239   ;
+
+psi_dot = -1.09054173382031e-13   ;
+
+psi0 = 0   ;
+
+q = 0.0000182833703875769   ;
+
+q_dot = -0.0000027016095453648   ;
+
+q_now_get_path = [-0.707106781186548 -0.707106781186548 0]   ;
+
+q_past_get_path = [0.764647372889995 0.644448908085373 0]   ;
+
+q0 = 0   ;
+
+r = 0.0000535580484676664   ;
+
+r_dot = -0.0000013574060383898   ;
+
+r_get_path = [1055.98535607514 1141.50153954656 -200]   ;
+
+r0 = 0   ;
+
+rand_x_gen = 1712.95066855848   ;
+
+rand_y_gen = 1417.63034798205   ;
+
+random_point_gen = [1712.95066855848, 1417.63034798205, -200]   ;
+
+rangeheight = 100   ;
+
+ret = [-0.105694688450463, 0.467794002688979]   ;
+
+ret_cd = 0.0532635816280586   ;
+
+ret_cl = 0.267531188722674   ;
+
+ret_cx = -0.0318353150364485   ;
+
+ret_cxdel = -0.0278883283285501   ;
+
+ret_cxq = 0   ;
+
+ret_cz = -0.270853423884895   ;
+
+ret_czdel = 0.358918153822064   ;
+
+ret_czq = 0   ;
+
+rho = 1.2682   ;
+
+rightflap = Scene Display List()   ;
+
+rightwing = Scene Display List()   ;
+
+rightwingtip = Scene Display List()   ;
+
+roll_control_loop = Function( {state, phi_c},
+	delta_a_max = 1;
+	phi = state[7];
+	p = state[10];
+	phi_error = phi_c - phi;
+	delta_a_prime = phi_error * kp_roll;
+	delta_a_unsaturated = delta_a_prime - kd_roll * p;
+	delta_a = saturate_val( delta_a_unsaturated, delta_a_max );
+	Return( delta_a );
+	delta_a;
+)   ;
+
+rotateACto_x_val = 0   ;
+
+rotateACto_y_val = 180   ;
+
+rotateACto_z_val = 180   ;
+
+rotateto_x_val = -180   ;
+
+rotateto_y_val = 0   ;
+
+rotateto_z_val = 0   ;
+
+rudder = Scene Display List()   ;
+
+S = 0.55   ;
+
+saturate_val = Function( {value, max_value},
+	If( Abs( value ) > max_value,
+		saturated_value = (value / Abs( value )) * max_value,
+		saturated_value = value
+	);
+	saturated_value;
+)   ;
+
+saturated_value = 0.467794002688979   ;
+
+sb = DisplayBox[SliderBox]   ;
+
+sb_avgheight = DisplayBox[SliderBox]   ;
+
+sb_centerpoint_x = DisplayBox[SliderBox]   ;
+
+sb_centerpoint_y = DisplayBox[SliderBox]   ;
+
+sb_centerpoint_z = DisplayBox[SliderBox]   ;
+
+sb_lookat_x = DisplayBox[SliderBox]   ;
+
+sb_lookat_y = DisplayBox[SliderBox]   ;
+
+sb_lookat_z = DisplayBox[SliderBox]   ;
+
+sb_perspective = DisplayBox[SliderBox]   ;
+
+sb_perspective_far = DisplayBox[SliderBox]   ;
+
+sb_perspective_near = DisplayBox[SliderBox]   ;
+
+sb_rangeheight = DisplayBox[SliderBox]   ;
+
+scene = DisplayBox[SceneBox]   ;
+
+scenex = 800   ;
+
+sceney = 800   ;
+
+shortest_dist = 812.63633127587   ;
+
+shortest_end_dist = 1   ;
+
+shortest_end_idx = 144   ;
+
+shortest_idx = 140   ;
+
+shortest_path = 
+[-50 -50 -200,
+-39.3869211361043 49.4352178909904 -200,
+-5.74668377066669 143.607052480729 -200,
+-2.05276552219404 243.538804031342 -200,
+97.9394251837662 242.289084933752 -200,
+197.882162904462 238.9054216981 -200,
+282.245666311618 292.597127695122 -200,
+274.606473679744 392.304914431832 -200,
+274.368926337246 492.304632287734 -200,
+280.858860465604 592.093813840694 -200,
+295.322243570216 691.042338585478 -200,
+292.556189522613 791.004075990376 -200,
+357.64571175225 866.920833665592 -200,
+428.097534852972 937.889422645398 -200,
+483.137303716009 1021.37968461351 -200,
+553.199302908598 1092.73314471978 -200,
+650.009646236059 1117.78823252284 -200,
+749.865301662468 1112.41719171474 -200,
+847.336289024698 1090.06978419996 -200,
+771.146134452422 1154.83906971595 -200,
+869.186450557063 1135.13890682063 -200,
+963.797337635618 1102.75403309525 -200,
+1055.98535607514 1141.50153954656 -200,
+1600 1600 -200]   ;
+
+shortest_point = [963.797337635618 1102.75403309525 -200]   ;
+
+sideslip_control_loop = Function( {beta},
+	beta_c = 0;
+	error1 = beta_c - beta;
+	error2 = unit_circle_compliment( error1 );
+	If( error1 <= error2,
+		error = error1,
+		error = error2
+	);
+	sideslip_integrator += (ts_control / 2) * (error + sideslip_error_d1);
+	delta_r_unsat = sideslip_kp * error - sideslip_ki * sideslip_integrator;
+	sideslip_error_d1 = error;
+	delta_r = saturate( delta_r_unsat, delta_r_max );
+	sideslip_integrator = sideslip_integrator + (ts_control / sideslip_ki) * (delta_r
+	 - delta_r_unsat);
+	Return( delta_r );
+	delta_r;
+)   ;
+
+sideslip_error_d1 = 0   ;
+
+sideslip_integrator = 0   ;
+
+sideslip_ki = 1   ;
+
+sideslip_kp = 1   ;
+
+sigma = 0.05   ;
+
+simulate_onestep = Function( {},
+	ii = ii + 1;
+	scene << clear;
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	scene << Look At(
+		lookat_x_val,
+		lookat_y_val,
+		lookat_z_val,
+		centerpoint_x_val,
+		centerpoint_y_val,
+		centerpoint_z_val,
+		0,
+		0,
+		1
+	);
+	box << clear;
+	makethebuildings_expr;
+	ppath << clear;
+	makethepath_expr;
+	waypath << clear;
+	makethewaypoints_expr;
+	box << Call list( waypath );
+	box << Call list( ppath );
+	scene << arcball( box, 100 );
+	plane << clear;
+	drawtheairplane_expr;
+	scene << pushmatrix;
+	scene << Translate( north[ii] - 20, -east[ii], -down[ii] );
+	scene << Rotate( 90, 1, 0, 0 );
+	scene << Rotate( 90, 0, 1, 0 );
+	scene << Rotate( -a_theta[ii] * 180 / Pi(), 1, 0, 0 );
+	scene << Call list( plane );
+	scene << popmatrix;
+	scene << Update;
+)   ;
+
+simulate_tenstep = Function( {},
+	ii = ii + 10;
+	scene << clear;
+	scene << Perspective( angleperspective, nearperspective, farperspective );
+	scene << Look At(
+		lookat_x_val,
+		lookat_y_val,
+		lookat_z_val,
+		centerpoint_x_val,
+		centerpoint_y_val,
+		centerpoint_z_val,
+		0,
+		0,
+		1
+	);
+	box << clear;
+	makethebuildings_expr;
+	ppath << clear;
+	makethepath_expr;
+	waypath << clear;
+	makethewaypoints_expr;
+	box << Call list( waypath );
+	box << Call list( ppath );
+	scene << arcball( box, 100 );
+	plane << clear;
+	drawtheairplane_expr;
+	scene << pushmatrix;
+	scene << Translate( north[ii] - 20, -east[ii], -down[ii] );
+	scene << Rotate( 90, 1, 0, 0 );
+	scene << Rotate( 90, 0, 1, 0 );
+	scene << Rotate( -a_theta[ii] * 180 / Pi(), 1, 0, 0 );
+	scene << Call list( plane );
+	scene << popmatrix;
+	scene << Update;
+)   ;
+
+simulatebutton = Function( {},
+	For( ii = 1, ii < N Row( north ), ii = ii + animation_time_step,
+		scene << clear;
+		scene << Perspective( angleperspective, nearperspective, farperspective );
+		scene << Look At(
+			lookat_x_val,
+			lookat_y_val,
+			lookat_z_val,
+			centerpoint_x_val,
+			centerpoint_y_val,
+			centerpoint_z_val,
+			0,
+			0,
+			1
+		);
+		box << clear;
+		makethebuildings_expr;
+		ppath << clear;
+		makethepath_expr;
+		waypath << clear;
+		makethewaypoints_expr;
+		box << Call list( waypath );
+		box << Call list( ppath );
+		scene << arcball( box, 100 );
+		plane << clear;
+		drawtheairplane_expr;
+		scene << pushmatrix;
+		scene << Translate( north[ii], east[ii], -down[ii] );
+		scene << Rotate( 90, 1, 0, 0 );
+		scene << Rotate( 90, 0, 1, 0 );
+		scene << Rotate( a_psi[ii] * 180 / Pi(), 0, 1, 0 );
+		scene << Rotate( -a_phi[ii] * 180 / Pi(), 0, 0, 1 );
+		scene << Rotate( -a_theta[ii] * 180 / Pi(), 1, 0, 0 );
+		scene << Call list( plane );
+		scene << popmatrix;
+		xcurpoint = north[ii];
+		ycurpoint = east[ii];
+		gb1[framebox( 1 )] << reshow;
+		scene << Update;
+		Wait( 0.001 );
+	)
+)   ;
+
+simulation_time_step = 0.01   ;
+
+slices = 50   ;
+
+sphi = 0   ;
+
+Sprop = 0.2027   ;
+
+spsi = 0   ;
+
+stacks = 50   ;
+
+state = [1589.96194533941, 1590.77194930339, -200.008357502138, 34.8924872673897,
+0.000149015584194247, 2.71118392589398, 0.0000159163459712117, 0.0774727646827515,
+0.702913744177239, -0.0000065086309014278, 0.0000182833703875769,
+0.0000535580484676664]   ;
+
+step_size = 100   ;
+
+stheta = 0   ;
+
+str = "gb1[framebox(1)] << Add Graphics Script(rect(0*(blockdim_x+StreetGap),0*(blockdim_y+StreetGap)+200,0*(blockdim_x+StreetGap)+200,0*(blockdim_y+StreetGap));
+rect(0*(blockdim_x+StreetGap),1*(blockdim_y+StreetGap)+200,0*(blockdim_x+StreetGap)+200,1*(blockdim_y+StreetGap));
+rect(0*(blockdim_x+StreetGap),2*(blockdim_y+StreetGap)+200,0*(blockdim_x+StreetGap)+200,2*(blockdim_y+StreetGap));
+rect(0*(blockdim_x+StreetGap),3*(blockdim_y+StreetGap)+200,0*(blockdim_x+StreetGap)+200,3*(blockdim_y+StreetGap));
+rect(0*(blockdim_x+StreetGap),4*(blockdim_y+StreetGap)+200,0*(blockdim_x+StreetGap)+200,4*(blockdim_y+StreetGap));
+rect(1*(blockdim_x+StreetGap),0*(blockdim_y+StreetGap)+200,1*(blockdim_x+StreetGap)+200,0*(blockdim_y+StreetGap));
+rect(1*(blockdim_x+StreetGap),1*(blockdim_y+StreetGap)+200,1*(blockdim_x+StreetGap)+200,1*(blockdim_y+StreetGap));
+rect(1*(blockdim_x+StreetGap),2*(blockdim_y+StreetGap)+200,1*(blockdim_x+StreetGap)+200,2*(blockdim_y+StreetGap));
+rect(1*(blockdim_x+StreetGap),3*(blockdim_y+StreetGap)+200,1*(blockdim_x+StreetGap)+200,3*(blockdim_y+StreetGap));
+rect(1*(blockdim_x+StreetGap),4*(blockdim_y+StreetGap)+200,1*(blockdim_x+StreetGap)+200,4*(blockdim_y+StreetGap));
+rect(2*(blockdim_x+StreetGap),0*(blockdim_y+StreetGap)+200,2*(blockdim_x+StreetGap)+200,0*(blockdim_y+StreetGap));
+rect(2*(blockdim_x+StreetGap),1*(blockdim_y+StreetGap)+200,2*(blockdim_x+StreetGap)+200,1*(blockdim_y+StreetGap));
+rect(2*(blockdim_x+StreetGap),2*(blockdim_y+StreetGap)+200,2*(blockdim_x+StreetGap)+200,2*(blockdim_y+StreetGap));
+rect(2*(blockdim_x+StreetGap),3*(blockdim_y+StreetGap)+200,2*(blockdim_x+StreetGap)+200,3*(blockdim_y+StreetGap));
+rect(2*(blockdim_x+StreetGap),4*(blockdim_y+StreetGap)+200,2*(blockdim_x+StreetGap)+200,4*(blockdim_y+StreetGap));
+rect(3*(blockdim_x+StreetGap),0*(blockdim_y+StreetGap)+200,3*(blockdim_x+StreetGap)+200,0*(blockdim_y+StreetGap));
+rect(3*(blockdim_x+StreetGap),1*(blockdim_y+StreetGap)+200,3*(blockdim_x+StreetGap)+200,1*(blockdim_y+StreetGap));
+rect(3*(blockdim_x+StreetGap),2*(blockdim_y+StreetGap)+200,3*(blockdim_x+StreetGap)+200,2*(blockdim_y+StreetGap));
+rect(3*(blockdim_x+StreetGap),3*(blockdim_y+StreetGap)+200,3*(blockdim_x+StreetGap)+200,3*(blockdim_y+StreetGap));
+rect(3*(blockdim_x+StreetGap),4*(blockdim_y+StreetGap)+200,3*(blockdim_x+StreetGap)+200,4*(blockdim_y+StreetGap));
+rect(4*(blockdim_x+StreetGap),0*(blockdim_y+StreetGap)+200,4*(blockdim_x+StreetGap)+200,0*(blockdim_y+StreetGap));
+rect(4*(blockdim_x+StreetGap),1*(blockdim_y+StreetGap)+200,4*(blockdim_x+StreetGap)+200,1*(blockdim_y+StreetGap));
+rect(4*(blockdim_x+StreetGap),2*(blockdim_y+StreetGap)+200,4*(blockdim_x+StreetGap)+200,2*(blockdim_y+StreetGap));
+rect(4*(blockdim_x+StreetGap),3*(blockdim_y+StreetGap)+200,4*(blockdim_x+StreetGap)+200,3*(blockdim_y+StreetGap));
+rect(4*(blockdim_x+StreetGap),4*(blockdim_y+StreetGap)+200,4*(blockdim_x+StreetGap)+200,4*(blockdim_y+StreetGap));
+);"   ;
+
+StreetGap = 100   ;
+
+strparsed = gb1[framebox( 1 )] << Add Graphics Script(
+	Rect(
+		0 * (blockdim_x + StreetGap),
+		0 * (blockdim_y + StreetGap) + 200,
+		0 * (blockdim_x + StreetGap) + 200,
+		0 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		0 * (blockdim_x + StreetGap),
+		1 * (blockdim_y + StreetGap) + 200,
+		0 * (blockdim_x + StreetGap) + 200,
+		1 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		0 * (blockdim_x + StreetGap),
+		2 * (blockdim_y + StreetGap) + 200,
+		0 * (blockdim_x + StreetGap) + 200,
+		2 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		0 * (blockdim_x + StreetGap),
+		3 * (blockdim_y + StreetGap) + 200,
+		0 * (blockdim_x + StreetGap) + 200,
+		3 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		0 * (blockdim_x + StreetGap),
+		4 * (blockdim_y + StreetGap) + 200,
+		0 * (blockdim_x + StreetGap) + 200,
+		4 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		1 * (blockdim_x + StreetGap),
+		0 * (blockdim_y + StreetGap) + 200,
+		1 * (blockdim_x + StreetGap) + 200,
+		0 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		1 * (blockdim_x + StreetGap),
+		1 * (blockdim_y + StreetGap) + 200,
+		1 * (blockdim_x + StreetGap) + 200,
+		1 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		1 * (blockdim_x + StreetGap),
+		2 * (blockdim_y + StreetGap) + 200,
+		1 * (blockdim_x + StreetGap) + 200,
+		2 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		1 * (blockdim_x + StreetGap),
+		3 * (blockdim_y + StreetGap) + 200,
+		1 * (blockdim_x + StreetGap) + 200,
+		3 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		1 * (blockdim_x + StreetGap),
+		4 * (blockdim_y + StreetGap) + 200,
+		1 * (blockdim_x + StreetGap) + 200,
+		4 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		2 * (blockdim_x + StreetGap),
+		0 * (blockdim_y + StreetGap) + 200,
+		2 * (blockdim_x + StreetGap) + 200,
+		0 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		2 * (blockdim_x + StreetGap),
+		1 * (blockdim_y + StreetGap) + 200,
+		2 * (blockdim_x + StreetGap) + 200,
+		1 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		2 * (blockdim_x + StreetGap),
+		2 * (blockdim_y + StreetGap) + 200,
+		2 * (blockdim_x + StreetGap) + 200,
+		2 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		2 * (blockdim_x + StreetGap),
+		3 * (blockdim_y + StreetGap) + 200,
+		2 * (blockdim_x + StreetGap) + 200,
+		3 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		2 * (blockdim_x + StreetGap),
+		4 * (blockdim_y + StreetGap) + 200,
+		2 * (blockdim_x + StreetGap) + 200,
+		4 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		3 * (blockdim_x + StreetGap),
+		0 * (blockdim_y + StreetGap) + 200,
+		3 * (blockdim_x + StreetGap) + 200,
+		0 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		3 * (blockdim_x + StreetGap),
+		1 * (blockdim_y + StreetGap) + 200,
+		3 * (blockdim_x + StreetGap) + 200,
+		1 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		3 * (blockdim_x + StreetGap),
+		2 * (blockdim_y + StreetGap) + 200,
+		3 * (blockdim_x + StreetGap) + 200,
+		2 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		3 * (blockdim_x + StreetGap),
+		3 * (blockdim_y + StreetGap) + 200,
+		3 * (blockdim_x + StreetGap) + 200,
+		3 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		3 * (blockdim_x + StreetGap),
+		4 * (blockdim_y + StreetGap) + 200,
+		3 * (blockdim_x + StreetGap) + 200,
+		4 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		4 * (blockdim_x + StreetGap),
+		0 * (blockdim_y + StreetGap) + 200,
+		4 * (blockdim_x + StreetGap) + 200,
+		0 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		4 * (blockdim_x + StreetGap),
+		1 * (blockdim_y + StreetGap) + 200,
+		4 * (blockdim_x + StreetGap) + 200,
+		1 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		4 * (blockdim_x + StreetGap),
+		2 * (blockdim_y + StreetGap) + 200,
+		4 * (blockdim_x + StreetGap) + 200,
+		2 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		4 * (blockdim_x + StreetGap),
+		3 * (blockdim_y + StreetGap) + 200,
+		4 * (blockdim_x + StreetGap) + 200,
+		3 * (blockdim_y + StreetGap)
+	);
+	Rect(
+		4 * (blockdim_x + StreetGap),
+		4 * (blockdim_y + StreetGap) + 200,
+		4 * (blockdim_x + StreetGap) + 200,
+		4 * (blockdim_y + StreetGap)
+	);
+)   ;
+
+t_rad = 175   ;
+
+tail = Scene Display List()   ;
+
+tailwing = Scene Display List()   ;
+
+tempemptyfunction = Function( {}, a = 9 )   ;
+
+test_point = [1712.95066855848, 1417.63034798205, -200]   ;
+
+theta = 0.0774727646827515   ;
+
+theta_c = 0.209592756265572   ;
+
+theta_c_unsat = 0.209592756265572   ;
+
+theta_command = 0.209592756265572   ;
+
+theta_dot = -7.40967018495367e-14   ;
+
+theta_max = 0.436331944444444   ;
+
+theta0 = 0.00340582609   ;
+
+throttle_c = 0.467794002688979   ;
+
+throttle_c_unsat = 0.467794002688979   ;
+
+time = 507.899999999659   ;
+
+translateto_x_val = -80   ;
+
+translateto_y_val = -80   ;
+
+translateto_z_val = -80   ;
+
+ts_control = 0.001   ;
+
+ts_simulation = 0.015   ;
+
+ttheta = -4.30535700560095e-18   ;
+
+u = 34.8924872673897   ;
+
+u_dot = 0.000126893207559386   ;
+
+U_error = -1.10653755948234   ;
+
+u0 = 34.999797   ;
+
+ucc_sign = -1   ;
+
+unit_circle_compliment = Function( {angle},
+	ucc_sign = angle / Abs( angle );
+	compliment_angle = ucc_sign * (Abs( angle ) - 2 * 3.14159265359);
+	If( angle == 0,
+		compliment_angle = 2 * 3.14159
+	);
+	Return( compliment_angle );
+	compliment_angle;
+)   ;
+
+update_birdseye = Function( {},
+	numj = NumberStreets;
+	numi = NumberStreets;
+	Try( gb1[framebox( 1 )] << Remove Graphics Script( 2 ) );
+	Try( gb1[framebox( 1 )] << Remove Graphics Script( 1 ) );
+	str = "gb1[framebox(1)] << Add Graphics Script(";
+	For( i = 0, i < numi, i++,
+		For( j = 0, j < numj, j++,
+			str = str || "rect(" || Char( i ) || "*(blockdim_x+StreetGap)," || Char( j )
+			 || "*(blockdim_y+StreetGap)+200," || Char( i ) ||
+			"*(blockdim_x+StreetGap)+200," || Char( j ) || "*(blockdim_y+StreetGap));
+"
+		)
+	);
+	str = str || ");";
+	strparsed = Parse( str );
+	Eval( strparsed );
+	gb1[axisbox( 1 )] << Max( numi * (blockdim_x + StreetGap) + 10 );
+	gb1[axisbox( 2 )] << Max( numj * (blockdim_y + StreetGap) + 10 );
+	gb1 << Reshow;
+)   ;
+
+update_birdseye2 = Function( {}, a = 9 )   ;
+
+updatescenesize = Function( {},
+	(vlbscene << child) << delete;
+	vlbscene << append( scene = Scene Box( scenex, sceney ) );
+)   ;
+
+updateState_func = Function( {current_state, current_inputs},
+	k1 = derivatives( current_state, current_inputs );
+	k2 = derivatives(
+		current_state * ts_simulation / num_steps / 2 :* k1,
+		current_inputs
+	);
+	k3 = derivatives(
+		current_state * ts_simulation / num_steps / 2 :* k2,
+		current_inputs
+	);
+	k4 = derivatives(
+		current_state * ts_simulation / num_steps :* k3,
+		current_inputs
+	);
+	new_state = current_state + (ts_simulation / num_steps / 6) * (k1 + 2 * k2 + 2 *
+	k3 + k4);
+	new_state;
+)   ;
+
+updateTable_func = Function( {data, state},
+	pn = state[1];
+	pe = state[2];
+	pd = state[3];
+	u = state[4];
+	v = state[5];
+	w = state[6];
+	phi = state[7];
+	theta = state[8];
+	psi = state[9];
+	p = state[10];
+	q = state[11];
+	r = state[12];
+	data << Add Rows(
+		{:time_col = time, :Pn_col = Pn, :Pe_col = Pe, :Pd_col = Pd, :u_col = u, :v_col
+		 = v, :w_col = w, :phi_col = phi, :theta_col = theta, :psi_col = psi, :p_col = p,
+		:q_col = q, :r_col = r}
+	);
+)   ;
+
+useFlatNormal = 0   ;
+
+useFlatShaded = 0   ;
+
+v = 0.000149015584194247   ;
+
+v_dot = 0.0000234799110139157   ;
+
+v0 = -0.0000276273829   ;
+
+va = 34.9976595459142   ;
+
+Va0 = 34.9999999937145   ;
+
+vec_x = [1]   ;
+
+vec_y = [1]   ;
+
+vec_z = [1]   ;
+
+vector_length = 0.0850701402088044   ;
+
+vg_fs = 34.9976579438327   ;
+
+vlbscene = DisplayBox[ListBox]   ;
+
+w = 2.71118392589398   ;
+
+w_dot = -0.000118955903823698   ;
+
+w0 = 0.119203683   ;
+
+waypath = Scene Display List()   ;
+
+waypoint_counter = 1   ;
+
+waypoint_list = 
+[-50 -50 -200 -1 0 0,
+-39.3869211361043 49.4352178909904 -200 1 100 0,
+-5.74668377066669 143.607052480729 -200 2 200 0,
+-2.05276552219404 243.538804031342 -200 3 300 0,
+-21.44839218292 147.813107576609 -200 2 200 0,
+97.9394251837662 242.289084933752 -200 4 400 0,
+197.882162904462 238.9054216981 -200 6 500 0,
+282.245666311618 292.597127695122 -200 7 600 0,
+382.006146613016 299.514249208766 -200 8 700 0,
+274.606473679744 392.304914431832 -200 8 700 0,
+274.368926337246 492.304632287734 -200 10 800 0,
+280.858860465604 592.093813840694 -200 11 900 0,
+255.256865550682 490.415019238889 -200 10 800 0,
+295.322243570216 691.042338585478 -200 12 1000 0,
+277.227040468114 299.76912520363 -200 7 600 0,
+269.556544072169 492.734578516831 -200 12 1000 0,
+257.759580997798 318.997211554962 -200 7 600 0,
+328.06801999952 576.663433487433 -200 11 900 0,
+-33.8134283841041 48.6812793761992 -200 1 100 0,
+97.7417380269323 249.946382464995 -200 4 400 0,
+425.423449116205 599.509011210619 -200 18 1000 0,
+334.292381045743 572.361984078801 -200 11 900 0,
+304.268651833544 587.730029406352 -200 11 900 0,
+231.549710776847 415.501318736993 -200 17 700 0,
+292.556189522613 791.004075990376 -200 14 1100 0,
+369.010074289644 460.008299457948 -200 11 900 0,
+357.64571175225 866.920833665592 -200 25 1200 0,
+428.097534852972 937.889422645398 -200 27 1300 0,
+432.431329484134 553.159203045656 -200 22 1000 0,
+483.137303716009 1021.37968461351 -200 28 1400 0,
+532.03467663348 544.261268642274 -200 29 1100 0,
+627.741991388646 515.276619216147 -200 31 1200 0,
+272.631075026259 399.663454880831 -200 15 700 0,
+553.199302908598 1092.73314471978 -200 30 1500 0,
+650.009646236059 1117.78823252284 -200 34 1600 0,
+749.865301662468 1112.41719171474 -200 35 1700 0,
+721.06769513076 479.355691875122 -200 32 1300 0,
+499.915393731362 1177.35480283868 -200 34 1600 0,
+408.136410213714 1087.52245423996 -200 30 1500 0,
+470.477868776885 1148.92179424255 -200 34 1600 0,
+411.697715532836 1036.53548656214 -200 28 1400 0,
+402.008167197379 956.542106513499 -200 27 1300 0,
+814.294176847864 443.178031549302 -200 37 1400 0,
+649.601729920178 1119.31456805031 -200 34 1600 0,
+295.840486063011 890.950128419848 -200 25 1200 0,
+749.99396534521 1119.5590888918 -200 35 1700 0,
+627.178712354276 513.477953896135 -200 31 1200 0,
+538.683047221327 1269.53435069439 -200 38 1700 0,
+815.546810461944 446.588379409237 -200 37 1400 0,
+719.248817485666 474.451094669509 -200 47 1300 0,
+635.132972103999 1295.94290972601 -200 48 1800 0,
+341.394873612479 965.419311060917 -200 41 1500 0,
+408.335629613071 1187.52225579791 -200 39 1600 0,
+785.563925822495 399.602538195289 -200 50 1400 0,
+476.130148451078 1029.01230486967 -200 34 1600 0,
+848.267125782154 1138.06276251988 -200 46 1800 0,
+583.562137466892 1232.15646579194 -200 38 1700 0,
+251.021308860404 700.037853202046 -200 25 1200 0,
+635.687470849116 1218.34180367013 -200 44 1700 0,
+847.336289024698 1090.06978419996 -200 36 1800 0,
+802.814324464039 419.525635696028 -200 50 1400 0,
+332.3317261688 984.054314123508 -200 45 1300 0,
+734.389710631028 1308.11253819105 -200 51 1900 0,
+931.232804387674 1193.8901408707 -200 56 1900 0,
+478.693557476205 1349.54223230689 -200 48 1800 0,
+631.826181847834 537.807162425791 -200 31 1200 0,
+808.600279155232 429.54768391362 -200 50 1400 0,
+490.387261740779 1016.11978710986 -200 28 1400 0,
+879.850877449803 355.765385507753 -200 61 1500 0,
+638.906154002027 1318.28999064099 -200 59 1800 0,
+333.109722675022 1065.07550140524 -200 52 1600 0,
+505.65617235124 1109.65604844967 -200 39 1600 0,
+399.503659826542 957.73885050702 -200 27 1300 0,
+654.832772707759 1150.28932507406 -200 46 1800 0,
+931.174698146425 1035.56179252958 -200 60 1900 0,
+689.714205106774 428.112730034669 -200 54 1500 0,
+752.035036705174 493.814074614978 -200 54 1500 0,
+719.488842878203 1242.23921277761 -200 51 1900 0,
+280.323764561279 295.503852031977 -200 7 600 0,
+844.508360930163 1080.12646034409 -200 36 1800 0,
+209.57985405973 401.456542288935 -200 13 900 0,
+255.379601123291 799.942834502036 -200 58 1300 0,
+683.249570315739 430.676632122473 -200 47 1300 0,
+717.643346909956 1044.12900001833 -200 35 1700 0,
+731.249045396175 548.535359098475 -200 66 1300 0,
+287.85868433028 990.6310736456 -200 45 1300 0,
+879.621914767158 986.49399622541 -200 80 1900 0,
+528.798006463651 526.44846423286 -200 29 1100 0,
+590.774534375157 392.61920541246 -200 83 1400 0,
+333.933431148106 964.068801984803 -200 27 1300 0,
+384.777670883482 1015.26255848717 -200 86 1400 0,
+454.200263327219 1041.45433035089 -200 73 1400 0,
+385.956643125016 1010.0421653281 -200 86 1400 0,
+677.370359561005 530.503656924885 -200 83 1400 0,
+610.899030749979 469.357118031042 -200 88 1200 0,
+636.305254117467 1218.32381976408 -200 70 1900 0,
+300.874044704076 891.48168940979 -200 86 1400 0,
+689.463604744064 1146.853233331 -200 78 2000 0,
+771.146134452422 1154.83906971595 -200 60 1900 0,
+283.186295302508 703.886664690703 -200 82 1400 0,
+870.807433812535 1163.06253673747 -200 99 2000 0,
+720.490620029377 477.521203681003 -200 47 1300 0,
+377.637095727131 827.392423556359 -200 97 1500 0,
+396.919438676593 910.64489618204 -200 93 1500 0,
+417.460394885302 1120.77589187977 -200 38 1700 0,
+347.182076391896 910.128060321229 -200 86 1400 0,
+599.157340439058 1189.64447385408 -200 38 1700 0,
+352.094446458966 465.465411549959 -200 13 900 0,
+285.976869579074 499.392226377316 -200 24 800 0,
+223.403072157213 705.193155899512 -200 82 1400 0,
+42.2127821521696 -11.3114641301004 -200 1 100 0,
+638.214581727941 1279.20252729387 -200 48 1800 0,
+580.431898100909 1236.65988292554 -200 38 1700 0,
+592.940115091343 476.916962505533 -200 94 1500 0,
+522.66264292892 516.413890809163 -200 95 1300 0,
+454.17785210842 1266.28217368866 -200 38 1700 0,
+48.2761572282506 -31.5122494486711 -200 1 100 0,
+892.371687307145 510.60352056912 -200 49 1500 0,
+536.77766645381 506.73016576601 -200 66 1300 0,
+261.563453203442 596.366372936438 -200 109 900 0,
+869.186450557063 1135.13890682063 -200 99 2000 0,
+313.715743367004 904.295354010617 -200 103 1600 0,
+238.491221369893 903.666404952764 -200 86 1400 0,
+502.152761658483 518.841376116899 -200 114 1600 0,
+474.186336371446 1345.95538372553 -200 48 1800 0,
+323.275143485503 873.360784128411 -200 82 1400 0,
+340.477279660081 1065.41510107899 -200 52 1600 0,
+928.803849798645 1026.32803512157 -200 80 1900 0,
+702.595419935073 447.80969506683 -200 47 1300 0,
+491.984084388828 941.672515098211 -200 104 1600 0,
+561.170390825462 1185.3229977353 -200 74 1900 0,
+871.129586845226 1153.01993596167 -200 99 2000 0,
+634.548145208383 1150.89125555984 -200 34 1600 0,
+724.206890336829 1078.26688549314 -200 74 1900 0,
+646.768169608372 392.640390749726 -200 114 1600 0,
+940.279628628402 422.82636432469 -200 118 1600 0,
+842.792151417831 423.759582260218 -200 118 1600 0,
+469.675512050361 613.420592955969 -200 124 1700 0,
+636.271574765292 1247.70594507691 -200 48 1800 0,
+963.797337635618 1102.75403309525 -200 121 2100 0,
+457.318088892833 875.008925847653 -200 27 1300 0,
+490.77704947895 391.909970308341 -200 89 1500 0,
+1055.98535607514 1141.50153954656 -200 140 2200 0,
+1600 1600 -200 143 2911.45820048887 1]   ;
+
+waypoint_mat = 
+[-50 -50 -200,
+-39.3869211361043 49.4352178909904 -200,
+-5.74668377066669 143.607052480729 -200,
+-2.05276552219404 243.538804031342 -200,
+97.9394251837662 242.289084933752 -200,
+197.882162904462 238.9054216981 -200,
+282.245666311618 292.597127695122 -200,
+274.606473679744 392.304914431832 -200,
+274.368926337246 492.304632287734 -200,
+280.858860465604 592.093813840694 -200,
+295.322243570216 691.042338585478 -200,
+292.556189522613 791.004075990376 -200,
+357.64571175225 866.920833665592 -200,
+428.097534852972 937.889422645398 -200,
+483.137303716009 1021.37968461351 -200,
+553.199302908598 1092.73314471978 -200,
+650.009646236059 1117.78823252284 -200,
+749.865301662468 1112.41719171474 -200,
+847.336289024698 1090.06978419996 -200,
+771.146134452422 1154.83906971595 -200,
+869.186450557063 1135.13890682063 -200,
+963.797337635618 1102.75403309525 -200,
+1055.98535607514 1141.50153954656 -200,
+1600 1600 -200]   ;
+
+waypoint_next = [-50 -50 -200]   ;
+
+waypoint_now = [1600 1600 -200]   ;
+
+waypoint_past = [1055.98535607514 1141.50153954656 -200]   ;
+
+X = 0    ;
+
+x_coor = [50]   ;
+
+x_coor2 = [900]   ;
+
+xcurpoint = 0   ;
+
+xmat = [1200 1200 1400 1400 1200]   ;
+
+xp = 1600   ;
+
+xpathmat = []   ;
+
+xrange = 544.014643924859   ;
+
+Y = 0    ;
+
+y_coor = [50]   ;
+
+y_coor2 = [38]   ;
+
+y_manager = {1, 35, r_get_path, q_past_get_path, 1, 1, 1}   ;
+
+ycurpoint = 0   ;
+
+ymat = [1200 1400 1400 1200 1200]   ;
+
+yp = 1600   ;
+
+ypathmat = []   ;
+
+yrange = 458.498460453439   ;
+
+zeta_beta = 3   ;
+
+zeta_chi = 3   ;
+
+zeta_phi = 0.707   ;
+
+zeta_theta = 5   ;
+
+zp = -200   ;
+
+zrange = 0   ;
+

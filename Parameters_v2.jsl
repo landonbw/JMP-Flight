@@ -1,0 +1,253 @@
+﻿///////////////////////////////////////////////////////////////////////////////////////////
+					//	State Params
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+//aircraftState = [0, 0, -200, 34.99979, 0, 0.1192, 0, 0, 0, 0, 0, 0];
+/*
+Pn = -50.0;
+Pe = -50.0;
+Pd = -200.0;
+u = 3.49997970e+01;
+v = -2.76273829e-05;
+w = 1.19203683e-01;
+phi = -1.52263833e-06;
+theta =  0.08;
+psi = 0.0;
+p = 0;
+q = 0;
+r = 0;
+
+Pn0 = 0.0;
+Pe0 = 0.0;
+Pd0 = -50.0;
+u0 = 3.49997970e+01;
+v0 = -2.76273829e-05;
+w0 = 1.19203683e-01;
+phi0 = -1.52263833e-06;
+theta0 =  3.40582609e-03;
+psi0 = 0.0;
+p0 = 0;
+q0 = 0;
+r0 = 0;
+
+//state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r});
+
+fx = 0.0;
+fy = 0.0;
+fz = 0.0;
+ml = 0.0;
+mm = 0.0;
+mn = 0.0;
+
+deltaA = 0.0;
+deltaE = -0.049348;
+deltaR = 0.0;
+deltaT = 0.46382;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+					//	Plane Parameters
+///////////////////////////////////////////////////////////////////////////////////////////
+mass = 13.5; //kg
+jx = 0.8244;//kg m^2
+jy = 1.135;
+jz = 1.759;
+jxz = 0.1204;
+
+S = 0.55;
+b = 2.8956;
+c = 0.18994;
+Sprop = 0.2027;
+rho = 1.2682;
+kMotor = 80;
+kTp = 0.0;
+kOmega = 0.0;
+e = 0.9;
+AR = (b^2) / S;
+
+g = 9.8;    //gravity
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   Longitudinal Coefficients
+///////////////////////////////////////////////////////////////////////////////////////////
+CL0 = 0.28;
+Cd0 = 0.03;
+Cm0 = -0.02338;
+ClAlpha = 3.45;
+CdAlpha = 0.3;
+CmAlpha = -0.38;
+Clq = 0.0;
+Cdq = 0.0;
+Cmq = -3.6;
+ClDeltae = -0.36;
+CdDeltae = 0.0;
+CmDeltae = -0.5;
+Cprop = 1.0;
+M = 50.0;
+alpha0 = 0.4712;
+epsilon = 0.1592;
+Cdp = 0.0437;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   Lateral Coefficients
+///////////////////////////////////////////////////////////////////////////////////////////
+Cy0 = 0.0;
+Cl0 = 0.0;
+Cn0 = 0.0;
+CyBeta = -0.98;
+ClBeta = -0.12;
+CnBeta = 0.25;
+CyP = 0.0;
+ClP = -0.26;
+CnP = 0.022;
+CYr = 0.0;
+Clr = 0.14;
+Cnr = -0.35;
+CyDeltaa = 0.0;
+ClDeltaa = 0.08;
+CnDeltaa = 0.06;
+CyDeltar = -0.17;
+ClDeltar = 0.105;
+CnDeltar = -0.032;
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //	Calculation Values
+///////////////////////////////////////////////////////////////////////////////////////////
+ts_simulation = 0.015;
+ts_simulation = simulation_time_step;
+num_steps = 10;
+//   gamma parameters pulled from page 36 (dynamics)
+gamma = jx * jz - (jxz^2);
+gamma1 = (jxz * (jx - jy + jz)) / gamma;
+gamma2 = (jz * (jz - jy) + (jxz^2)) / gamma;
+gamma3 = jz / gamma;
+gamma4 = jxz / gamma;
+gamma5 = (jz - jx) / jy;
+gamma6 = jxz / jy;
+gamma7 = ((jx - jy) * jx + (jxz^2)) / gamma;
+gamma8 = jx / gamma;
+
+//   C values defines on pag 62
+Cp0         = gamma3 * Cl0      + gamma4 * Cn0;
+CpBeta      = gamma3 * ClBeta   + gamma4 * CnBeta;
+CpP         = gamma3 * ClP      + gamma4 * CnP;
+CpR         = gamma3 * Clr      + gamma4 * Cnr;
+CpDeltaA    = gamma3 * ClDeltaa + gamma4 * CnDeltaa;
+CpDeltaR    = gamma3 * ClDeltar + gamma4 * CnDeltar;
+Cr0         = gamma4 * Cl0      + gamma8 * Cn0;
+CrBeta      = gamma4 * ClBeta   + gamma8 * CnBeta;
+CrP         = gamma4 * ClP      + gamma8 * CnP;
+CrR         = gamma4 * Clr      + gamma8 * Cnr;
+CrDeltaA    = gamma4 * ClDeltaa + gamma8 * CnDeltaa;
+CrDeltaR    = gamma4 * ClDeltar + gamma8 * CnDeltar;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //	Control Values
+///////////////////////////////////////////////////////////////////////////////////////////
+
+// ts_control = 0.1
+ts_control = ts_simulation * 2.0;
+sigma = 0.05; // low pass filter gain for derivative
+
+// Initial path following values
+Va0 = sqrt(u0^2 + v0^2 + w0^2); //m/s
+altitude0 = -Pd0;
+heading0 = psi0;
+beta0 = 0.0;
+path_angle0 = 0.0;
+
+//////////// Lateral transfer function vales
+// Roll control values
+e_phi_max = 40 * 3.14159/180;
+delta_a_max = 30 * 3.14159/180; // dashboard connection
+delta_a_max = maximum_aileron_angle * 3.14159/180;
+a_phi1 = -0.5 * rho * Va0^2 * S * b * CpP * b / (2 * Va0);
+a_phi2 = 0.5 * rho * Va0^2 * S * b * CpDeltaA;
+zeta_phi = 0.707;
+omega_n_phi = sqrt(abs(a_phi2) * (delta_a_max / e_phi_max));
+kp_roll = delta_a_max / (e_phi_max) * 0.37;
+kd_roll = (2. * zeta_phi * omega_n_phi - a_phi1) / a_phi2 * 4.0;
+kd_roll = derivative_gain_on_roll; // dashboard connection
+
+// Course control values
+phi_max = 20 * 3.14159/180; // dashboard connection ??? 
+phi_max =  maximum_commanded_roll * 3.14159/180; // dashboard connection
+course_bandwidth_separation = 36.0; 
+omega_n_chi = omega_n_phi / course_bandwidth_separation;
+zeta_chi = 3.0;
+kp_chi = 0.8 * zeta_chi * omega_n_chi * Va0 / g;
+kp_chi = proportional_gain_on_course;  // dashboard connection
+//kp_chi = kp_roll;
+//show(kp_chi);
+kd_chi = 0.0;
+kd_chi = derivative_gain_on_course;  // dashboard connection
+ki_chi = omega_n_chi^2 * Va0 / g * 0.6;
+ki_chi =  integral_gain_on_course; // dashboard connection
+
+
+// Sideslip control values
+delta_r_max = 30 * 3.14159/180; // dashboard connection 
+delta_r_max = maximum_rudder_angle * 3.14159/180; // dashboard connection  
+e_beta_max = 60 * 3.14159/180;
+zeta_beta = 3.0;
+a_beta1 = -rho * Va0 * S * CyBeta / (2.0 * mass);
+a_beta2 = rho * Va0 * S * CyDeltar / (2.0 * mass);
+kp_beta = delta_r_max / e_beta_max / 5;
+kp_beta =  proportional_gain_on_sideslip; 
+ki_beta = (1 / a_beta2) * ((a_beta1 + a_beta2 * kp_beta) / (2.0 * zeta_beta))^2 * 5;
+ki_beta = integral_gain_on_sideslip;
+
+
+////////// Longitudinal transfer function values
+h_error_max = 10.0;
+h_error_max = Height_error_saturation_value;
+// energy balance control values
+theta_max = 25* 3.14159/180;// dashboard connection ??? 
+theta_max =maximum_commanded_theta;
+kp_bal = 0.0001;// dashboard connection ??? 
+kp_bal = proportional_gain_on_energy_balance;
+ki_bal = 0.00006;// dashboard connection ??? 
+ki_bal = integral_gain_on_energy_balance;
+
+
+
+// Pitch control values
+delta_e_max = 30 * 3.14159/180; // dashboard connection ??? 
+delta_e_max = maximum_commanded_pitch_value;
+e_theta_max = 30 * 3.14159/180; // dashboard connection ??? 
+
+a_theta1 = -rho * Va0^2 * c^2 * S * Cmq / (4.0 * jy * Va0);
+a_theta2 = -rho * Va0^2 * c * S * CmAlpha / (2.0 * jy);
+a_theta3 = rho * Va0^2 * c * S * CmDeltae / (2.0 * jy);
+// kp_theta = delta_e_max / e_theta_max * 0.80
+kp_theta = delta_e_max / e_theta_max * 0.8;
+kp_theta =  proportional_gain_on_pitch;
+omega_n_theta = sqrt(a_theta2 + (delta_e_max / e_theta_max) * abs(a_theta3));
+zeta_theta = 5.0;
+kd_theta = (2 * zeta_theta * omega_n_theta - a_theta1) / a_theta3 / 30;
+kd_theta = derivative_gain_on_pitch;
+
+// Throttle control values
+delta_t_max = 1.0; // dashboard connection ??? 
+delta_t_max = maximum_allowable_throttle;
+kp_throttle = 0.003; // dashboard connection ??? 
+kp_throttle = proportional_gain_on_throttle;
+ki_throttle = 0.0001; // dashboard connection ??? 
+ki_throttle = integral_gain_on_throttle;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //	Path Follower Parameters
+///////////////////////////////////////////////////////////////////////////////////////////
+chi_inf = 80 * 3.14159 / 180; // dashboard connection ??? 
+chi_inf = maximum_path_approach_angle * 3.14159 / 180; // dashboard connection ??? 
+k_path = 0.005; // dashboard connection ??? 
+k_path = path_transition_rate_for_line;
+k_orbit = 2; // dashboard connection ??? 
+k_orbit = path_transition_rate_for_orbit;
+t_rad = 175; // dashboard connection ??? 
+t_rad = orbit_radius;
+//step_size = 3 * t_rad;
+
+print("Parameters runned.");
+

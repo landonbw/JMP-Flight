@@ -5,8 +5,10 @@ Clear Log();
 Random Reset( 1 );
 
 dir = Get Default Directory();
+planescale = 1;
 
 Include("toyplane_integrated.jsl");
+Include("SavingFullContent.jsl");
 
 waypoint_mat = [0 0 0];
 
@@ -18,6 +20,112 @@ xcurpoint = 0;
 ycurpoint = 0;
 
 endpointgoal = 5*(200+40)+200+100;
+
+
+Pn = -50.0;
+Pe = -50.0;
+Pd = -200.0;
+u = 3.49997970e+01;
+v = -2.76273829e-05;
+w = 1.19203683e-01;
+phi = -1.52263833e-06;
+theta =  0.08;
+psi = 0.0;
+p = 0;
+q = 0;
+r = 0;
+
+Pn0 = 0.0;
+Pe0 = 0.0;
+Pd0 = -50.0;
+u0 = 3.49997970e+01;
+v0 = -2.76273829e-05;
+w0 = 1.19203683e-01;
+phi0 = -1.52263833e-06;
+theta0 =  3.40582609e-03;
+psi0 = 0.0;
+p0 = 0;
+q0 = 0;
+r0 = 0;
+
+//state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r});
+
+fx = 0.0;
+fy = 0.0;
+fz = 0.0;
+ml = 0.0;
+mm = 0.0;
+mn = 0.0;
+
+deltaA = 0.0;
+deltaE = -0.049348;
+deltaR = 0.0;
+deltaT = 0.46382;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+					//	Plane Parameters
+///////////////////////////////////////////////////////////////////////////////////////////
+mass = 13.5; //kg
+jx = 0.8244;//kg m^2
+jy = 1.135;
+jz = 1.759;
+jxz = 0.1204;
+
+S = 0.55;
+b = 2.8956;
+c = 0.18994;
+Sprop = 0.2027;
+rho = 1.2682;
+kMotor = 80;
+kTp = 0.0;
+kOmega = 0.0;
+e = 0.9;
+AR = (b^2) / S;
+
+g = 9.8;    //gravity
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   Longitudinal Coefficients
+///////////////////////////////////////////////////////////////////////////////////////////
+CL0 = 0.28;
+Cd0 = 0.03;
+Cm0 = -0.02338;
+ClAlpha = 3.45;
+CdAlpha = 0.3;
+CmAlpha = -0.38;
+Clq = 0.0;
+Cdq = 0.0;
+Cmq = -3.6;
+ClDeltae = -0.36;
+CdDeltae = 0.0;
+CmDeltae = -0.5;
+Cprop = 1.0;
+M = 50.0;
+alpha0 = 0.4712;
+epsilon = 0.1592;
+Cdp = 0.0437;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+                //   Lateral Coefficients
+///////////////////////////////////////////////////////////////////////////////////////////
+Cy0 = 0.0;
+Cl0 = 0.0;
+Cn0 = 0.0;
+CyBeta = -0.98;
+ClBeta = -0.12;
+CnBeta = 0.25;
+CyP = 0.0;
+ClP = -0.26;
+CnP = 0.022;
+CYr = 0.0;
+Clr = 0.14;
+Cnr = -0.35;
+CyDeltaa = 0.0;
+ClDeltaa = 0.08;
+CnDeltaa = 0.06;
+CyDeltar = -0.17;
+ClDeltar = 0.105;
+CnDeltar = -0.032;
 
 //dt = open("plane_sim_test.jmp");
 
@@ -128,7 +236,7 @@ Height_error_saturation_value = 10; //_(5-100)
 
 maximum_commanded_theta = 30; //deg_(10-60)
 proportional_gain_on_energy_balance = 0.0001; //_(0.0_-_0.001)
-derivative_gain_on_energy_balance = 0.00006; //_(0.0_-_0.0001)
+integral_gain_on_energy_balance = 0.00006; //_(0.0_-_0.0001)
 
 maximum_commanded_pitch_value = 30; //deg_(10-60)
 proportional_gain_on_pitch = 4.8; //_(2-6)
@@ -140,7 +248,7 @@ integral_gain_on_throttle = 0.0001; //_(0-0.001)
 
 
 maximum_path_approach_angle = 80; //_deg_(10-90)
-path_transition_rate_for_line = 0.05; //_(0_-_1)
+path_transition_rate_for_line = 0.005; //_(0_-_1)
 path_transition_rate_for_orbit = 2; //_(0-3)
 orbit_radius = 275; //_(200-300)
 
@@ -148,7 +256,7 @@ orbit_radius = 275; //_(200-300)
 step_size = 100; //_(500-1200)
 
 
-simulation_time_step = 0.01; //_(0.0001_-_0.1)
+simulation_time_step = 0.015; //_(0.0001_-_0.1)
 animation_time_step = 10;
 
 
@@ -201,7 +309,7 @@ nw = new window("UAV Flight City",
 				),
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Number of Streets" )),
-				sb = Slider Box( 2, 20, NumberStreets, NumberStreets = round(NumberStreets); update_birdseye; myscript )
+				sb = Slider Box( 2, 20, NumberStreets, NumberStreets = round(NumberStreets); numi = NumberStreets; numj = NumberStreets;  update_birdseye; myscript )
 				),
 			H List Box(
 				vlistbox(spacerbox(Size(200,0),Color("red")),Text Box( "Street Gap" )),
@@ -269,7 +377,7 @@ nw = new window("UAV Flight City",
 			),
 					H List Box(
 						vlistbox(spacerbox(Size(250,0),Color("red")),Text Box( "Derivative Gain On Energy Balance" )),
-				sb = Slider Box( 0, 0.0001, derivative_gain_on_energy_balance,  tempemptyfunction; myscript )
+				sb = Slider Box( 0, 0.0001, integral_gain_on_energy_balance,  tempemptyfunction; myscript )
 			),
 			Textbox(" Pitch Control Values", set font style("bold"), font color("blue")),
 					H List Box(
@@ -334,7 +442,11 @@ nw = new window("UAV Flight City",
 			),
 			H List Box(
 			vlistbox(spacerbox(Size(250,0),Color("red")), Text Box( "Animation Time Step" )),
-				sb = Slider Box( 1, 1000, animation_time_step,  tempemptyfunction; myscriptnobuildings )
+				sb = Slider Box( 1, 50, animation_time_step,  tempemptyfunction; )
+			),
+			H List Box(
+			vlistbox(spacerbox(Size(250,0),Color("red")), Text Box( "UAV Size" )),
+				sb = Slider Box( 1, 2, planescale,  Include(dir || "toyplane_integrated.jsl"); tempemptyfunction; )
 			),
 			)
 
@@ -351,8 +463,8 @@ nw = new window("UAV Flight City",
 			
 		),
 		ob_test2 = outlinebox("Simulation",
-		Hlistbox(textbox("x"), sliderbox(300,1000, scenex, updatescenesize;myscriptnobuildings;), 
-		textbox("   y"), sliderbox(300,1000, sceney, updatescenesize;myscriptnobuildings;)), 
+		Hlistbox(textbox("x"), sliderbox(300,1000, scenex, updatescenesize; myscriptnobuildings; addingpathandplane ), 
+		textbox("   y"), sliderbox(300,1000, sceney, updatescenesize; myscriptnobuildings; addingpathandplane )), 
 		vlbscene = vlistbox(
 			scene = SceneBox(800,800),
 			),
@@ -366,6 +478,22 @@ nw = new window("UAV Flight City",
 			hlistbox(textbox("Center Point X"), sb_centerpoint_x = sliderbox(-500,500,centerpoint_x_val,myscriptnobuildings;)),
 			hlistbox(textbox("Center Point Y"), sb_centerpoint_y = sliderbox(-500,500,centerpoint_y_val,myscriptnobuildings;)),
 			hlistbox(textbox("Center Point Z"), sb_centerpoint_z = sliderbox(0,500,centerpoint_z_val,myscriptnobuildings;)),
+			buttonbox("Default View",
+				angleperspective = 95;
+				nearperspective = 1;
+				farperspective = 8000;
+
+				lookat_x_val = -170;
+				lookat_y_val = -170;
+				lookat_z_val = 760;
+			
+				centerpoint_x_val = 244.6593916;
+				centerpoint_y_val = 232.27834765;
+				centerpoint_z_val = 73.86;
+			
+			
+				myscriptnobuildings;
+			)
 			),
 			
 			
@@ -404,6 +532,8 @@ nw = new window("UAV Flight City",
 					centerpoint_x_val = lookat_x_val + 100;
 					centerpoint_y_val = lookat_y_val + 100;
 					myscriptnobuildings;
+					//addingpathandplane;
+					
 				);
 				pencolor("Green");
 				pen size(2);
@@ -411,6 +541,7 @@ nw = new window("UAV Flight City",
 				
 				marker({xcurpoint,ycurpoint});
 			),
+			outlinebox("RRT Figure",
 			gb3 = graphbox(
 				Frame Size( 200, 200 ),
 				xname("North"),
@@ -418,9 +549,10 @@ nw = new window("UAV Flight City",
 				xscale(-60,1000),
 				yscale(-60,1000),
 				
-				Transparency(0.5);
-				pencolor("blue");
+				//Transparency(0.5);
+				//pencolor("blue");
 
+			),
 			),
 			outlinebox("View Height Position",
 			gb2 = graphbox(
@@ -445,8 +577,126 @@ nw = new window("UAV Flight City",
 			),
 			<< close(1)
 			),
+			hlistbox(
+			buttonbox("Calculate Flight Path", 
 			
-			buttonbox("Calculate Flight Path", Include(dir || "FlightSimMain.jsl")),
+				Pn = -50.0;
+				Pe = -50.0;
+				Pd = -200.0;
+				u = 3.49997970e+01;
+				v = -2.76273829e-05;
+				w = 1.19203683e-01;
+				phi = -1.52263833e-06;
+				theta =  0.08;
+				psi = 0.0;
+				p = 0;
+				q = 0;
+				r = 0;
+
+				Pn0 = 0.0;
+				Pe0 = 0.0;
+				Pd0 = -50.0;
+				u0 = 3.49997970e+01;
+				v0 = -2.76273829e-05;
+				w0 = 1.19203683e-01;
+				phi0 = -1.52263833e-06;
+				theta0 =  3.40582609e-03;
+				psi0 = 0.0;
+				p0 = 0;
+				q0 = 0;
+				r0 = 0;
+
+				//state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r});
+
+				fx = 0.0;
+				fy = 0.0;
+				fz = 0.0;
+				ml = 0.0;
+				mm = 0.0;
+				mn = 0.0;
+
+				deltaA = 0.0;
+				deltaE = -0.049348;
+				deltaR = 0.0;
+				deltaT = 0.46382;
+			
+			
+			
+			Include(dir || "FlightSimMain.jsl")),
+			Buttonbox("Calculate Node Points",
+			
+			
+				Pn = -50.0;
+				Pe = -50.0;
+				Pd = -200.0;
+				u = 3.49997970e+01;
+				v = -2.76273829e-05;
+				w = 1.19203683e-01;
+				phi = -1.52263833e-06;
+				theta =  0.08;
+				psi = 0.0;
+				p = 0;
+				q = 0;
+				r = 0;
+
+				Pn0 = 0.0;
+				Pe0 = 0.0;
+				Pd0 = -50.0;
+				u0 = 3.49997970e+01;
+				v0 = -2.76273829e-05;
+				w0 = 1.19203683e-01;
+				phi0 = -1.52263833e-06;
+				theta0 =  3.40582609e-03;
+				psi0 = 0.0;
+				p0 = 0;
+				q0 = 0;
+				r0 = 0;
+
+				//state = matrix({Pn, Pe, Pd, u, v, w, phi, theta, psi, p, q, r});
+
+				fx = 0.0;
+				fy = 0.0;
+				fz = 0.0;
+				ml = 0.0;
+				mm = 0.0;
+				mn = 0.0;
+
+				deltaA = 0.0;
+				deltaE = -0.049348;
+				deltaR = 0.0;
+				deltaT = 0.46382;
+			
+			
+			
+				Include(dir || "CalcNodesOnly.jsl");
+				
+				north = waypoint_mat[0,1];
+				east = waypoint_mat[0,2];
+				down = waypoint_mat[0,3];
+				
+				ppath = Scene Display List( 1 );
+				ppath << Color( 0, 0.9, 0 );
+				ppath << LineWidth(5);
+				ppath << Begin( LINE_STRIP );
+
+				for(i=1, i<=nrow(north), i++,
+
+					ppath<<Vertex(north[i], east[i], -down[i],);
+
+				);
+
+				ppath<<End();
+				
+				
+				
+				addingpathandplane;
+				
+				
+			)
+			),
+			
+			
+			
 /*			buttonbox("Extract Flight Path",
 				
 				dttemp = data table("plane_sim.jmp");
@@ -470,36 +720,48 @@ nw = new window("UAV Flight City",
 				
 				print("Path extracted");
 			),*/
-			Buttonbox("Show Flight Path", 
-			
-				//dttemp = data table("plane_sim.jmp");
-				
-				dtmat =  dttemp << Get as Matrix();
+			hlistbox(
+				Buttonbox("Show Flight Path", 
 
-				north = dtmat[0,2];
-				east = dtmat[0,3];
-				down = dtmat[0,4];
+				Try(gb3[framebox(1)] << Remove Graphics Script( 2 ));
+				Try(gb3[framebox(1)] << Remove Graphics Script( 1 ));
 
-				a_phi = dtmat[0,8];
-				a_theta = dtmat[0,9];
-				a_psi = dtmat[0,10];
-				
-				xpathmat = north;
-				ypathmat = east;
-				
-				gb1[framebox(1)] << reshow;
-				
-				show(waypoint_mat);
-				
-				print("Path extracted");
-			
-				addingpathandplane;
+					lb_old_runs<< Clear Selection;
+					if(Is Empty(dttemp),
+						dttemp = data table("plane_sim.jmp");
+					);
+					//dttemp = data table("plane_sim.jmp");
 					
-				),
+					dtmat =  dttemp << Get as Matrix();
+
+					north = dtmat[0,2];
+					east = dtmat[0,3];
+					down = dtmat[0,4];
+
+					a_phi = dtmat[0,8];
+					a_theta = dtmat[0,9];
+					a_psi = dtmat[0,10];
+					
+					xpathmat = north;
+					ypathmat = east;
+					
+					gb1[framebox(1)] << reshow;
+					
+					show(waypoint_mat);
+					
+					print("Path extracted");
+				
+					addingpathandplane;
+					update_birdseye;
+						
+					),
+				Buttonbox("Save Flight Path", savecurrentFP),
+			),
 			Buttonbox("Show RRT", 
 				//waypoint_list
 				//dttest = Current Data table();
-
+				Try(gb3[framebox(1)] << Remove Graphics Script( 2 ));
+				Try(gb3[framebox(1)] << Remove Graphics Script( 1 ));
 
 
 				str = "gb3[framebox(1)] << Add Graphics Script(
@@ -519,9 +781,9 @@ nw = new window("UAV Flight City",
 				gb3[axisbox(1)] << Max( numi*(blockdim_x+StreetGap)+10 );
 				gb3[axisbox(2)] << Max( numj*(blockdim_y+StreetGap)+10 );
 				
-				gb3[framebox(1)] << Add graphics script(
-					pencolor("black");
-				);
+				//gb3[framebox(1)] << Add graphics script(
+				//	pencolor("black");
+				//);
 
 
 				mattest = waypoint_list; //dttest << get as matrix;
@@ -529,24 +791,42 @@ nw = new window("UAV Flight City",
 				//gb3[axisbox(1)] << max(max(mattest[0,1]));
 				//gb3[axisbox(2)] << max(max(mattest[0,1]));
 
+				str2 = "gb3[framebox(1)] << Add Graphics Script(
+					pencolor(\!"black\!");";
 				for(b = 2, b<=nrows(mattest), b++,
-						temp = eval expr(
-						gb3[framebox(1)] << Add graphics script(
-							line({mattest[expr(b),1],mattest[expr(b),2]},{mattest[mattest[expr(b),4],1],mattest[mattest[expr(b),4],2]})
-						);
+							str2 = str2 || "line({mattest["|| char(b) || ",1],mattest["|| char(b) || ",2]},{mattest[mattest["|| char(b) || ",4],1],mattest[mattest["|| char(b) || ",4],2]});\!n";
 					);
-					eval(temp);
-				);
+					str2 = str2 || ");";
+					str2parsed = parse(str2);
+					eval(str2parsed);
 				
 			),
 			
-			buttonbox("Animate", simulatebutton;),
+			hlistbox(buttonbox("Animate", simulatebutton;),buttonbox("Stop Animate", ii=nrow(north);)),
 			//buttonbox("Simulate One Step", simulate_onestep;),
 			//buttonbox("Simulate 10 Steps", simulate_tenstep;),
+			lb_old_runs = Listbox({}, nlines(10))
 		)
 	)
 );
 nw << move window(1,1);
+
+stringforoldruns = Load Text File("pastruns.txt"); //pastrunsvec
+eval(parse(stringforoldruns));
+
+for(i=1,i<=nrows(pastrunsvec),i++,
+	lb_old_runs << append(char(pastrunsvec[i]))
+);
+lb_old_runs << Set Script( 
+
+	timestringlist = lb_old_runs << Get Selected;
+	timestring = timestringlist[1];
+	tempstr = Load Text File(dir || "otherstuff_mat_" || char(timestring) || ".txt");
+	eval(parse(tempstr));
+	dttemp = Open(dir || "plane_sim_" || char(timestring) || ".jmp", invisible);
+	
+);
+
 
 tempemptyfunction = function({},
 	a = 9;
@@ -561,8 +841,8 @@ updatescenesize = function({},
 
 update_birdseye = function({},
 	
-	numj = NumberStreets;
-	numi = NumberStreets;
+	//numj = NumberStreets;
+	//numi = NumberStreets;
 	
 	Try(gb1[framebox(1)] << Remove Graphics Script( 2 ));
 	Try(gb1[framebox(1)] << Remove Graphics Script( 1 ));
@@ -621,16 +901,17 @@ makethewaypoints_expr = expr(
 
 	waypath = Scene Display List( 1 );
   
-  waypath << Point Size (10);
+  //waypath << Point Size (10);
 	//waypath << Begin( POINTS );
 	waypath << Color( 1, 0.7, 0.0 );
+	waypath << Quadric Draw Style(Line);
 	//ppath << Color( 0, 0.9, 0 );
 	
 	for(i=1, i<=nrows(waypoint_mat), i++,
 
 		waypath << Push Matrix;
 		waypath << Translate(waypoint_mat[i,1], waypoint_mat[i,2], -waypoint_mat[i,3]);
-		waypath << Sphere( 7, 15, 15);
+		waypath << Sphere( 3, 10, 10);
 		waypath << pop Matrix;
 
 		//waypath<<Vertex(waypoint_mat[i,1], waypoint_mat[i,2], -waypoint_mat[i,3]);
@@ -755,12 +1036,23 @@ myscriptnobuildings = expr(
 		scene << Color(0.1, .1, .1 );
 		scene << Call list(box);
 		//scene << arcball(box,100);
+		
+		print("scene updated");
 		scene << Update;
+		
 );
 
 
 myscript = expr(
 
+	xpathmat = [];
+	ypathmat = [];
+
+	Try(gb3[framebox(1)] << Remove Graphics Script( 2 ));
+	Try(gb3[framebox(1)] << Remove Graphics Script( 1 ));
+
+	gb1 << Reshow;
+	gb3 << Reshow;
 
 
 	if(cb << Get( 1 ),
@@ -860,7 +1152,7 @@ addingpathandplane = function({},
 	//scene << arcball(ppath,100);
 	//box << popmatrix;
 	
-	scene << arcball(box,100);
+	scene << arcball(box,1000);
 	
 	scene << Update;
 	print("addingpathandplane run.")
@@ -903,7 +1195,9 @@ for(ii=1, ii<nrow(north), ii=ii+animation_time_step,
 	//scene << Translate( translateto_x_val, translateto_y_val, translateto_z_val );
 	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
 	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
-	scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	
+	//scene <<Look At( /*eye*/ lookat_x_val,lookat_y_val,lookat_z_val, /*center*/ centerpoint_x_val,centerpoint_y_val,centerpoint_z_val, /*up*/ 0,0,1 );
+	scene <<Look At( /*eye*/ north[ii-10]-20,east[ii-10]-20,-down[ii-10]+5, /*center*/ north[ii],east[ii], -down[ii], /*up*/ 0,0,1 );
 
 
 	box << clear;
@@ -919,7 +1213,7 @@ for(ii=1, ii<nrow(north), ii=ii+animation_time_step,
 	
 	box << Call list(ppath);
 
-	scene << arcball(box,100);
+	scene << arcball(box,1000);
 		
 	plane << clear;
 	drawtheairplane_expr;
@@ -1005,7 +1299,7 @@ ii = ii+1;
 	
 	box << Call list(ppath);
 
-	scene << arcball(box,100);
+	scene << arcball(box,1000);
 		
 	plane << clear;
 	drawtheairplane_expr;
@@ -1086,7 +1380,7 @@ ii = ii+10;
 	
 	box << Call list(ppath);
 
-	scene << arcball(box,100);
+	scene << arcball(box,1000);
 		
 	plane << clear;
 	drawtheairplane_expr;

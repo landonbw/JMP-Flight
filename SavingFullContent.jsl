@@ -1,0 +1,62 @@
+
+
+savecurrentFP = function({},
+
+	timestring = Today();
+	dttemp = data table("plane_sim.jmp");
+	dttemp << Set Name("plane_sim_" || char(timestring) || ".jmp");
+	dttemp << save(dir || (dttemp << get name()) || ".jmp");
+	
+	otherstuff_str = "";
+	
+	otherstuff_str = otherstuff_str ||  "waypoint_mat = " || char(waypoint_mat);
+	otherstuff_str = otherstuff_str || ";\!n\!n";
+
+	otherstuff_str = otherstuff_str ||  "numi = " || char(numi);
+	otherstuff_str = otherstuff_str || ";\!n\!n";	
+	
+	otherstuff_str = otherstuff_str ||  "numj = " || char(numj);
+	otherstuff_str = otherstuff_str || ";\!n\!n";
+	
+	otherstuff_str = otherstuff_str ||  "listofblockdims_z = " || char(listofblockdims_z);
+	otherstuff_str = otherstuff_str || ";\!n\!n";
+	
+	otherstuff_str = otherstuff_str ||  "listofpeakdims = " || char(listofpeakdims);
+	otherstuff_str = otherstuff_str || ";\!n\!n";	
+	
+	otherstuff_str = otherstuff_str ||  "StreetGap = " || char(StreetGap);
+	otherstuff_str = otherstuff_str || ";\!n\!n";	
+	
+	otherstuff_str = otherstuff_str ||  "waypoint_list = " || char(waypoint_list);
+	otherstuff_str = otherstuff_str || ";\!n\!n";
+	
+	Save Text File(dir || "otherstuff_mat_" || char(timestring) || ".txt", otherstuff_str);
+
+	lb_old_runs << append(char(timestring));
+
+	pastrunsvec = pastrunsvec |/ timestring;
+	
+	pastrunsvec_str = "pastrunsvec = " || char(pastrunsvec);
+	pastrunsvec_str = pastrunsvec_str || ";\!n\!n";
+	
+	Save Text File(dir || "pastruns.txt", pastrunsvec_str);
+
+);
+
+
+if(0,
+	timestring = 3591099239;
+	tempstr = Load Text File(dir || "otherstuff_mat_" || char(timestring) || ".txt");
+	eval(parse(tempstr));
+	dttemp = Open("plane_sim_" || char(timestring) || ".jmp", invisible);
+
+	timestring = 3591099879;
+	tempstr = Load Text File(dir || "otherstuff_mat_" || char(timestring) || ".txt");
+	eval(parse(tempstr));
+	dttemp = Open("plane_sim_" || char(timestring) || ".jmp", invisible);
+
+	timestring = 3591114707;
+	tempstr = Load Text File(dir || "otherstuff_mat_" || char(timestring) || ".txt");
+	eval(parse(tempstr));
+	dttemp = Open("plane_sim_" || char(timestring) || ".jmp", invisible);
+);

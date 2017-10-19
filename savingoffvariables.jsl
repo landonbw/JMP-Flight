@@ -1,0 +1,79 @@
+temp345 = Window("Watch");
+temp345 << Bring Window To Front;
+wer = temp345 << child();
+wer2 = wer << child();
+wer3 = wer2 << child();
+savingstr = "";
+
+for(i=0,i<550,i++,
+
+sometext = wer3 << Get Text ();
+savingstr = savingstr || sometext || ";";
+savingstr = savingstr || "\!n\!n";
+
+wer3 = wer3 << sib();
+//wer4 << Show Tree Structure;
+
+);
+
+savingstr = Substitute(savingstr, "\!nX =", "\!nX = 0", );
+savingstr = Substitute(savingstr, "\!nY =", "\!nY = 0", );
+
+Save Text File("tempfile.txt",savingstr);
+
+
+anotherstr = Load Text File("tempfile.txt");
+if(0,
+  anotherstr = Substitute(anotherstr, "a","");
+);
+anotherstr = Substitute(anotherstr, "cb = DisplayBox[CheckBoxBox]   ;","");
+isitinside = Contains(anotherstr, "drawtheairplane_expr = plane = Scene Display List( 1 );
+plane << Color( 1, 0, 0 );
+plane << pushmatrix;
+plane << call list( nose );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( tail );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( body1 );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( body2 );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( leftwingtip );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( rightwingtip );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( leftwing );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( rightwing );
+plane << popmatrix;
+plane << pushmatrix;
+plane << translate( 2, 0, -0.5 );
+plane << Rotate( angleflap, 1, 0, 0 );
+plane << call list( leftflap );
+plane << popmatrix;
+plane << pushmatrix;
+plane << translate( -2, 0, -0.5 );
+plane << Rotate( angleflap, 1, 0, 0 );
+plane << call list( rightflap );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( tailwing );
+plane << popmatrix;
+plane << pushmatrix;
+plane << translate( 0, 0, -4.5 );
+plane << Rotate( anglerudder, 0, 1, 0 );
+plane << call list( rudder );
+plane << popmatrix;
+plane << pushmatrix;
+plane << call list( cockpit );
+plane << popmatrix;   ;");
+
+eval(parse(anotherstr));
+clear globals();
